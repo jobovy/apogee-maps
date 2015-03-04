@@ -64,6 +64,26 @@ def healpixelate(dist,densprofile,params=None,nside=512,nest=True):
     return densprofile(phi,numpy.pi/2.-theta,dist*numpy.ones(npix),glon=True,
                        params=params)   
 
+def powspec(dist,densprofile,params=None,nside=512):
+    """
+    NAME:
+       powspec
+    PURPOSE:
+       calculate the angular power spectrum of a density profile at a given distance
+    INPUT:
+       dist - distance in kpc
+       densprofile - density profile function from this module
+       params= parameter array of the density profile
+       nside= (512) HEALPIX nside
+    OUTPUT:
+       (l,C_l)
+    HISTORY:
+       2015-03-04 - Written - Bovy (IAS)
+    """
+    dmap= healpixelate(dist,densprofile,params=params,nside=nside,nest=False)
+    cl= healpy.sphtfunc.anafast(dmap,pol=False)
+    return (numpy.arange(len(cl)),cl)
+
 ############################### DENSITY PROFILES ##############################
 @scalarDecorator
 @glonDecorator
