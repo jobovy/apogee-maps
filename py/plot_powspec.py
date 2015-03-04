@@ -43,6 +43,9 @@ def plot_powspec(dist,basename,plotname):
         green15cr= healpy.sphtfunc.anafast(green15map,map2=densmap,pol=False)
         green15mcl= healpy.sphtfunc.anafast(green15mask,pol=False)
         green15mcr= healpy.sphtfunc.anafast(green15mask,map2=densmap,pol=False)
+        # Save
+        save_pickles(green15name,ell,green15cl,green15cr,
+                     green15mcl,green15mcr)
         # Now work on the samples
         nsamples= 20
         samplescl= numpy.empty((nsamples,len(green15cl)))
@@ -50,7 +53,7 @@ def plot_powspec(dist,basename,plotname):
         samplesmcl= numpy.empty((nsamples,len(green15cl)))
         samplesmcr= numpy.empty((nsamples,len(green15cl)))
         for samplenum in range(nsamples):
-            print "Working on sample %i / %i ..." (samplenum+1,nsamples)
+            print "Working on sample %i / %i ..." % (samplenum+1,nsamples)
             green15maps= dust.load_green15(dist,nest=False,nside_out=_NSIDE,
                                            samples=True,samplenum=samplenum)
             green15masks= ((green15maps > (_HMIN-H0))\
@@ -65,10 +68,10 @@ def plot_powspec(dist,basename,plotname):
             samplesmcr[samplenum]= healpy.sphtfunc.anafast(green15masks,
                                                            map2=densmap,
                                                            pol=False)
-        # Save
-        save_pickles(green15name,ell,green15cl,green15cr,
-                     green15mcl,green15mcr,
-                     samplescl,samplescr,samplesmcl,samplesmcr)
+            # Save, here in case it crashes after a few samples
+            save_pickles(green15name,ell,green15cl,green15cr,
+                         green15mcl,green15mcr,
+                         samplescl,samplescr,samplesmcl,samplesmcr)
     else:
         with open(green15name,'rb') as savefile:
             ell= pickle.load(savefile)
