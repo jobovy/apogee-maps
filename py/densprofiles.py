@@ -7,6 +7,7 @@ from galpy.util import bovy_coords
 _R0= 8.
 _Zsun= 0.025
 
+# Input decorators
 def glonDecorator(func):
     """Decorator to convert input in (l/rad,b/rad,D/kpc) to (R,z,phi)"""
     @wraps(func)
@@ -39,6 +40,7 @@ def scalarDecorator(func):
             return result
     return scalar_wrapper
 
+############################### DENSITY PROFILES ##############################
 @scalarDecorator
 @glonDecorator
 def expdisk(R,phi,z,glon=False,
