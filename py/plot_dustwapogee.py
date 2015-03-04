@@ -5,6 +5,8 @@
 import sys
 import numpy
 import healpy
+import matplotlib
+matplotlib.use('Agg')
 from galpy.util import bovy_plot
 import apogee.select.apogeeSelect
 import dust
