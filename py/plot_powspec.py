@@ -21,7 +21,7 @@ def plot_powspec(dist,basename,plotname):
     # Density
     densname= basename+'_D%.1f_denscl.sav' % dist
     if not os.path.exists(densname):
-        densmap= densprofiles.healpixelate(dist,densprofiles.expdist,
+        densmap= densprofiles.healpixelate(dist,densprofiles.expdisk,
                                            [1./3.,1./0.3],nside=_NSIDE,
                                            nest=False)
         denscl= healpy.sphtfunc.anafast(densmap,pol=False)
@@ -83,6 +83,6 @@ def plot_powspec(dist,basename,plotname):
     return None
 
 if __name__ == '__main__':
-    plot_powspec(sys.argv[1], # distance
+    plot_powspec(float(sys.argv[1]), # distance
                  sys.argv[2], # basename of pickles
                  sys.argv[3]) # plotfilename
