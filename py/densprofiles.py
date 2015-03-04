@@ -81,7 +81,7 @@ def powspec(dist,densprofile,params=None,nside=512):
        2015-03-04 - Written - Bovy (IAS)
     """
     dmap= healpixelate(dist,densprofile,params=params,nside=nside,nest=False)
-    cl= healpy.sphtfunc.anafast(dmap,pol=False)
+    cl= healpy.sphtfunc.anafast(dmap-numpy.mean(dmap),pol=False)
     return (numpy.arange(len(cl)),cl)
 
 ############################### DENSITY PROFILES ##############################
