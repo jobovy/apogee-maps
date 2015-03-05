@@ -58,7 +58,7 @@ def plot_powspec(dist,basename,plotname,plane=False):
                 samplescr= pickle.load(savefile)
                 samplesmcl= pickle.load(savefile)
                 samplesmcr= pickle.load(savefile)
-                samplesstart= 1
+                samplesstart= 14
             except EOFError:
                 pass
             else:

@@ -20,7 +20,7 @@ def plot_dust(dist,plotname):
                              xsize=4000,min=0.,
                              max=round(10.*(12.8-dm+1.49))/10.,
                              format=r'$%g$',
-                             title=r'$\mathrm{Dust\ at\ %.1f\,kpc}$' % dist,
+                             title=r'$\mathrm{Extinction\ to\ %.1f\,kpc}$' % dist,
                              cmap='gist_yarg',
                              unit='$A_H\,(\mathrm{mag})$')
     bovy_plot.bovy_end_print(plotname)
