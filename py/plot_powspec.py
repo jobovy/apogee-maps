@@ -117,6 +117,7 @@ def plot_powspec(dist,basename,plotname,plane=False):
     # Can smooth the masked power spectrum, perhaps underplot the non-smoothed in gray
     # sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],numpy.log(green15mcl)[1:],k=3,s=300.)
     # sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],numpy.log(numpy.fabs(green15mcr))[1:],k=3,s=10000.)
+    # Plot min, median, and max of samples
     return None
 
 if __name__ == '__main__':
