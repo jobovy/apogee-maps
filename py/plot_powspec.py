@@ -95,6 +95,10 @@ def plot_powspec(dist,basename,plotname,plane=False):
             samplescr= pickle.load(savefile)
             samplesmcl= pickle.load(savefile)
             samplesmcr= pickle.load(savefile)
+    # Plot
+    # Can smooth the masked power spectrum, perhaps underplot the non-smoothed in gray
+    # sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],numpy.log(green15mcl)[1:],k=3,s=300.)
+    # sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],numpy.log(numpy.fabs(green15mcr))[1:],k=3,s=10000.)
     return None
 
 if __name__ == '__main__':
