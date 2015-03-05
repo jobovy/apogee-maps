@@ -58,6 +58,7 @@ def plot_powspec(dist,basename,plotname,plane=False):
                 samplescr= pickle.load(savefile)
                 samplesmcl= pickle.load(savefile)
                 samplesmcr= pickle.load(savefile)
+                samplesstart= 1
             except EOFError:
                 pass
             else:
@@ -77,14 +78,15 @@ def plot_powspec(dist,basename,plotname,plane=False):
         save_pickles(green15name,ell,green15cl,green15cr,
                      green15mcl,green15mcr)
         gc.collect()
+    # Now work on the samples
+    nsamples= 20
     if not samplesloaded:
-        # Now work on the samples
-        nsamples= 20
         samplescl= numpy.empty((nsamples,len(green15cl)))
         samplescr= numpy.empty((nsamples,len(green15cl)))
         samplesmcl= numpy.empty((nsamples,len(green15cl)))
         samplesmcr= numpy.empty((nsamples,len(green15cl)))
-        for samplenum in range(nsamples):
+    if not samplesloaded or samplesstart < nsamples:
+        for samplenum in range(samplesstart,nsamples):
             print "Working on sample %i / %i ..." % (samplenum+1,nsamples)
             green15maps= dust.load_green15(dist,nest=False,nside_out=_NSIDE,
                                            samples=True,samplenum=samplenum)
@@ -109,7 +111,8 @@ def plot_powspec(dist,basename,plotname,plane=False):
             # Save, here in case it crashes after a few samples
             save_pickles(green15name,ell,green15cl,green15cr,
                          green15mcl,green15mcr,
-                         samplescl,samplescr,samplesmcl,samplesmcr)
+                         samplescl,samplescr,samplesmcl,samplesmcr,
+                         samplenum+1)
     # Plot
     # Can smooth the masked power spectrum, perhaps underplot the non-smoothed in gray
     # sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],numpy.log(green15mcl)[1:],k=3,s=300.)
