@@ -42,7 +42,26 @@ def plot_powspec(dist,basename,plotname,plane=False):
             densmap= pickle.load(savefile)
     # Pan-STARRS dust map Cl and cross-power with dens
     green15name= basename+'_D%.1f_green15cl.sav' % dist
-    if not os.path.exists(green15name):
+    bestfitloaded= False
+    samplesloaded= False
+    if os.path.exists(green15name):
+        with open(green15name,'rb') as savefile:
+            ell= pickle.load(savefile)
+            green15cl= pickle.load(savefile)
+            green15cr= pickle.load(savefile)
+            green15mcl= pickle.load(savefile)
+            green15mcr= pickle.load(savefile)
+            bestfitloaded= True
+            try:
+                samplescl= pickle.load(savefile)
+                samplescr= pickle.load(savefile)
+                samplesmcl= pickle.load(savefile)
+                samplesmcr= pickle.load(savefile)
+            except EOFError:
+                pass
+            else:
+                samplesloaded= True
+    if not bestfitloaded:
         # First do the best-fit
         green15map= dust.load_green15(dist,nest=False,nside_out=_NSIDE)
         if plane:
@@ -56,6 +75,7 @@ def plot_powspec(dist,basename,plotname,plane=False):
         # Save
         save_pickles(green15name,ell,green15cl,green15cr,
                      green15mcl,green15mcr)
+    if not samplesloaded:
         # Now work on the samples
         nsamples= 20
         samplescl= numpy.empty((nsamples,len(green15cl)))
@@ -84,17 +104,6 @@ def plot_powspec(dist,basename,plotname,plane=False):
             save_pickles(green15name,ell,green15cl,green15cr,
                          green15mcl,green15mcr,
                          samplescl,samplescr,samplesmcl,samplesmcr)
-    else:
-        with open(green15name,'rb') as savefile:
-            ell= pickle.load(savefile)
-            green15cl= pickle.load(savefile)
-            green15cr= pickle.load(savefile)
-            green15mcl= pickle.load(savefile)
-            green15mcr= pickle.load(savefile)
-            samplescl= pickle.load(savefile)
-            samplescr= pickle.load(savefile)
-            samplesmcl= pickle.load(savefile)
-            samplesmcr= pickle.load(savefile)
     # Plot
     # Can smooth the masked power spectrum, perhaps underplot the non-smoothed in gray
     # sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],numpy.log(green15mcl)[1:],k=3,s=300.)
