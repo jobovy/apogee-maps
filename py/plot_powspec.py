@@ -15,15 +15,23 @@ _NSIDE=2048
 # magnitude limits for the survey
 _HMIN= 7.
 _HMAX= 12.8
-def plot_powspec(dist,basename,plotname):
+def plot_powspec(dist,basename,plotname,plane=False):
+    """plane is True limits to |b| <= 5"""
     # First calculate everything
     H0= -1.49+dust.dist2distmod(dist)
+    if plane:
+        npix= healpy.pixelfunc.nside2npix(_NSIDE)
+        theta,phi= healpy.pixelfunc.pix2ang(_NSIDE,numpy.arange(npix),
+                                            nest=False)
+        b= (numpy.pi/2.-theta)*180./numpy.pi
     # Density
     densname= basename+'_D%.1f_denscl.sav' % dist
     if not os.path.exists(densname):
         densmap= densprofiles.healpixelate(dist,densprofiles.expdisk,
                                            [1./3.,1./0.3],nside=_NSIDE,
                                            nest=False)
+        if plane:
+            densmap[numpy.fabs(b) > 5.]= healpy.UNSEEN
         denscl= healpy.sphtfunc.anafast(densmap,pol=False)
         ell= numpy.arange(len(denscl))
         save_pickles(densname,ell,denscl,densmap)
@@ -37,6 +45,8 @@ def plot_powspec(dist,basename,plotname):
     if not os.path.exists(green15name):
         # First do the best-fit
         green15map= dust.load_green15(dist,nest=False,nside_out=_NSIDE)
+        if plane:
+            green15map[numpy.fabs(b) > 5.]= healpy.UNSEEN
         green15mask= ((green15map > (_HMIN-H0))\
                           *(green15map < (_HMAX-H0))).astype('float')
         green15cl= healpy.sphtfunc.anafast(green15map,pol=False)
@@ -56,6 +66,8 @@ def plot_powspec(dist,basename,plotname):
             print "Working on sample %i / %i ..." % (samplenum+1,nsamples)
             green15maps= dust.load_green15(dist,nest=False,nside_out=_NSIDE,
                                            samples=True,samplenum=samplenum)
+            if plane:
+                green15maps[numpy.fabs(b) > 5.]= healpy.UNSEEN
             green15masks= ((green15maps > (_HMIN-H0))\
                               *(green15maps < (_HMAX-H0))).astype('float')
             samplescl[samplenum]= healpy.sphtfunc.anafast(green15maps,
@@ -88,4 +100,5 @@ def plot_powspec(dist,basename,plotname):
 if __name__ == '__main__':
     plot_powspec(float(sys.argv[1]), # distance
                  sys.argv[2], # basename of pickles
-                 sys.argv[3]) # plotfilename
+                 sys.argv[3],
+                 plane=len(sys.argv) > 4) # plotfilename
