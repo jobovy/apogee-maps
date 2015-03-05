@@ -2,6 +2,7 @@
 # plot_powspec: plot the power-spectrum of a density distribution, dust, the 
 #               essf, and the cross correlation of these at a given distance
 ###############################################################################
+import gc
 import sys
 import os, os.path
 import pickle
@@ -75,6 +76,7 @@ def plot_powspec(dist,basename,plotname,plane=False):
         # Save
         save_pickles(green15name,ell,green15cl,green15cr,
                      green15mcl,green15mcr)
+        gc.collect()
     if not samplesloaded:
         # Now work on the samples
         nsamples= 20
@@ -92,14 +94,18 @@ def plot_powspec(dist,basename,plotname,plane=False):
                               *(green15maps < (_HMAX-H0))).astype('float')
             samplescl[samplenum]= healpy.sphtfunc.anafast(green15maps,
                                                           pol=False)
+            gc.collect()
             samplescr[samplenum]= healpy.sphtfunc.anafast(green15maps,
                                                           map2=densmap,
                                                           pol=False)
+            gc.collect()
             samplesmcl[samplenum]= healpy.sphtfunc.anafast(green15masks,
                                                            pol=False)
+            gc.collect()
             samplesmcr[samplenum]= healpy.sphtfunc.anafast(green15masks,
                                                            map2=densmap,
                                                            pol=False)
+            gc.collect()
             # Save, here in case it crashes after a few samples
             save_pickles(green15name,ell,green15cl,green15cr,
                          green15mcl,green15mcr,
