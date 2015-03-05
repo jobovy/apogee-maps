@@ -113,7 +113,7 @@ def plot_powspec(dist,basename,plotname,plane=False):
                          green15mcl,green15mcr,
                          samplescl,samplescr,samplesmcl,samplesmcr,
                          samplenum+1)
-    # Plot
+    # Plot (2l+1)Cl!!
     # Can smooth the masked power spectrum, perhaps underplot the non-smoothed in gray
     # sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],numpy.log(green15mcl)[1:],k=3,s=300.)
     # sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],numpy.log(numpy.fabs(green15mcr))[1:],k=3,s=10000.)
