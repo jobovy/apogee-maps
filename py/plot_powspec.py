@@ -65,7 +65,13 @@ def plot_powspec(dist,basename,plotname,plane=False):
                 samplesmcr= pickle.load(savefile)
                 samplesstart= pickle.load(savefile)
             except EOFError:
-                pass
+                samplesstart= 0
+            else:
+                samplesloaded= True
+            try:
+                samplesstart= pickle.load(savefile)
+            except EOFError:
+                samplesstart= 20
             else:
                 samplesloaded= True
     if not bestfitloaded:
