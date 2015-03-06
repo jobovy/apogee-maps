@@ -8,7 +8,12 @@ import os, os.path
 import pickle
 import numpy
 import healpy
-from galpy.util import save_pickles
+import matplotlib
+matplotlib.use('Agg')
+from galpy.util import save_pickles, bovy_plot
+from matplotlib import pyplot
+from matplotlib.ticker import NullFormatter
+from scipy import interpolate
 import densprofiles
 import dust
 # nside to work at, 2048 is the max
@@ -40,7 +45,7 @@ def plot_powspec(dist,basename,plotname,plane=False):
         with open(densname,'rb') as savefile:
             ell= pickle.load(savefile)
             denscl= pickle.load(savefile)
-            densmap= pickle.load(savefile)
+#            densmap= pickle.load(savefile)
     # Pan-STARRS dust map Cl and cross-power with dens
     green15name= basename+'_D%.1f_green15cl.sav' % dist
     bestfitloaded= False
@@ -58,7 +63,7 @@ def plot_powspec(dist,basename,plotname,plane=False):
                 samplescr= pickle.load(savefile)
                 samplesmcl= pickle.load(savefile)
                 samplesmcr= pickle.load(savefile)
-                samplesstart= 14
+                samplesstart= pickle.load(savefile)
             except EOFError:
                 pass
             else:
@@ -118,6 +123,106 @@ def plot_powspec(dist,basename,plotname,plane=False):
     # sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],numpy.log(green15mcl)[1:],k=3,s=300.)
     # sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],numpy.log(numpy.fabs(green15mcr))[1:],k=3,s=10000.)
     # Plot min, median, and max of samples
+    # First plot the power-spectrum, then the cross-correlation, then the
+    # cumulative sum
+    bovy_plot.bovy_print(fig_height=3.)
+    bovy_plot.bovy_plot(ell[1:],
+                        (2.*ell[1:]+1.)*numpy.median(samplescl[:,1:],axis=0),
+                        'k-',loglog=True,
+                        ylabel=r'$(2l+1)\,C_l$',
+                        xrange=[0.5,20000],
+                        yrange=[10.**-12.,1.],
+                        zorder=3)
+    bovy_plot.bovy_plot(ell[1:],
+                        (2.*ell[1:]+1.)*numpy.amin(samplescl[:,1:],axis=0),
+                        color='0.65',zorder=0,overplot=True)
+    bovy_plot.bovy_plot(ell[1:],
+                        (2.*ell[1:]+1.)*numpy.amax(samplescl[:,1:],axis=0),
+                        color='0.65',zorder=0,overplot=True)
+    bovy_plot.bovy_plot(ell[2::2],
+                        (2.*ell[2::2]+1.)*denscl[2::2],
+                        'b-',overplot=True)                       
+    sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],
+                                     numpy.log(numpy.median(samplesmcl,
+                                                            axis=0))[1:],
+                                     k=3,s=300.)
+    bovy_plot.bovy_plot(ell[1:],
+                        (2.*ell[1:]+1.)*numpy.exp(sp(numpy.log(ell[1:]))),
+                        'r-',overplot=True,zorder=2)
+    spmin= interpolate.UnivariateSpline(numpy.log(ell)[1:],
+                                        numpy.log(numpy.amin(samplesmcl,
+                                                             axis=0))[1:],
+                                        k=3,s=300.)
+    spmax= interpolate.UnivariateSpline(numpy.log(ell)[1:],
+                                        numpy.log(numpy.amax(samplesmcl,
+                                                             axis=0))[1:],
+                                        k=3,s=300.)
+    bovy_plot.bovy_plot(ell[1:],
+                        (2.*ell[1:]+1.)*numpy.exp(spmin(numpy.log(ell[1:]))),
+                        color='0.65',zorder=0,overplot=True)
+    bovy_plot.bovy_plot(ell[1:],
+                        (2.*ell[1:]+1.)*numpy.exp(spmax(numpy.log(ell[1:]))),
+                        color='0.65',zorder=0,overplot=True)
+    nullfmt   = NullFormatter()         # no labels
+    pyplot.gca().xaxis.set_major_formatter(nullfmt)
+    bovy_plot.bovy_end_print(plotname)
+    # Cross-correlation
+    bovy_plot.bovy_print(fig_height=3.)
+    sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],
+                                     numpy.log(numpy.median(numpy.fabs(samplescr[:,1:]),
+                                                            axis=0)),
+                                     k=3,s=10000.)
+    bovy_plot.bovy_plot(ell[1:],
+                        (2.*ell[1:]+1.)*numpy.exp(sp(numpy.log(ell[1:]))),
+                        'k-',loglog=True,
+                        ylabel=r'$(2l+1)\,C_l$',
+                        xrange=[0.5,20000],
+                        yrange=[10.**-12.,10.],
+                        zorder=3)
+    spmin= interpolate.UnivariateSpline(numpy.log(ell)[1:],
+                                        numpy.log(numpy.amin(numpy.fabs(samplescr),
+                                                             axis=0))[1:],
+                                        k=3,s=100000.)
+    spmax= interpolate.UnivariateSpline(numpy.log(ell)[1:],
+                                        numpy.log(numpy.amax(numpy.fabs(samplescr),
+                                                             axis=0))[1:],
+                                        k=3,s=100000.)
+    pyplot.fill_between(ell[1:],
+                        (2.*ell[1:]+1.)*numpy.exp(spmin(numpy.log(ell[1:]))),
+                        (2.*ell[1:]+1.)*numpy.exp(spmax(numpy.log(ell[1:]))),
+                        color='0.65',zorder=1)
+    sp= interpolate.UnivariateSpline(numpy.log(ell)[1:],
+                                     numpy.log(numpy.median(numpy.fabs(samplesmcr),
+                                                            axis=0))[1:],
+                                     k=3,s=100000.)
+    bovy_plot.bovy_plot(ell[1:],
+                        10.*(2.*ell[1:]+1.)*numpy.exp(sp(numpy.log(ell[1:]))),
+                        'r-',overplot=True,zorder=2)
+    spmin= interpolate.UnivariateSpline(numpy.log(ell)[1:],
+                                        numpy.log(numpy.amin(numpy.fabs(samplesmcr),
+                                                             axis=0))[1:],
+                                        k=3,s=100000.)
+    spmax= interpolate.UnivariateSpline(numpy.log(ell)[1:],
+                                        numpy.log(numpy.amax(numpy.fabs(samplesmcr),
+                                                             axis=0))[1:],
+                                        k=3,s=100000.)
+    pyplot.fill_between(ell[1:],
+                        10.*(2.*ell[1:]+1.)*numpy.exp(spmin(numpy.log(ell[1:]))),
+                        10.*(2.*ell[1:]+1.)*numpy.exp(spmax(numpy.log(ell[1:]))),
+                        color='0.35',zorder=0)
+    pyplot.gca().xaxis.set_major_formatter(nullfmt)
+    bovy_plot.bovy_end_print(plotname.replace('powspec','crosspowspec'))
+    effvol= numpy.sum((2.*ell+1.)*numpy.median(samplesmcr,axis=0))
+    bovy_plot.bovy_plot(ell[1:],
+                        numpy.fabs((effvol
+                         -numpy.cumsum((2.*ell+1.)*numpy.median(samplesmcr,axis=0)))/effvol)[1:],
+                        'k-',loglog=True,
+                        xlabel=r'$l$',
+                        ylabel=r'$\delta\sum_{l}\sum_{m}\nu_{*,lm}\,m^*_{lm}$',
+                        xrange=[0.5,20000],
+                        yrange=[2.*10.**-13.,2.],
+                        zorder=3)
+    bovy_plot.bovy_end_print(plotname.replace('powspec','cumulcrosspowspec')) 
     return None
 
 if __name__ == '__main__':
