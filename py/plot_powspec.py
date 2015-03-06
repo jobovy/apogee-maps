@@ -63,7 +63,6 @@ def plot_powspec(dist,basename,plotname,plane=False):
                 samplescr= pickle.load(savefile)
                 samplesmcl= pickle.load(savefile)
                 samplesmcr= pickle.load(savefile)
-                samplesstart= pickle.load(savefile)
             except EOFError:
                 samplesstart= 0
             else:
@@ -132,12 +131,13 @@ def plot_powspec(dist,basename,plotname,plane=False):
     # First plot the power-spectrum, then the cross-correlation, then the
     # cumulative sum
     bovy_plot.bovy_print(fig_height=3.)
+    yrange=[10.**-12.,10.],
     bovy_plot.bovy_plot(ell[1:],
                         (2.*ell[1:]+1.)*numpy.median(samplescl[:,1:],axis=0),
                         'k-',loglog=True,
                         ylabel=r'$(2l+1)\,C_l$',
                         xrange=[0.5,20000],
-                        yrange=[10.**-12.,1.],
+                        yrange=yrange,
                         zorder=3)
     bovy_plot.bovy_plot(ell[1:],
                         (2.*ell[1:]+1.)*numpy.amin(samplescl[:,1:],axis=0),
@@ -183,7 +183,7 @@ def plot_powspec(dist,basename,plotname,plane=False):
                         'k-',loglog=True,
                         ylabel=r'$(2l+1)\,C_l$',
                         xrange=[0.5,20000],
-                        yrange=[10.**-12.,10.],
+                        yrange=[10.**-12.,100.],
                         zorder=3)
     spmin= interpolate.UnivariateSpline(numpy.log(ell)[1:],
                                         numpy.log(numpy.amin(numpy.fabs(samplescr),
@@ -226,7 +226,7 @@ def plot_powspec(dist,basename,plotname,plane=False):
                         xlabel=r'$l$',
                         ylabel=r'$\delta\sum_{l}\sum_{m}\nu_{*,lm}\,m^*_{lm}$',
                         xrange=[0.5,20000],
-                        yrange=[2.*10.**-13.,2.],
+                        yrange=[2.*10.**-13.,20.],
                         zorder=3)
     bovy_plot.bovy_end_print(plotname.replace('powspec','cumulcrosspowspec')) 
     return None
