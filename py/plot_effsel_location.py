@@ -35,9 +35,8 @@ def plot_effsel_location(location,plotname):
         apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=gd)
         sf_default= apof(location,ds)
         sf_samples= numpy.zeros((20,len(ds)))
-        if False:
+        if True:
             for ii in range(20):
-                print ii
                 # Swap in a sample for bestfit in the Green et al. (2015) dmap
                 gd._intps= numpy.zeros(len(gd._pix_info['healpix_index']),
                                        dtype='object') # need to remove the cache
@@ -50,8 +49,11 @@ def plot_effsel_location(location,plotname):
         drimmel= mwdust.Drimmel03(filter='2MASS H')
         apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=drimmel)
         sf_drimmel= apof(location,ds)
+        marshall= mwdust.Marshall06(filter='2MASS H')
+        apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=marshall)
+        sf_marshall= apof(location,ds)
         save_pickles(effselFile,distmods,sf_default,sf_samples,sf_zero,
-                     sf_drimmel)
+                     sf_drimmel,sf_marshall)
     else:
         with open(effselFile,'rb') as savefile:
             distmods= pickle.load(savefile)
@@ -59,6 +61,7 @@ def plot_effsel_location(location,plotname):
             sf_samples= pickle.load(savefile)
             sf_zero= pickle.load(savefile)
             sf_drimmel= pickle.load(savefile)
+            sf_marshall= pickle.load(savefile)
     # Now plot
     bovy_plot.bovy_print(fig_height=3.)
     rc('text.latex', preamble=r'\usepackage{amsmath}'+'\n'
@@ -79,6 +82,7 @@ def plot_effsel_location(location,plotname):
                         zorder=0)
     bovy_plot.bovy_plot(distmods,sf_zero,'b-',overplot=True,zorder=7)
     bovy_plot.bovy_plot(distmods,sf_drimmel,'y-',overplot=True,zorder=8)
+    bovy_plot.bovy_plot(distmods,sf_marshall,'r-',overplot=True,zorder=9)
     bovy_plot.bovy_end_print(plotname)
     return None
 
