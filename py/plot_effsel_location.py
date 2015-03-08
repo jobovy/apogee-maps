@@ -15,6 +15,7 @@ import apogee.select.apogeeSelect
 from define_rcsample import get_rcsample
 _PLOTDIST= True
 _LW= 1.5
+_EXAGGERATE_ERRORS= 10.
 def plot_effsel_location(location,plotname):
     # Setup selection function
     selectFile= '../savs/selfunc-nospdata.sav'
@@ -33,7 +34,7 @@ def plot_effsel_location(location,plotname):
         distmods= numpy.linspace(7.,15.5,201)
         ds= 10.**(distmods/5-2.)
         # Setup default effective selection function
-        do_samples= False
+        do_samples= True
         gd= mwdust.Green15(filter='2MASS H',load_samples=do_samples)
         apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=gd)
         sf_default= apof(location,ds)
@@ -47,9 +48,7 @@ def plot_effsel_location(location,plotname):
         if do_samples:
             for ii in range(20):
                 # Swap in a sample for bestfit in the Green et al. (2015) dmap
-                gd._intps= numpy.zeros(len(gd._pix_info['healpix_index']),
-                                       dtype='object') # need to remove the cache
-                gd._best_fit= gd._samples[:,ii,:]
+                gd.substitute_sample(ii)
                 apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=gd)
                 sf_samples[ii]= apof(location,ds)          
         zerodust= mwdust.Zero(filter='2MASS H')
@@ -87,9 +86,12 @@ def plot_effsel_location(location,plotname):
                         yrange=[0.,1.1*numpy.amax(sf_zero)],
                         xlabel=r'$\mathrm{distance\ modulus}\ \mu$',
                         ylabel=r'$\textswab{S}(\mathrm{location},\mu)$')
-    pyplot.fill_between(distmods,numpy.amin(sf_samples,axis=0),
-                        numpy.amax(sf_samples,axis=0),color='0.4',
-                        zorder=0)
+    pyplot.fill_between(distmods,
+                        sf_default-_EXAGGERATE_ERRORS\
+                            *(sf_default-numpy.amin(sf_samples,axis=0)),
+                        sf_default+_EXAGGERATE_ERRORS\
+                            *(numpy.amax(sf_samples,axis=0)-sf_default),
+                        color='0.4',zorder=0)
     bovy_plot.bovy_plot(distmods,sf_jkz,'g-.',lw=2.*_LW,
                         overplot=True,zorder=11)
     bovy_plot.bovy_plot(distmods,sf_zero,'k--',lw=_LW,overplot=True,zorder=7)
