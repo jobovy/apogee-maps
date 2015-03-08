@@ -33,7 +33,8 @@ def plot_effsel_location(location,plotname):
         distmods= numpy.linspace(7.,15.5,201)
         ds= 10.**(distmods/5-2.)
         # Setup default effective selection function
-        gd= mwdust.Green15(filter='2MASS H',load_samples=True)
+        do_samples= False
+        gd= mwdust.Green15(filter='2MASS H',load_samples=do_samples)
         apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=gd)
         sf_default= apof(location,ds)
         # Also calculate for a sample of MH
@@ -43,7 +44,7 @@ def plot_effsel_location(location,plotname):
         sf_jkz= apof(location,ds,MH=MH)
         # Go through the samples
         sf_samples= numpy.zeros((20,len(ds)))
-        if False:
+        if do_samples:
             for ii in range(20):
                 # Swap in a sample for bestfit in the Green et al. (2015) dmap
                 gd._intps= numpy.zeros(len(gd._pix_info['healpix_index']),
