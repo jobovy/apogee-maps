@@ -12,6 +12,7 @@ from galpy.util import save_pickles, bovy_plot
 from matplotlib import rc, pyplot
 import mwdust
 import apogee.select.apogeeSelect
+_PLOTDIST= True
 def plot_effsel_location(location,plotname):
     # Setup selection function
     selectFile= '../savs/selfunc-nospdata.sav'
@@ -57,13 +58,19 @@ def plot_effsel_location(location,plotname):
             sf_default= pickle.load(savefile)
             sf_samples= pickle.load(savefile)
             sf_zero= pickle.load(savefile)
+            sf_drimmel= pickle.load(savefile)
     # Now plot
     bovy_plot.bovy_print(fig_height=3.)
     rc('text.latex', preamble=r'\usepackage{amsmath}'+'\n'
        +r'\usepackage{amssymb}'+'\n'+r'\usepackage{yfonts}')
+    if _PLOTDIST:
+        distmods= 10.**(distmods/5-2.)
+        xrange= [0.,12.]
+    else:
+        xrange=[7.,15.8],
     bovy_plot.bovy_plot(distmods,sf_default,
                         'k-',zorder=10,
-                        xrange=[7.,15.8],
+                        xrange=xrange,
                         yrange=[0.,1.1*numpy.amax(sf_zero)],
                         xlabel=r'$\mathrm{distance\ modulus}\ \mu$',
                         ylabel=r'$\textswab{S}(\mathrm{location},\mu)$')
