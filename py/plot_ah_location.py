@@ -154,12 +154,17 @@ def plot_ah_location(location,plotname):
         data= data[data['LOCATION_ID'] == location]
         bovy_plot.bovy_plot(data['RC_DIST'],data['AK_TARG']*1.55,
                             'ko',zorder=20,overplot=True,ms=2.)
-    if location == 4312:
-        pyplot.legend((line_default[0],line_sale[0],
-                       line_marshall[0],line_drimmel[0]),
+    if location == 4318:
+        pyplot.legend((line_default[0],line_sale[0]),
                       (r'$\mathrm{Green\ et\ al.\ (2015)}$',
-                       r'$\mathrm{Sale\ et\ al.\ (2014)}$',
-                       r'$\mathrm{Marshall\ et\ al.\ (2006)}$',
+                       r'$\mathrm{Sale\ et\ al.\ (2014)}$'),
+                      loc='lower right',#bbox_to_anchor=(.91,.375),
+                      numpoints=8,
+                      prop={'size':14},
+                      frameon=False)                      
+    elif location == 4242:
+        pyplot.legend((line_marshall[0],line_drimmel[0]),
+                      (r'$\mathrm{Marshall\ et\ al.\ (2006)}$',
                        r'$\mathrm{Drimmel\ et\ al.\ (2003)}$'),
                       loc='lower right',#bbox_to_anchor=(.91,.375),
                       numpoints=8,
