@@ -71,12 +71,12 @@ def plot_ah_location(location,plotname):
             sale= mwdust.Sale14(filter='2MASS H')
             try:
                 pa, ah= sale.dust_vals_disk(glon,glat,ds,apo.radius(location))
-            except (TypeError,ValueError):
-                meanah_sale= -numpy.ones_like(ds)
-                stdah_sale= -numpy.ones_like(ds)
-            else:
                 meanah_sale= numpy.sum(numpy.tile(pa,(len(ds),1)).T*ah,
                                        axis=0)/numpy.sum(pa)
+            except (TypeError,ValueError):
+                meanah_sale= -numpy.ones_like(ds)
+                stdah_sale= -numpy.ones_like(ds)               
+            else:
                 stdah_sale= numpy.sqrt(numpy.sum(numpy.tile(pa,(len(ds),1)).T\
                                                      *ah**2.,axis=0)\
                                            /numpy.sum(pa)-meanah_sale**2.)
