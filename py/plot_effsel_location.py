@@ -15,7 +15,7 @@ import apogee.select.apogeeSelect
 from define_rcsample import get_rcsample
 _PLOTDIST= True
 _LW= 1.5
-_EXAGGERATE_ERRORS= 10.
+_EXAGGERATE_ERRORS= 1.
 def plot_effsel_location(location,plotname):
     # Setup selection function
     selectFile= '../savs/selfunc-nospdata.sav'
@@ -31,10 +31,10 @@ def plot_effsel_location(location,plotname):
     effselFile= '../savs/effselfunc-%i.sav' % location
     if not os.path.exists(effselFile):
         # Distances at which to calculate the effective selection function
-        distmods= numpy.linspace(7.,15.5,201)
+        distmods= numpy.linspace(7.,15.5,301)
         ds= 10.**(distmods/5-2.)
         # Setup default effective selection function
-        do_samples= True
+        do_samples= False
         gd= mwdust.Green15(filter='2MASS H',load_samples=do_samples)
         apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=gd)
         sf_default= apof(location,ds)
@@ -59,9 +59,18 @@ def plot_effsel_location(location,plotname):
         sf_drimmel= apof(location,ds)
         marshall= mwdust.Marshall06(filter='2MASS H')
         apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=marshall)
-        sf_marshall= apof(location,ds)
+        try:
+            sf_marshall= apof(location,ds)
+        except IndexError:
+            sf_marshall= -numpy.ones_like(ds)
+        sale= mwdust.Sale14(filter='2MASS H')
+        apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=sale)
+        try:
+            sf_sale= apof(location,ds)
+        except TypeError:
+            sf_sale= -numpy.ones_like(ds)
         save_pickles(effselFile,distmods,sf_default,sf_jkz,sf_samples,
-                     sf_zero,sf_drimmel,sf_marshall)
+                     sf_zero,sf_drimmel,sf_marshall,sf_sale)
     else:
         with open(effselFile,'rb') as savefile:
             distmods= pickle.load(savefile)
@@ -71,6 +80,7 @@ def plot_effsel_location(location,plotname):
             sf_zero= pickle.load(savefile)
             sf_drimmel= pickle.load(savefile)
             sf_marshall= pickle.load(savefile)
+            sf_sale= pickle.load(savefile)
     # Now plot
     bovy_plot.bovy_print(fig_height=3.)
     rc('text.latex', preamble=r'\usepackage{amsmath}'+'\n'
@@ -78,26 +88,33 @@ def plot_effsel_location(location,plotname):
     if _PLOTDIST:
         distmods= 10.**(distmods/5-2.)
         xrange= [0.,12.]
+        xlabel=r'$D\,(\mathrm{kpc})$'
+        ylabel=r'$\textswab{S}(\mathrm{location},D)$'
     else:
         xrange=[7.,15.8],
+        xlabel=r'$\mathrm{distance\ modulus}\ \mu$'
+        ylabel=r'$\textswab{S}(\mathrm{location},\mu)$'
     bovy_plot.bovy_plot(distmods,sf_default,
-                        'b-',lw=_LW,zorder=10,
+                        'b-',lw=_LW,zorder=12,
                         xrange=xrange,
+                        xlabel=xlabel,
                         yrange=[0.,1.1*numpy.amax(sf_zero)],
-                        xlabel=r'$\mathrm{distance\ modulus}\ \mu$',
-                        ylabel=r'$\textswab{S}(\mathrm{location},\mu)$')
+                        ylabel=ylabel)
     pyplot.fill_between(distmods,
                         sf_default-_EXAGGERATE_ERRORS\
                             *(sf_default-numpy.amin(sf_samples,axis=0)),
                         sf_default+_EXAGGERATE_ERRORS\
                             *(numpy.amax(sf_samples,axis=0)-sf_default),
-                        color='0.4',zorder=0)
+                        color='0.65',zorder=0)
     bovy_plot.bovy_plot(distmods,sf_jkz,'g-.',lw=2.*_LW,
-                        overplot=True,zorder=11)
+                        overplot=True,zorder=13)
     bovy_plot.bovy_plot(distmods,sf_zero,'k--',lw=_LW,overplot=True,zorder=7)
-    bovy_plot.bovy_plot(distmods,sf_drimmel,'y-',lw=_LW,overplot=True,zorder=8)
+    bovy_plot.bovy_plot(distmods,sf_drimmel,'-',color='gold',
+                        lw=_LW,overplot=True,zorder=8)
     bovy_plot.bovy_plot(distmods,sf_marshall,'r-',lw=_LW,overplot=True,
                         zorder=9)
+    bovy_plot.bovy_plot(distmods,sf_sale,'c-',lw=_LW,overplot=True,
+                        zorder=10)
     # Label
     lcen, bcen= apo.glonGlat(location)
     if numpy.fabs(bcen) < 0.1: bcen= 0.
