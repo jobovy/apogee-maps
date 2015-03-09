@@ -66,7 +66,7 @@ def plot_ah_location(location,plotname):
         else:
             meanah_drimmel= -numpy.ones_like(ds)
             stdah_drimmel= -numpy.ones_like(ds)
-        if False:
+        if True:
             # Sale et al. (2014)
             sale= mwdust.Sale14(filter='2MASS H')
             try:
