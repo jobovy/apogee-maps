@@ -154,18 +154,11 @@ def plot_ah_location(location,plotname):
         data= data[data['LOCATION_ID'] == location]
         bovy_plot.bovy_plot(data['RC_DIST'],data['AK_TARG']*1.55,
                             'ko',zorder=20,overplot=True,ms=2.)
-    if location == 4378:
-        pyplot.legend((line_default[0],line_jkz[0],line_zero[0]),
+    if location == 4312:
+        pyplot.legend((line_default[0],line_sale[0],
+                       line_marshall[0],line_drimmel[0]),
                       (r'$\mathrm{Green\ et\ al.\ (2015)}$',
-                       r'$\mathrm{Green\ et\ al.} + p(M_H)$',
-                       r'$\mathrm{zero\ extinction}$'),
-                      loc='lower right',#bbox_to_anchor=(.91,.375),
-                      numpoints=8,
-                      prop={'size':14},
-                      frameon=False)
-    elif location == 4312:
-        pyplot.legend((line_sale[0],line_marshall[0],line_drimmel[0]),
-                      (r'$\mathrm{Sale\ et\ al.\ (2014)}$',
+                       r'$\mathrm{Sale\ et\ al.\ (2014)}$',
                        r'$\mathrm{Marshall\ et\ al.\ (2006)}$',
                        r'$\mathrm{Drimmel\ et\ al.\ (2003)}$'),
                       loc='lower right',#bbox_to_anchor=(.91,.375),
@@ -177,7 +170,7 @@ def plot_ah_location(location,plotname):
     if numpy.fabs(bcen) < 0.1: bcen= 0.
     bovy_plot.bovy_text(r'$(l,b) = (%.1f,%.1f)$' % (lcen,bcen),
                         top_right=True,size=16.)
-    bovy_plot.bovy_end_print(plotname)
+    bovy_plot.bovy_end_print(plotname,dpi=300)
     return None
 
 if __name__ == '__main__':
