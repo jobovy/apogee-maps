@@ -95,27 +95,47 @@ def plot_effsel_location(location,plotname):
         xrange=[7.,15.8],
         xlabel=r'$\mathrm{distance\ modulus}\ \mu$'
         ylabel=r'$\textswab{S}(\mathrm{location},\mu)$'
-    bovy_plot.bovy_plot(distmods,sf_default,
-                        'b-',lw=_LW,zorder=12,
-                        xrange=xrange,
-                        xlabel=xlabel,
-                        yrange=[0.,1.1*numpy.amax(sf_zero)],
-                        ylabel=ylabel)
+    line_default= bovy_plot.bovy_plot(distmods,sf_default,
+                                      'b-',lw=_LW,zorder=12,
+                                      xrange=xrange,
+                                      xlabel=xlabel,
+                                      yrange=[0.,1.2*numpy.amax(sf_zero)],
+                                      ylabel=ylabel)
     pyplot.fill_between(distmods,
                         sf_default-_EXAGGERATE_ERRORS\
                             *(sf_default-numpy.amin(sf_samples,axis=0)),
                         sf_default+_EXAGGERATE_ERRORS\
                             *(numpy.amax(sf_samples,axis=0)-sf_default),
                         color='0.65',zorder=0)
-    bovy_plot.bovy_plot(distmods,sf_jkz,'g-.',lw=2.*_LW,
-                        overplot=True,zorder=13)
-    bovy_plot.bovy_plot(distmods,sf_zero,'k--',lw=_LW,overplot=True,zorder=7)
-    bovy_plot.bovy_plot(distmods,sf_drimmel,'-',color='gold',
-                        lw=_LW,overplot=True,zorder=8)
-    bovy_plot.bovy_plot(distmods,sf_marshall,'r-',lw=_LW,overplot=True,
+    line_jkz= bovy_plot.bovy_plot(distmods,sf_jkz,'g-.',lw=2.*_LW,
+                                   overplot=True,zorder=13)
+    line_zero= bovy_plot.bovy_plot(distmods,sf_zero,'k--',lw=_LW,
+                                   overplot=True,zorder=7)
+    line_drimmel= bovy_plot.bovy_plot(distmods,sf_drimmel,'-',color='gold',
+                                      lw=_LW,overplot=True,zorder=8)
+    line_marshall= bovy_plot.bovy_plot(distmods,sf_marshall,'r-',lw=_LW,
+                                       overplot=True,
                         zorder=9)
-    bovy_plot.bovy_plot(distmods,sf_sale,'c-',lw=_LW,overplot=True,
-                        zorder=10)
+    line_sale= bovy_plot.bovy_plot(distmods,sf_sale,'c-',lw=_LW,overplot=True,
+                                   zorder=10)
+    if location == 4378:
+        pyplot.legend((line_default[0],line_jkz[0],line_zero[0]),
+                      (r'$\mathrm{Green\ et\ al.\ (2015; G15)}$',
+                       r'$\mathrm{G15} + \mathrm{p(M_H)}$',
+                       r'$\mathrm{zero\ extinction}$'),
+                      loc='lower right',#bbox_to_anchor=(.91,.375),
+                      numpoints=8,
+                      prop={'size':16},
+                      frameon=False)
+    elif location == 4312:
+        pyplot.legend((line_sale[0],line_marshall[0],line_drimmel[0]),
+                      (r'$\mathrm{Sale\ et\ al.\ (2014)}$',
+                       r'$\mathrm{Marshall\ et\ al.\ (2006)}$',
+                       r'$\mathrm{Drimmel\ et\ al.\ (2003)}$'),
+                      loc='lower right',#bbox_to_anchor=(.91,.375),
+                      numpoints=8,
+                      prop={'size':16},
+                      frameon=False)                      
     # Label
     lcen, bcen= apo.glonGlat(location)
     if numpy.fabs(bcen) < 0.1: bcen= 0.
