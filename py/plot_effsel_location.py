@@ -121,7 +121,7 @@ def plot_effsel_location(location,plotname):
     if location == 4378:
         pyplot.legend((line_default[0],line_jkz[0],line_zero[0]),
                       (r'$\mathrm{Green\ et\ al.\ (2015)}$',
-                       r'$\mathrm{Green\ et \al.} + \mathrm{p(M_H)}$',
+                       r'$\mathrm{Green\ et\ al.} + p(M_H)$',
                        r'$\mathrm{zero\ extinction}$'),
                       loc='lower right',#bbox_to_anchor=(.91,.375),
                       numpoints=8,
