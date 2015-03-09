@@ -125,7 +125,7 @@ def plot_effsel_location(location,plotname):
                        r'$\mathrm{zero\ extinction}$'),
                       loc='lower right',#bbox_to_anchor=(.91,.375),
                       numpoints=8,
-                      prop={'size':16},
+                      prop={'size':14},
                       frameon=False)
     elif location == 4312:
         pyplot.legend((line_sale[0],line_marshall[0],line_drimmel[0]),
@@ -134,7 +134,7 @@ def plot_effsel_location(location,plotname):
                        r'$\mathrm{Drimmel\ et\ al.\ (2003)}$'),
                       loc='lower right',#bbox_to_anchor=(.91,.375),
                       numpoints=8,
-                      prop={'size':16},
+                      prop={'size':14},
                       frameon=False)                      
     # Label
     lcen, bcen= apo.glonGlat(location)
