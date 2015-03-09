@@ -34,7 +34,7 @@ def plot_effsel_location(location,plotname):
         distmods= numpy.linspace(7.,15.5,301)
         ds= 10.**(distmods/5-2.)
         # Setup default effective selection function
-        do_samples= False
+        do_samples= True
         gd= mwdust.Green15(filter='2MASS H',load_samples=do_samples)
         apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=gd)
         sf_default= apof(location,ds)
