@@ -141,8 +141,7 @@ def plot_effsel_location(location,plotname):
     if numpy.fabs(bcen) < 0.1: bcen= 0.
     bovy_plot.bovy_text(r'$(l,b) = (%.1f,%.1f)$' % (lcen,bcen),
                         top_right=True,size=16.)
-    bovy_plot.bovy_end_print(plotname,
-                             bbox_inches='tight')
+    bovy_plot.bovy_end_print(plotname)
     return None
 
 if __name__ == '__main__':
