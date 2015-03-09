@@ -121,7 +121,7 @@ def plot_ah_location(location,plotname):
     pyplot.fill_between(distmods,
                         meanah_default-stdah_default,
                         meanah_default+stdah_default,
-                        hatch='//',facecolor=(0,0,0,0),
+                        hatch='/',facecolor=(0,0,0,0),
                         color='b',lw=0.25,zorder=4)
     line_marshall= bovy_plot.bovy_plot(distmods,meanah_marshall,'r-',lw=_LW,
                                        overplot=True,
@@ -129,7 +129,7 @@ def plot_ah_location(location,plotname):
     pyplot.fill_between(distmods,
                         meanah_marshall-stdah_marshall,
                         meanah_marshall+stdah_marshall,
-                        hatch='\\\\',facecolor=(0,0,0,0),
+                        hatch='\\',facecolor=(0,0,0,0),
                         color='r',lw=0.25,zorder=2)
     line_drimmel= bovy_plot.bovy_plot(distmods,meanah_drimmel,'-',lw=_LW,
                                       color='gold',
@@ -147,7 +147,7 @@ def plot_ah_location(location,plotname):
     pyplot.fill_between(distmods,
                         meanah_sale-stdah_sale,
                         meanah_sale+stdah_sale,
-                        hatch='///',facecolor=(0,0,0,0),
+                        hatch='//',facecolor=(0,0,0,0),
                         color='c',lw=0.25,zorder=3)
     if True:
         data= get_rcsample()
@@ -175,7 +175,9 @@ def plot_ah_location(location,plotname):
     if numpy.fabs(bcen) < 0.1: bcen= 0.
     bovy_plot.bovy_text(r'$(l,b) = (%.1f,%.1f)$' % (lcen,bcen),
                         top_right=True,size=16.)
-    bovy_plot.bovy_end_print(plotname,dpi=300)
+    bovy_plot.bovy_end_print(plotname,dpi=300,
+                             bbox_extra_artists=pyplot.gca().get_children(),
+                             bbox_inches='tight')
     return None
 
 if __name__ == '__main__':
