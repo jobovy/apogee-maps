@@ -68,7 +68,7 @@ def plot_effsel_location(location,plotname):
         apof= apogee.select.apogeeEffectiveSelect(apo,dmap3d=sale)
         try:
             sf_sale= apof(location,ds)
-        except TypeError:
+        except (TypeError,ValueError):
             sf_sale= -numpy.ones_like(ds)
         save_pickles(effselFile,distmods,sf_default,sf_jkz,sf_samples,
                      sf_zero,sf_drimmel,sf_marshall,sf_sale)
