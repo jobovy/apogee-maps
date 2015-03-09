@@ -28,6 +28,7 @@ def plot_effsel_location(location,plotname):
         # Delete these because they're big and we don't need them
         del apo._specdata
         del apo._photdata
+        save_pickles(selectFile,apo)
     effselFile= '../savs/effselfunc-%i.sav' % location
     if not os.path.exists(effselFile):
         # Distances at which to calculate the effective selection function
