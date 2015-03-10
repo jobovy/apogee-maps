@@ -64,5 +64,10 @@ def get_rcsample():
                                                     +weight_si+weight_ca
                                                     +weight_mg)\
                                                     -data['FE_H']
+    # Remove locations outside of the Pan-STARRS dust map
+    data= data[data['LOCATION_ID'] != 4266] #240,-18
+    data= data[data['LOCATION_ID'] != 4331] #5.5,-14.2
+    data= data[data['LOCATION_ID'] != 4381] #5.2,-12.2
+    data= data[data['LOCATION_ID'] != 4332] #1,-4
     return data
     
