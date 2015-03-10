@@ -69,5 +69,9 @@ def get_rcsample():
     data= data[data['LOCATION_ID'] != 4331] #5.5,-14.2
     data= data[data['LOCATION_ID'] != 4381] #5.2,-12.2
     data= data[data['LOCATION_ID'] != 4332] #1,-4
+    data= data[data['LOCATION_ID'] != 4329] #0,-5
+    data= data[data['LOCATION_ID'] != 4351] #0,-2
+    data= data[data['LOCATION_ID'] != 4353] #358,0
+    data= data[data['LOCATION_ID'] != 4385] #358.6,1.4
     return data
     
