@@ -8,6 +8,8 @@ import apogee.tools.read as apread
 from apogee.samples.rc import rcdist
 import isodist
 _FEHTAG= 'FE_H'
+_AFETAG= 'AVG_ALPHAFE'
+_AFELABEL= r'$[\left([\mathrm{O+Mg+Si+S+Ca}]/5\right)/\mathrm{Fe}]$'
 def get_rcsample():
     """
     NAME:
@@ -63,7 +65,7 @@ def get_rcsample():
                           +weight_mg*data['MG_H'])/(weight_o+weight_s
                                                     +weight_si+weight_ca
                                                     +weight_mg)\
-                                                    -data['FE_H']
+                                                    -data['FE_H']-0.05
     # Remove locations outside of the Pan-STARRS dust map
     data= data[data['LOCATION_ID'] != 4266] #240,-18
     data= data[data['LOCATION_ID'] != 4331] #5.5,-14.2
@@ -75,3 +77,39 @@ def get_rcsample():
     data= data[data['LOCATION_ID'] != 4385] #358.6,1.4
     return data
     
+# Define the low-alpha, low-iron sample
+def _lowlow_lowfeh(afe):
+    # The low metallicity edge
+    return -0.5
+def _lowlow_highfeh(afe):
+    # The high metallicity edge
+    return -0.15
+def _lowlow_lowafe(feh):
+    # The low alpha edge (-0.15,-0.075) to (-0.5,0)
+    return (0--0.075)/(-0.5--0.15)*(feh--0.15)-0.075
+def _lowlow_highafe(feh):
+    # The high alpha edge (-0.15,0.075) to (-0.5,0.15)
+    return (0.15-0.075)/(-0.5--0.15)*(feh--0.15)+0.075
+
+def get_lowlowsample():
+    """
+    NAME:
+       get_lowlowsample
+    PURPOSE:
+       get the RC sample at low alpha, low iron
+    INPUT:
+       None so far
+    OUTPUT:
+       sample
+    HISTORY:
+       2015-03-18 - Started - Bovy (IAS)
+    """
+    # Get the full sample first
+    data= get_rcsample()
+    # Now cut it
+    lowfeh= _lowlow_lowfeh(0.)
+    highfeh= _lowlow_highfeh(0.)
+    indx= (data[_FEHTAG] > lowfeh)*(data[_FEHTAG] <= highfeh)\
+        *(data[_AFETAG] > _lowlow_lowafe(data[_FEHTAG]))\
+        *(data[_AFETAG] <= _lowlow_highafe(data[_FEHTAG]))
+    return data[indx]
