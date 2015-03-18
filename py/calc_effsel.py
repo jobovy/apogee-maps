@@ -68,7 +68,7 @@ def _calc_effsel_onelocation(locid,apof,apo,ds):
     # Calculate the effective selection function for a given location
     try:
         esf= apof(locid,ds)*apo.area(locid)
-    except IndexError:
+    except (IndexError, TypeError,ValueError):
         esf= -numpy.ones_like(ds)
     return esf
 

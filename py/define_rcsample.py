@@ -67,6 +67,7 @@ def get_rcsample():
                                                     +weight_mg)\
                                                     -data['FE_H']-0.05
     # Remove locations outside of the Pan-STARRS dust map
+    # In the Southern hemisphere
     data= data[data['LOCATION_ID'] != 4266] #240,-18
     data= data[data['LOCATION_ID'] != 4331] #5.5,-14.2
     data= data[data['LOCATION_ID'] != 4381] #5.2,-12.2
@@ -75,6 +76,9 @@ def get_rcsample():
     data= data[data['LOCATION_ID'] != 4351] #0,-2
     data= data[data['LOCATION_ID'] != 4353] #358,0
     data= data[data['LOCATION_ID'] != 4385] #358.6,1.4
+    # Close to the ecliptic pole where there's no data (is it the ecliptic pole?
+    data= data[data['LOCATION_ID'] != 4528] #120,30
+    data= data[data['LOCATION_ID'] != 4217] #123,22.4
     return data
     
 # Define the low-alpha, low-iron sample
