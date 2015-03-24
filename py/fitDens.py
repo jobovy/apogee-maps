@@ -43,7 +43,6 @@ def fitDens(data,
                                                   dataR,dataphi,dataz,
                                                   effsel,Rgrid,phigrid,zgrid),
                               init,disp=verbose)
-    print out
     return out
 
 def _mloglike(*args,**kwargs):
