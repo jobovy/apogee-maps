@@ -11,7 +11,8 @@ import define_rcsample
 def fitDens(data,
             locations,effsel,distmods,
             type='exp',
-            mcmc=False):
+            mcmc=False,
+            verbose=True):
     """
     NAME:
        fitDens
@@ -41,9 +42,9 @@ def fitDens(data,
     out= optimize.fmin_powell(lambda x: _mloglike(x,densfunc,
                                                   dataR,dataphi,dataz,
                                                   effsel,Rgrid,phigrid,zgrid),
-                              init)
+                              init,disp=verbose)
     print out
-    return None
+    return out
 
 def _mloglike(*args,**kwargs):
     """Minus the log likelihood"""
