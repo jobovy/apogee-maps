@@ -41,6 +41,14 @@ def scalarDecorator(func):
             return result
     return scalar_wrapper
 
+############################### LOGIT FOR AMPLITUDES ##########################
+def logit(p):
+    """The logit functions"""
+    return numpy.log(p/(1.-p))
+def ilogit(x):
+    """The reverse logit"""
+    return 1./(1.+numpy.exp(-x))
+
 ################################# HEALPIX MAPS ################################
 def healpixelate(dist,densprofile,params=None,nside=512,nest=True):
     """
@@ -108,4 +116,25 @@ def expdisk(R,phi,z,glon=False,
         return -params[0]*(R-_R0)-params[1]*numpy.fabs(z)
     else:
         return numpy.exp(-params[0]*(R-_R0)-params[1]*numpy.fabs(z))
+
+@scalarDecorator
+@glonDecorator
+def expdiskplusconst(R,phi,z,glon=False,
+                     params=[1./3.,1./0.3,0.1]):
+    """
+    NAME:
+       expdiskplusconst
+    PURPOSE:
+       density of an exponential disk plus a constant
+    INPUT:
+       R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
+       glon= (False) if True, input coordinates above are (l,b,D)
+       params= parameters [1/hR,1/hz,log(amp)]
+    OUTPUT:
+       density or log density
+    HISTORY:
+       2015-03-04 - Written - Bovy (IAS)
+    """
+    return numpy.exp(-params[0]*(R-_R0)-params[1]*numpy.fabs(z))\
+        +numpy.exp(params[2])/24.
 

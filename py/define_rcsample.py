@@ -7,6 +7,8 @@ from galpy.util import bovy_coords
 import apogee.tools.read as apread
 from apogee.samples.rc import rcdist
 import isodist
+_R0= 8. # kpc
+_Z0= 0.025 # kpc
 _FEHTAG= 'FE_H'
 _AFETAG= 'AVG_ALPHAFE'
 _AFELABEL= r'$[\left([\mathrm{O+Mg+Si+S+Ca}]/5\right)/\mathrm{Fe}]$'
