@@ -38,6 +38,21 @@ def plot_afefeh(plotfilename):
     pyplot.plot([lowfeh,highfeh],[define_rcsample._lowlow_highafe(lowfeh),
                                   define_rcsample._lowlow_highafe(highfeh)],
                 'k--',lw=2.)
+    # high alpha
+    lowfeh= define_rcsample._highalpha_lowfeh(0.)
+    highfeh= define_rcsample._highalpha_highfeh(0.)
+    pyplot.plot([lowfeh,lowfeh],[define_rcsample._highalpha_lowafe(lowfeh),
+                                 define_rcsample._highalpha_highafe(lowfeh)],
+                'k--',lw=2.)
+    pyplot.plot([highfeh,highfeh],[define_rcsample._highalpha_lowafe(highfeh),
+                                   define_rcsample._highalpha_highafe(highfeh)],
+                'k--',lw=2.)
+    pyplot.plot([lowfeh,highfeh],[define_rcsample._highalpha_lowafe(lowfeh),
+                                  define_rcsample._highalpha_lowafe(highfeh)],
+                'k--',lw=2.)
+    pyplot.plot([lowfeh,highfeh],[define_rcsample._highalpha_highafe(lowfeh),
+                                  define_rcsample._highalpha_highafe(highfeh)],
+                'k--',lw=2.)
     bovy_plot.bovy_end_print(plotfilename)
     return None
 

@@ -119,3 +119,40 @@ def get_lowlowsample():
         *(data[_AFETAG] > _lowlow_lowafe(data[_FEHTAG]))\
         *(data[_AFETAG] <= _lowlow_highafe(data[_FEHTAG]))
     return data[indx]
+
+# Define the high-alpha sample
+def _highalpha_lowfeh(afe):
+    # The low metallicity edge
+    return -0.7
+def _highalpha_highfeh(afe):
+    # The high metallicity edge
+    return -0.1
+def _highalpha_lowafe(feh):
+    # The low alpha edge (-0.125,0.115) to (-0.6,0.215)
+    return (0.2-0.1)/(-0.6--0.125)*(feh--0.125)+0.115
+def _highalpha_highafe(feh):
+    # The high alpha edge (-0.125,0.19) to (-0.6,0.29)
+    return (0.275-0.175)/(-0.6--0.125)*(feh--0.125)+0.19
+
+def get_highalphasample():
+    """
+    NAME:
+       get_highalphasample
+    PURPOSE:
+       get the RC sample at high alpha
+    INPUT:
+       None so far
+    OUTPUT:
+       sample
+    HISTORY:
+       2015-03-24 - Started - Bovy (IAS)
+    """
+    # Get the full sample first
+    data= get_rcsample()
+    # Now cut it
+    lowfeh= _highalpha_lowfeh(0.)
+    highfeh= _highalpha_highfeh(0.)
+    indx= (data[_FEHTAG] > lowfeh)*(data[_FEHTAG] <= highfeh)\
+        *(data[_AFETAG] > _highalpha_lowafe(data[_FEHTAG]))\
+        *(data[_AFETAG] <= _highalpha_highafe(data[_FEHTAG]))
+    return data[indx]
