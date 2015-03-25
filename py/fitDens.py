@@ -6,12 +6,14 @@ import pickle
 import numpy
 from scipy import optimize
 from galpy.util import bovy_coords
+import bovy_mcmc
+import acor
 import densprofiles
 import define_rcsample
 def fitDens(data,
             locations,effsel,distmods,
             type='exp',
-            mcmc=False,
+            mcmc=False,nsamples=10000,
             verbose=True):
     """
     NAME:
@@ -25,6 +27,8 @@ def fitDens(data,
        distmods - grid of distance moduli on which the effective selection function is pre-computed
        type= ('exp') type of density profile to fit
        mcmc= (False) run MCMC or not
+       nsamples= (10000) number of MCMC samples to obtain
+       verbose= (True) set this to False for no optimize convergence messages
     OUTPUT:
     HISTORY:
        2015-03-24 - Written - Bovy (IAS)
@@ -43,7 +47,22 @@ def fitDens(data,
                                                   dataR,dataphi,dataz,
                                                   effsel,Rgrid,phigrid,zgrid),
                               init,disp=verbose)
-    return out
+    if mcmc:
+        samples= bovy_mcmc.markovpy(out,
+                                    0.05,
+                                    lambda x: loglike(x,densfunc,
+                                                      dataR,dataphi,dataz,
+                                                      effsel,Rgrid,
+                                                      phigrid,zgrid),
+                                    (),
+                                    isDomainFinite=[[False,False] for ii in range(len(out))],
+                                    domain= [[0.,0.] for ii in range(len(out))],
+                                    nsamples=nsamples,
+                                    nwalkers=2*len(out))
+        if verbose: print_samples_qa(samples)
+        return (out,numpy.array(samples).T)
+    else:
+        return out
 
 def _mloglike(*args,**kwargs):
     """Minus the log likelihood"""
@@ -139,3 +158,12 @@ def _setup_effvol(locations,effsel,distmods):
     # Also need to multiply in distance factors
     effsel*= numpy.tile(ds**3.*(distmods[1]-distmods[0]),(effsel.shape[0],1))
     return (effsel,Rgrid,phigrid,zgrid)
+
+# From vclos before...
+def print_samples_qa(samples):
+    print "Mean, standard devs, acor tau, acor mean, acor s ..."
+    for kk in range(len(samples[0])):
+        xs= numpy.array([s[kk] for s in samples])
+        #Auto-correlation time
+        tau, m, s= acor.acor(xs)
+        print numpy.mean(xs), numpy.std(xs), tau, m, s
