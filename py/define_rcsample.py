@@ -156,3 +156,78 @@ def get_highalphasample():
         *(data[_AFETAG] > _highalpha_lowafe(data[_FEHTAG]))\
         *(data[_AFETAG] <= _highalpha_highafe(data[_FEHTAG]))
     return data[indx]
+
+# Define the solar sample
+def _solar_lowfeh(afe):
+    # The low metallicity edge
+    return -0.1
+def _solar_highfeh(afe):
+    # The high metallicity edge
+    return 0.1
+def _solar_lowafe(feh):
+    # The low alpha edge (0.1,-0.075) to (-0.1,-0.075)
+    return -0.075
+def _solar_highafe(feh):
+    # The high alpha edge (-0.15,0.1) to (0.1,0.05)
+    return (0.1-0.05)/(-0.15-0.1)*(feh-0.1)+0.05
+
+def get_solarsample():
+    """
+    NAME:
+       get_solarsample
+    PURPOSE:
+       get the RC sample at solar abundances
+    INPUT:
+       None so far
+    OUTPUT:
+       sample
+    HISTORY:
+       2015-03-18 - Started - Bovy (IAS)
+    """
+    # Get the full sample first
+    data= get_rcsample()
+    # Now cut it
+    lowfeh= _solar_lowfeh(0.)
+    highfeh= _solar_highfeh(0.)
+    indx= (data[_FEHTAG] > lowfeh)*(data[_FEHTAG] <= highfeh)\
+        *(data[_AFETAG] > _solar_lowafe(data[_FEHTAG]))\
+        *(data[_AFETAG] <= _solar_highafe(data[_FEHTAG]))
+    return data[indx]
+
+# Define the high metallicity sample
+def _highfeh_lowfeh(afe):
+    # The low metallicity edge
+    return 0.15
+def _highfeh_highfeh(afe):
+    # The high metallicity edge
+    return 0.4
+def _highfeh_lowafe(feh):
+    # The low alpha edge (0.1,-0.075) to (-0.1,-0.075)
+    return -0.075
+def _highfeh_highafe(feh):
+    # The high alpha edge (-0.15,0.1) to (0.1,0.05)
+    return 0.05
+
+def get_highfehsample():
+    """
+    NAME:
+       get_highfehsample
+    PURPOSE:
+       get the RC sample at high [Fe/H]
+    INPUT:
+       None so far
+    OUTPUT:
+       sample
+    HISTORY:
+       2015-03-18 - Started - Bovy (IAS)
+    """
+    # Get the full sample first
+    data= get_rcsample()
+    # Now cut it
+    lowfeh= _highfeh_lowfeh(0.)
+    highfeh= _highfeh_highfeh(0.)
+    indx= (data[_FEHTAG] > lowfeh)*(data[_FEHTAG] <= highfeh)\
+        *(data[_AFETAG] > _highfeh_lowafe(data[_FEHTAG]))\
+        *(data[_AFETAG] <= _highfeh_highafe(data[_FEHTAG]))
+    return data[indx]
+

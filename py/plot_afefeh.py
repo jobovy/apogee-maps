@@ -53,6 +53,36 @@ def plot_afefeh(plotfilename):
     pyplot.plot([lowfeh,highfeh],[define_rcsample._highalpha_highafe(lowfeh),
                                   define_rcsample._highalpha_highafe(highfeh)],
                 'k--',lw=2.)
+    # solar
+    lowfeh= define_rcsample._solar_lowfeh(0.)
+    highfeh= define_rcsample._solar_highfeh(0.)
+    pyplot.plot([lowfeh,lowfeh],[define_rcsample._solar_lowafe(lowfeh),
+                                 define_rcsample._solar_highafe(lowfeh)],
+                'k--',lw=2.)
+    pyplot.plot([highfeh,highfeh],[define_rcsample._solar_lowafe(highfeh),
+                                   define_rcsample._solar_highafe(highfeh)],
+                'k--',lw=2.)
+    pyplot.plot([lowfeh,highfeh],[define_rcsample._solar_lowafe(lowfeh),
+                                  define_rcsample._solar_lowafe(highfeh)],
+                'k--',lw=2.)
+    pyplot.plot([lowfeh,highfeh],[define_rcsample._solar_highafe(lowfeh),
+                                  define_rcsample._solar_highafe(highfeh)],
+                'k--',lw=2.)
+    # high [Fe/H]
+    lowfeh= define_rcsample._highfeh_lowfeh(0.)
+    highfeh= define_rcsample._highfeh_highfeh(0.)
+    pyplot.plot([lowfeh,lowfeh],[define_rcsample._highfeh_lowafe(lowfeh),
+                                 define_rcsample._highfeh_highafe(lowfeh)],
+                'k--',lw=2.)
+    pyplot.plot([highfeh,highfeh],[define_rcsample._highfeh_lowafe(highfeh),
+                                   define_rcsample._highfeh_highafe(highfeh)],
+                'k--',lw=2.)
+    pyplot.plot([lowfeh,highfeh],[define_rcsample._highfeh_lowafe(lowfeh),
+                                  define_rcsample._highfeh_lowafe(highfeh)],
+                'k--',lw=2.)
+    pyplot.plot([lowfeh,highfeh],[define_rcsample._highfeh_highafe(lowfeh),
+                                  define_rcsample._highfeh_highafe(highfeh)],
+                'k--',lw=2.)
     bovy_plot.bovy_end_print(plotfilename)
     return None
 
