@@ -49,7 +49,7 @@ def fitDens(data,
                               init,disp=verbose)
     if mcmc:
         samples= bovy_mcmc.markovpy(out,
-                                    0.05,
+                                    0.2,
                                     lambda x: loglike(x,densfunc,
                                                       dataR,dataphi,dataz,
                                                       effsel,Rgrid,
@@ -87,6 +87,8 @@ def loglike(params,densfunc,
     HISTORY:
        2015-03-24 - Written - Bovy (IAS)
     """
+    # Check priors
+    raise NotImplementedError("Need to implement priors")
     # Setup the density function
     tdensfunc= lambda x,y,z: densfunc(x,y,z,params=params)
     # Evaluate the log density at the data
@@ -122,12 +124,20 @@ def _setup_densfunc(type):
         return densprofiles.expdisk
     elif type.lower() == 'expplusconst':
         return densprofiles.expdiskplusconst
+    elif type.lower() == 'twoexp':
+        return densprofiles.twoexpdisk
+    elif type.lower() == 'brokenexp':
+        return densprofiles.brokenexpdisk
 def _setup_initparams_densfunc(type,data):
     """Return the initial parameters of the density for this type, might depend on the data"""
     if type.lower() == 'exp':
         return [1./3.,1./0.3]
     elif type.lower() == 'expplusconst':
         return [1./3.,1./0.3,numpy.log(0.1)]
+    elif type.lower() == 'twoexp':
+        return [1./3.,1./0.3,1./4.,1./0.5,densprofiles.logit(0.5)]
+    elif type.lower() == 'brokenexp':
+        return [1./6.,1./0.3,1./2.,numpy.log(14.)]
 
 ########################### EFFECTIVE VOLUME SETUP ############################
 def _setup_effvol(locations,effsel,distmods):

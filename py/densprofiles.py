@@ -133,8 +133,63 @@ def expdiskplusconst(R,phi,z,glon=False,
     OUTPUT:
        density or log density
     HISTORY:
-       2015-03-04 - Written - Bovy (IAS)
+       2015-03-24 - Written - Bovy (IAS)
     """
-    return numpy.exp(-params[0]*(R-_R0)-params[1]*numpy.fabs(z))\
+    return numpy.exp(-params[0]*(R-_R0)-params[1]*numpy.fabs(z))/2.\
+        *numpy.fabs(params[1])\
         +numpy.exp(params[2])/24.
+
+@scalarDecorator
+@glonDecorator
+def twoexpdisk(R,phi,z,glon=False,
+               params=[1./3.,1./0.3,1./4.,1./0.5,logit(0.1)]):
+    """
+    NAME:
+       twoexpdisk
+    PURPOSE:
+       density of a sum of two exponential disks
+    INPUT:
+       R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
+       glon= (False) if True, input coordinates above are (l,b,D)
+       params= parameters [1/hR,1/hz,1/hR2,1/hz2,logit(amp2)]
+    OUTPUT:
+       density or log density
+    HISTORY:
+       2015-03-24 - Written - Bovy (IAS)
+    """
+    amp= ilogit(params[4])
+    return (1.-amp)/2.*numpy.fabs(params[1])\
+        *numpy.exp(-params[0]*(R-_R0)-params[1]*numpy.fabs(z))\
+        +amp/2.*params[3]*numpy.exp(-params[2]*(R-_R0)-params[3]*numpy.fabs(z))
+
+@scalarDecorator
+@glonDecorator
+def brokenexpdisk(R,phi,z,glon=False,
+                  params=[1./3.,1./0.3,1./4.,1./0.5,10.]):
+    """
+    NAME:
+       brokenexpdisk
+    PURPOSE:
+       density of a sum of two exponential disks
+    INPUT:
+       R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
+       glon= (False) if True, input coordinates above are (l,b,D)
+       params= parameters [1/hR,1/hz,1/hR2,1/hz2,log[Rbreak]]
+    OUTPUT:
+       density or log density
+    HISTORY:
+       2015-03-24 - Written - Bovy (IAS)
+    """
+    Rb= numpy.exp(params[3])
+    out= numpy.empty_like(R)
+    sR= R[R <= Rb]
+    bR= R[R > Rb]
+    sz= z[R <= Rb]
+    bz= z[R > Rb]
+    out[R <= Rb]= \
+        numpy.fabs(params[1])/2.*numpy.exp(-params[0]*(sR-_R0)-params[1]*numpy.fabs(sz))
+    out[R > Rb]=\
+        numpy.exp(-params[2]*(bR-_R0)-params[1]*numpy.fabs(bz))\
+        *numpy.fabs(params[1])/2.*numpy.exp(params[2]*(Rb-_R0)-params[0]*(Rb-_R0))
+    return out
 
