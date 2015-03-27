@@ -8,29 +8,36 @@ from scipy import interpolate
 from galpy.util import bovy_coords
 from fitDens import _setup_densfunc
 import define_rcsample
-def predict_Xdist(params,
-                  locations,effsel,distmods,
-                  type='exp',
-                  dR=None):
+def predict_spacedist(params,
+                      locations,effsel,distmods,
+                      type='exp',
+                      coord='Z'):
     """
     NAME:
-       predict_Xdist
+       predict_spacedist
     PURPOSE:
-       predict the distribution of Galactocentric X
+       predict the spatial distribution
     INPUT:
        params - parameters of the density profile
        locations - locations of the APOGEE effective selection function to consider
        effsel - array (nloc,nD) of the effective selection function, includes area of the field
        distmods - grid of distance moduli on which the effective selection function is pre-computed
        type= ('exp') type of density profile to fit      
-       dR= (None) if set, integrate over little bins in dR
+       coord= ('dm', 'X', or 'Z')
     OUTPUT:
        (R,model(R))
     HISTORY:
        2015-03-26 - Written - Bovy (IAS)
     """
-    # Grid in X
-    Xs= numpy.linspace(0.,20.,301)
+    if coord.lower() == 'x':
+        # Grid in X
+        Xs= numpy.linspace(0.,20.,301)
+    elif coord.lower() == 'z':
+        # Grid in X
+        Xs= numpy.linspace(0.,20.,301)
+    elif coord.lower() == 'dm':
+        # Grid in X
+        Xs= numpy.linspace(7.,15.5,301)
     # Setup the density function
     rdensfunc= _setup_densfunc(type)
     densfunc= lambda x,y,z: rdensfunc(x,y,z,params=params)
@@ -64,15 +71,24 @@ def predict_Xdist(params,
     effsel*= numpy.tile(ds**3.*(distmods[1]-distmods[0]),(effsel.shape[0],1))
     tdens= densfunc(Rgrid,phigrid,zgrid)
     rate= tdens*effsel
-    out= numpy.zeros_like(Xs)
     out= numpy.zeros((len(locations),len(Xs)))
     for ii in range(len(locations)):
-        # Jacobian
-        tjac= numpy.fabs((numpy.roll(distmods,-1)-distmods)/\
-                             (numpy.roll(Xgrid[ii],-1)-Xgrid[ii]))
-        tjac[-1]= tjac[-2]
-        # Interpolate between this location's minimum and maximum dm
-        tXs= Xgrid[ii,rate[ii] > 0.]
+        if coord.lower() == 'x':
+            # Jacobian
+            tjac= numpy.fabs((numpy.roll(distmods,-1)-distmods)/\
+                                 (numpy.roll(Xgrid[ii],-1)-Xgrid[ii]))
+            tjac[-1]= tjac[-2]
+            tXs= Xgrid[ii,rate[ii] > 0.]
+        elif coord.lower() == 'z':
+            # Jacobian
+            tjac= numpy.fabs((numpy.roll(distmods,-1)-distmods)/\
+                                 (numpy.roll(zgrid[ii],-1)-zgrid[ii]))
+            tjac[-1]= tjac[-2]
+            tXs= zgrid[ii,rate[ii] > 0.]
+        elif coord.lower() == 'dm':
+            # Jacobian
+            tjac= numpy.ones_like(Xs)
+            tXs= distmods[rate[ii] > 0.]
         sindx= numpy.argsort(tXs)
         tXs= tXs[sindx]
         trate= rate[ii,rate[ii] > 0.][sindx]
@@ -83,7 +99,7 @@ def predict_Xdist(params,
         sp= interpolate.InterpolatedUnivariateSpline(tXs,ipthis,k=3)
         tindx= (Xs >= numpy.amin(tXs))\
             *(Xs <= numpy.amax(tXs))
-        out[ii,tindx]+= (numpy.exp(sp(Xs[tindx])*baseline(Xs[tindx]))-10.**-8.)
+        out[ii,tindx]= (numpy.exp(sp(Xs[tindx])*baseline(Xs[tindx]))-10.**-8.)
     out[numpy.isinf(out)]= 0.
     return (Xs,out.sum(axis=0))
 
