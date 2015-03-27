@@ -88,7 +88,7 @@ def loglike(params,densfunc,
        2015-03-24 - Written - Bovy (IAS)
     """
     # Check priors
-    raise NotImplementedError("Need to implement priors")
+    #raise NotImplementedError("Need to implement priors")
     # Setup the density function
     tdensfunc= lambda x,y,z: densfunc(x,y,z,params=params)
     # Evaluate the log density at the data
