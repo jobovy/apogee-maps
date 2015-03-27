@@ -81,6 +81,8 @@ def get_rcsample():
     # Close to the ecliptic pole where there's no data (is it the ecliptic pole?
     data= data[data['LOCATION_ID'] != 4528] #120,30
     data= data[data['LOCATION_ID'] != 4217] #123,22.4
+    # Remove stars w/ DM < 8.49, because for standard candle RC, these cannot be in the sample
+    data= data[data['RC_DM_H'] > 8.49]
     return data
     
 # Define the low-alpha, low-iron sample
