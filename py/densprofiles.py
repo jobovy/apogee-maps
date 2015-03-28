@@ -165,7 +165,7 @@ def twoexpdisk(R,phi,z,glon=False,
 @scalarDecorator
 @glonDecorator
 def brokenexpdisk(R,phi,z,glon=False,
-                  params=[1./3.,1./0.3,1./4.,1./0.5,10.]):
+                  params=[1./3.,1./0.3,1./4.,numpy.log(10.)]):
     """
     NAME:
        brokenexpdisk
@@ -174,7 +174,7 @@ def brokenexpdisk(R,phi,z,glon=False,
     INPUT:
        R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
        glon= (False) if True, input coordinates above are (l,b,D)
-       params= parameters [1/hR,1/hz,1/hR2,1/hz2,log[Rbreak]]
+       params= parameters [1/hR,1/hz,1/hR2,log[Rbreak]]
     OUTPUT:
        density or log density
     HISTORY:
