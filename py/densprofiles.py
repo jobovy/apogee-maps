@@ -170,7 +170,7 @@ def brokenexpdisk(R,phi,z,glon=False,
     NAME:
        brokenexpdisk
     PURPOSE:
-       density of a sum of two exponential disks
+       density of a broken exponential disk (two scale lengths)
     INPUT:
        R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
        glon= (False) if True, input coordinates above are (l,b,D)
@@ -192,4 +192,26 @@ def brokenexpdisk(R,phi,z,glon=False,
         numpy.exp(-params[2]*(bR-_R0)-params[1]*numpy.fabs(bz))\
         *numpy.fabs(params[1])/2.*numpy.exp(params[2]*(Rb-_R0)-params[0]*(Rb-_R0))
     return out
+
+@scalarDecorator
+@glonDecorator
+def gaussexpdisk(R,phi,z,glon=False,
+                 params=[1./3.,1./0.3,numpy.log(10.)]):
+    """
+    NAME:
+       gaussexpdisk
+    PURPOSE:
+       density as a Gaussian in radius and an exponential vertically
+    INPUT:
+       R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
+       glon= (False) if True, input coordinates above are (l,b,D)
+       params= parameters [1/hR,1/hz,log[Rmax]]
+    OUTPUT:
+       density
+    HISTORY:
+       2015-03-28 - Written - Bovy (IAS)
+    """
+    Rm= numpy.exp(params[2])
+    return numpy.fabs(params[1])/2.*numpy.exp(-params[1]*numpy.fabs(z))\
+        *numpy.exp(-params[0]**2./2.*((R-Rm)**2.-(_R0-Rm)**2.))
 
