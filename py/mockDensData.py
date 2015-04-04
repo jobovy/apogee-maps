@@ -1,11 +1,13 @@
 ###############################################################################
 # mockDensData.py: generate mock data following a given density
 ###############################################################################
+import sys
 import os, os.path
 import pickle
 import numpy
 from scipy import ndimage
 from galpy.util import bovy_coords
+from apogee.select.apogeeSelect import _ERASESTR
 import mwdust
 import define_rcsample
 import fitDens
@@ -63,12 +65,13 @@ def generate(locations,
     distmods= numpy.linspace(7.,15.5,301)
     ds= 10.**(distmods/5-2.)
     maxp= 0.
-    nls, nbs= 51, 51
+    nls, nbs= 101,101
     lnprobs= numpy.empty((len(locations),len(distmods),nbs,nls))
     radii= []
     lcens, bcens= [], []
     for ll,loc in enumerate(locations):
-        print loc
+        sys.stdout.write('\r'+"Working on location %i / %i ..." % (ll+1,len(locations)))
+        sys.stdout.flush()
         lcen, bcen= apo.glonGlat(loc)
         lcens.append(lcen[0])
         bcens.append(bcen[0])
@@ -77,9 +80,9 @@ def generate(locations,
         ls= numpy.linspace(lcen-rad,lcen+rad,nls)
         bs= numpy.linspace(bcen-rad,bcen+rad,nbs)
         # Tile these
-        tls= numpy.tile(ls,(len(bs),len(ds),1))
-        tbs= numpy.tile(bs,(len(ls),len(ds),1)).T
-        tds= numpy.tile(ds.T,(1,len(ls),len(bs),1))[0].T
+        tls= numpy.tile(ls,(len(ds),len(bs),1))
+        tbs= numpy.swapaxes(numpy.tile(bs,(len(ds),len(ls),1)),1,2)
+        tds= numpy.tile(ds,(len(ls),len(bs),1)).T
         XYZ= bovy_coords.lbd_to_XYZ(tls.flatten(),
                                     tbs.flatten(),
                                     tds.flatten(),
@@ -104,6 +107,8 @@ def generate(locations,
         lnprobs[ll]= numpy.log(numpy.reshape(ps,(len(distmods),nbs,nls))\
                                    +10.**-8.)
     maxp*= 1.1 # Just to be sure
+    sys.stdout.write('\r'+_ERASESTR+'\r')
+    sys.stdout.flush()
     # Now generate mock data using rejection sampling
     nout= 0
     arlocations= numpy.array(locations)
@@ -173,7 +178,7 @@ def generate(locations,
         out['RC_GALPHI_H'][nout:nout+numpy.sum(keepIndx)]= Rphiz[1][keepIndx]
         out['RC_GALZ_H'][nout:nout+numpy.sum(keepIndx)]= Rphiz[2][keepIndx]
         nout= nout+numpy.sum(keepIndx)
-    return out    
+    return (out,lnprobs)
 
 def _setup_mockparams_densfunc(type):
     """Return the parameters of the mock density for this type"""
