@@ -245,7 +245,7 @@ if __name__ == '__main__':
     options, args= parser.parse_args()
     data= define_rcsample.get_rcsample()
     locations= list(set(list(data['LOCATION_ID'])))
-    locations= [4240,4242]
+    #locations= [4240,4242]
     out= generate(locations,
                   type=options.type,
                   sample=options.sample,
