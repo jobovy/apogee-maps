@@ -13,6 +13,9 @@ import mwdust
 import define_rcsample
 import fitDens
 import densprofiles
+dmap= None
+dmapg15= None
+apo= None
 def generate(locations,
              type='exp',
              sample='lowlow',
@@ -47,6 +50,8 @@ def generate(locations,
     mockparams= _setup_mockparams_densfunc(type,sample)
     densfunc= lambda x,y,z: rdensfunc(x,y,z,params=mockparams)   
     # Setup the extinction map
+    global dmap
+    global dmapg15
     if _dmapg15 is None: dmapg15= mwdust.Green15(filter='2MASS H')
     else: dmapg15= _dmapg15
     if isinstance(extmap,mwdust.DustMap3D.DustMap3D):
@@ -64,6 +69,7 @@ def generate(locations,
     # Loop through all locations and compute sampling probability on grid in 
     # (l,b,D)
     # First restore the APOGEE selection function (assumed pre-computed)
+    global apo
     selectFile= '../savs/selfunc-nospdata.sav'
     if os.path.exists(selectFile):
         with open(selectFile,'rb') as savefile:
@@ -78,7 +84,7 @@ def generate(locations,
     lcens, bcens= [], []
     lnprobs= multi.parallel_map(lambda x: _calc_lnprob(locations[x],nls,nbs,
                                                        ds,distmods,
-                                                       dmap,dmapg15,H0,
+                                                       H0,
                                                        densfunc,apo),
                                 range(len(locations)),
                                 numcores=numpy.amin([len(locations),
@@ -187,7 +193,7 @@ def _setup_mockparams_densfunc(type,sample):
         else:
             return [1./3.,1./0.3,numpy.log(10.)]
 
-def _calc_lnprob(loc,nls,nbs,ds,distmods,dmap,dmapg15,H0,densfunc,apo):
+def _calc_lnprob(loc,nls,nbs,ds,distmods,H0,densfunc):
     lcen, bcen= apo.glonGlat(loc)
     rad= apo.radius(loc)
     ls= numpy.linspace(lcen-rad,lcen+rad,nls)
