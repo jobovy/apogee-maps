@@ -217,7 +217,10 @@ def _calc_lnprob(loc,nls,nbs,ds,distmods,H0,densfunc):
             try:
                 tH[:,ii,jj]+= dmap(ls[jj],bs[ii],ds)
             except (IndexError, TypeError,ValueError):
-                tH[:,ii,jj]+= dmapg15(ls[jj],bs[ii],ds)
+                try:
+                    tH[:,ii,jj]+= dmapg15(ls[jj],bs[ii],ds)
+                except IndexError: # assume zero outside
+                    pass
     tH= tH.flatten()+H0[0]
     ps= densfunc(Rphiz[0],Rphiz[1],Rphiz[2])*apo(loc,tH)\
         *numpy.fabs(numpy.cos(tbs.flatten()/180.*numpy.pi))\
