@@ -85,7 +85,7 @@ def generate(locations,
     lnprobs= multi.parallel_map(lambda x: _calc_lnprob(locations[x],nls,nbs,
                                                        ds,distmods,
                                                        H0,
-                                                       densfunc,apo),
+                                                       densfunc),
                                 range(len(locations)),
                                 numcores=numpy.amin([len(locations),
                                                      multiprocessing.cpu_count(),ncpu]))
