@@ -1,22 +1,27 @@
 ###############################################################################
 # mockDensData.py: generate mock data following a given density
 ###############################################################################
-import sys
 import os, os.path
 import pickle
+import multiprocessing
+from optparse import OptionParser
 import numpy
 from scipy import ndimage
-from galpy.util import bovy_coords
-from apogee.select.apogeeSelect import _ERASESTR
+import fitsio
+from galpy.util import bovy_coords, multi
 import mwdust
 import define_rcsample
 import fitDens
+import densprofiles
 def generate(locations,
              type='exp',
+             sample='lowlow',
              extmap='green15',
+             nls=101,
              nmock=1000,
              H0=-1.49,
-             _dmapg15=None):
+             _dmapg15=None,             
+             ncpu=1):
     """
     NAME:
        generate
@@ -25,9 +30,12 @@ def generate(locations,
     INPUT:
        locations - locations to be included in the sample
        type= ('exp') type of density profile to sample from
+       sample= ('lowlow') for selecting mock parameters
        extmap= ('green15') extinction map to use ('marshall06' and others use Green15 to fill in unobserved regions)
+       nls= (101) number of longitude bins to use for each field
        nmock= (1000) number of mock data points to generate
        H0= (-1.49) absolute magnitude (can be array w/ sampling spread)
+       ncpu= (1) number of cpus to use to compute the probability
     OUTPUT:
        mockdata recarray with tags 'RC_GALR_H', 'RC_GALPHI_H', 'RC_GALZ_H'
     HISTORY:
@@ -36,7 +44,7 @@ def generate(locations,
     if isinstance(H0,float): H0= [H0]
     # Setup the density function and its initial parameters
     rdensfunc= fitDens._setup_densfunc(type)
-    mockparams= _setup_mockparams_densfunc(type)
+    mockparams= _setup_mockparams_densfunc(type,sample)
     densfunc= lambda x,y,z: rdensfunc(x,y,z,params=mockparams)   
     # Setup the extinction map
     if _dmapg15 is None: dmapg15= mwdust.Green15(filter='2MASS H')
@@ -64,51 +72,25 @@ def generate(locations,
     # maximum probability
     distmods= numpy.linspace(7.,15.5,301)
     ds= 10.**(distmods/5-2.)
-    maxp= 0.
-    nls, nbs= 101,101
+    nbs= nls
     lnprobs= numpy.empty((len(locations),len(distmods),nbs,nls))
     radii= []
     lcens, bcens= [], []
-    for ll,loc in enumerate(locations):
-        sys.stdout.write('\r'+"Working on location %i / %i ..." % (ll+1,len(locations)))
-        sys.stdout.flush()
+    lnprobs= multi.parallel_map(lambda x: _calc_lnprob(locations[x],nls,nbs,
+                                                       ds,distmods,
+                                                       dmap,dmapg15,H0,
+                                                       densfunc,apo),
+                                range(len(locations)),
+                                numcores=numpy.amin([len(locations),
+                                                     multiprocessing.cpu_count(),ncpu]))
+    lnprobs= numpy.array(lnprobs)
+    for ll, loc in enumerate(locations):
         lcen, bcen= apo.glonGlat(loc)
-        lcens.append(lcen[0])
-        bcens.append(bcen[0])
         rad= apo.radius(loc)
         radii.append(rad) # save for later
-        ls= numpy.linspace(lcen-rad,lcen+rad,nls)
-        bs= numpy.linspace(bcen-rad,bcen+rad,nbs)
-        # Tile these
-        tls= numpy.tile(ls,(len(ds),len(bs),1))
-        tbs= numpy.swapaxes(numpy.tile(bs,(len(ds),len(ls),1)),1,2)
-        tds= numpy.tile(ds,(len(ls),len(bs),1)).T
-        XYZ= bovy_coords.lbd_to_XYZ(tls.flatten(),
-                                    tbs.flatten(),
-                                    tds.flatten(),
-                                    degree=True)
-        Rphiz= bovy_coords.XYZ_to_galcencyl(XYZ[:,0],XYZ[:,1],XYZ[:,2],
-                                            Xsun=define_rcsample._R0,
-                                            Ysun=0.,
-                                            Zsun=define_rcsample._Z0)
-        # Evaluate probability density
-        tH= numpy.tile(distmods.T,(1,len(ls),len(bs),1))[0].T
-        for ii in range(tH.shape[1]):
-            for jj in range(tH.shape[2]):
-                try:
-                    tH[:,ii,jj]+= dmap(ls[jj],bs[ii],ds)
-                except (IndexError, TypeError,ValueError):
-                    tH[:,ii,jj]+= dmap15(ls[jj],bs[ii],ds)
-        tH= tH.flatten()+H0[0]
-        ps= densfunc(Rphiz[0],Rphiz[1],Rphiz[2])*apo(loc,tH)\
-            *numpy.fabs(numpy.cos(tbs.flatten()/180.*numpy.pi))\
-            *tds.flatten()**3.
-        if numpy.nanmax(ps) > maxp: maxp= numpy.nanmax(ps)
-        lnprobs[ll]= numpy.log(numpy.reshape(ps,(len(distmods),nbs,nls))\
-                                   +10.**-8.)
-    maxp*= 1.1 # Just to be sure
-    sys.stdout.write('\r'+_ERASESTR+'\r')
-    sys.stdout.flush()
+        lcens.append(lcen[0])
+        bcens.append(bcen[0])
+    maxp= (numpy.exp(numpy.nanmax(lnprobs))-10.**-8.)*1.1 # Just to be sure
     # Now generate mock data using rejection sampling
     nout= 0
     arlocations= numpy.array(locations)
@@ -180,15 +162,97 @@ def generate(locations,
         nout= nout+numpy.sum(keepIndx)
     return (out,lnprobs)
 
-def _setup_mockparams_densfunc(type):
+def _setup_mockparams_densfunc(type,sample):
     """Return the parameters of the mock density for this type"""
     if type.lower() == 'exp':
-        return [1./3.,1./0.3]
+        if sample.lower() == 'lowlow':
+            return [0.,1./0.3]
+        else:
+            return [1./3.,1./0.3]
     elif type.lower() == 'expplusconst':
-        return [1./3.,1./0.3,numpy.log(0.1)]
+        if sample.lower() == 'lowlow':
+            return [0.,1./0.3,numpy.log(0.1)]
+        else:
+            return [1./3.,1./0.3,numpy.log(0.1)]
     elif type.lower() == 'twoexp':
         return [1./3.,1./0.3,1./4.,1./0.5,densprofiles.logit(0.5)]
     elif type.lower() == 'brokenexp':
-        return [1./6.,1./0.3,1./2.,numpy.log(14.)]
+        if sample.lower() == 'lowlow':
+            return [-0.2,1./.3,0.2,numpy.log(11.)]
+        else:
+            return [1./6.,1./0.3,1./2.,numpy.log(14.)]
     elif type.lower() == 'gaussexp':
-        return [1./3.,1./0.3,numpy.log(10.)]
+        if sample.lower() == 'lowlow':
+            return [.4,1./0.3,numpy.log(11.)]
+        else:
+            return [1./3.,1./0.3,numpy.log(10.)]
+
+def _calc_lnprob(loc,nls,nbs,ds,distmods,dmap,dmapg15,H0,densfunc,apo):
+    lcen, bcen= apo.glonGlat(loc)
+    rad= apo.radius(loc)
+    ls= numpy.linspace(lcen-rad,lcen+rad,nls)
+    bs= numpy.linspace(bcen-rad,bcen+rad,nbs)
+    # Tile these
+    tls= numpy.tile(ls,(len(ds),len(bs),1))
+    tbs= numpy.swapaxes(numpy.tile(bs,(len(ds),len(ls),1)),1,2)
+    tds= numpy.tile(ds,(len(ls),len(bs),1)).T
+    XYZ= bovy_coords.lbd_to_XYZ(tls.flatten(),
+                                tbs.flatten(),
+                                tds.flatten(),
+                                degree=True)
+    Rphiz= bovy_coords.XYZ_to_galcencyl(XYZ[:,0],XYZ[:,1],XYZ[:,2],
+                                        Xsun=define_rcsample._R0,
+                                        Ysun=0.,
+                                        Zsun=define_rcsample._Z0)
+    # Evaluate probability density
+    tH= numpy.tile(distmods.T,(1,len(ls),len(bs),1))[0].T
+    for ii in range(tH.shape[1]):
+        for jj in range(tH.shape[2]):
+            try:
+                tH[:,ii,jj]+= dmap(ls[jj],bs[ii],ds)
+            except (IndexError, TypeError,ValueError):
+                tH[:,ii,jj]+= dmapg15(ls[jj],bs[ii],ds)
+    tH= tH.flatten()+H0[0]
+    ps= densfunc(Rphiz[0],Rphiz[1],Rphiz[2])*apo(loc,tH)\
+        *numpy.fabs(numpy.cos(tbs.flatten()/180.*numpy.pi))\
+        *tds.flatten()**3.
+    return numpy.log(numpy.reshape(ps,(len(distmods),nbs,nls))\
+                         +10.**-8.)
+
+def get_options():
+    usage = "usage: %prog [options] <savefilename>\n\nsavefilename= name of the file that the mock datawill be saved to"
+    parser = OptionParser(usage=usage)
+    parser.add_option("--type",dest='type',default='exp',
+                      help="Type of density profile")
+    parser.add_option("--sample",dest='sample',default='lowlow',
+                      help="Sample parameter for mock parameters")
+    parser.add_option("--H0",dest='H0',default=-1.49,type='float',
+                      help="RC absolute magnitude")
+    parser.add_option("--nls",dest='nls',default=101,type='int',
+                      help="Number of longitudes to bin each field in")
+    parser.add_option("--nmock",dest='nmock',default=20000,type='int',
+                      help="Number of mock samples to generate")
+    # Dust map to use
+    parser.add_option("--extmap",dest='extmap',default='green15',
+                      help="Dust map to use ('Green15', 'Marshall03', 'Drimmel03', 'Sale14', or 'zero'")
+    # Multiprocessing?
+    parser.add_option("-m","--multi",dest='multi',default=1,type='int',
+                      help="number of cpus to use")
+    return parser
+
+if __name__ == '__main__':
+    parser= get_options()
+    options, args= parser.parse_args()
+    data= define_rcsample.get_rcsample()
+    locations= list(set(list(data['LOCATION_ID'])))
+    locations= [4240,4242]
+    out= generate(locations,
+                  type=options.type,
+                  sample=options.sample,
+                  extmap=options.extmap,
+                  nls=options.nls,
+                  nmock=options.nmock,
+                  H0=options.H0,
+                  ncpu=options.multi)
+    fitsio.write(args[0],out[0],clobber=True)
+    
