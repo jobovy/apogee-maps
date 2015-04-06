@@ -173,6 +173,8 @@ def _setup_mockparams_densfunc(type,sample):
     if type.lower() == 'exp':
         if sample.lower() == 'lowlow':
             return [0.,1./0.3]
+        elif sample.lower() == 'solar':
+            return [1./3.,1./0.3]
         else:
             return [1./3.,1./0.3]
     elif type.lower() == 'expplusconst':
@@ -185,6 +187,8 @@ def _setup_mockparams_densfunc(type,sample):
     elif type.lower() == 'brokenexp':
         if sample.lower() == 'lowlow':
             return [-0.2,1./.3,0.2,numpy.log(11.)]
+        elif sample.lower() == 'solar':
+            return [1./6.,1./0.3,1./2.,numpy.log(14.)]
         else:
             return [1./6.,1./0.3,1./2.,numpy.log(14.)]
     elif type.lower() == 'gaussexp':
