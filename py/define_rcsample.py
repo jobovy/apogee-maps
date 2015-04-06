@@ -437,7 +437,8 @@ class MAPs:
             kwargs['vmax']= numpy.nanmax(z2d)
         xlabel= r'$[\mathrm{Fe/H}]$'
         ylabel= _AFELABEL
-        out= bovy_plot.bovy_dens2d(z2d.T,origin='lower',cmap='jet',
+        cmap= kwargs.pop('cmap','coolwarm')
+        out= bovy_plot.bovy_dens2d(z2d.T,origin='lower',cmap=cmap,
                                    interpolation='nearest',
                                    xlabel=xlabel,ylabel=ylabel,
                                    xrange=xrange,yrange=yrange,
