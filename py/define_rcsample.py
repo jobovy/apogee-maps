@@ -1,9 +1,10 @@
 ###############################################################################
 # define_rcsample: definitions of the sample used
 ###############################################################################
+import math
 import numpy
 import esutil
-from galpy.util import bovy_coords
+from galpy.util import bovy_coords, bovy_plot
 import apogee.tools.read as apread
 from apogee.samples.rc import rcdist
 import isodist
@@ -233,3 +234,217 @@ def get_highfehsample():
         *(data[_AFETAG] <= _highfeh_highafe(data[_FEHTAG]))
     return data[indx]
 
+###############################################################################
+# pixelization in (feh,afe)
+###############################################################################
+class MAPs:
+    """Class that pixelizes the data sample in [Fe/H] and [a/Fe]"""
+    def __init__(self,data=None,dfeh=0.1,dafe=0.05,fehmin=-0.65,fehmax=0.45,
+                afemin=-0.075,afemax=0.325):
+        """
+        NAME:
+           __init__
+        PURPOSE:
+           initialize the MAPs
+        INPUT:
+           data= (None) the data sample; if None, whole stat. RC sample
+           dfeh, dafe= pixel size
+           fehmin, fehmax, afemin, afemax= minimum and maximum FeH and AFe
+        OUTPUT:
+           object with pixelized data
+        HISTORY:
+           2015-04-06 - Written - Bovy (IAS)
+        """
+        if data is None: data= get_rcsample()
+        print len(data)
+        self.data= data
+        self.dx= dfeh
+        self.dy= dafe
+        self.xmin= fehmin
+        self.xmax= fehmax
+        self.ymin= afemin
+        self.ymax= afemax
+        # edges in X and Y
+        self.xedges= numpy.arange(self.xmin,self.xmax+0.01,self.dx)
+        self.yedges= numpy.arange(self.ymin,self.ymax+0.01,self.dy)
+        # X and Y
+        self.x= data[_FEHTAG]
+        self.y= data[_AFETAG]
+        return None
+
+    def __call__(self,*args,**kwargs):
+        """
+        NAME:
+           __call__
+        PURPOSE:
+           return the part of the sample in a (feh,afe) pixel
+        INPUT:
+           [Fe/H]
+           [a/Fe]
+        OUTPUT:
+           returns data recarray in the bin that feh and afe are in
+        HISTORY:
+           2015-04-06 - Written - Bovy (IAS)
+        """
+        #Find bin
+        xbin= int(math.floor((args[0]-self.xmin)/self.dx))
+        ybin= int(math.floor((args[1]-self.ymin)/self.dy))
+        #Return data
+        return self.data[(self.x > self.xedges[xbin])\
+                             *(self.x <= self.xedges[xbin+1])\
+                             *(self.y > self.yedges[ybin])\
+                             *(self.y <= self.yedges[ybin+1])]
+
+    def map(self):
+        """
+        NAME:
+           map
+        PURPOSE:
+           yield a map
+        INPUT:
+           (none)
+        OUTPUT:
+           iterates over the MAPs
+        HISTORY:
+           2015-04-06 - Written - Bovy (IAS)
+        """
+        nx= int((self.xmax-self.xmin)/self.dx)
+        ny= int((self.ymax-self.ymin)/self.dy)
+        gx= numpy.linspace(self.xmin+self.dx/2.,self.xmax-self.dx/2.,nx)
+        gy= numpy.linspace(self.ymin+self.dy/2.,self.ymax-self.dy/2.,ny)
+        for ii in range(nx):
+            for jj in range(ny):
+                yield self(gx[ii],gy[jj])
+
+    def callIndx(self,*args,**kwargs):
+        """
+        NAME:
+           callIndx
+        PURPOSE:
+           return index of the part of the sample in an [Fe/H] and [a/Fe] pixel
+        INPUT:
+           [Fe/H]
+           [a/Fe]
+        OUTPUT:
+           returns index into data recarray in the bin that [Fe/H] and [a/Fe] are in
+        HISTORY:
+           2015-04-06 - Written - Bovy (IAS)
+        """
+        #Find bin
+        xbin= int(math.floor((args[0]-self.xmin)/self.dx))
+        ybin= int(math.floor((args[1]-self.ymin)/self.dy))
+        #Return data
+        return (self.x > self.xedges[xbin])\
+            *(self.x <= self.xedges[xbin+1])\
+            *(self.y > self.yedges[ybin])\
+            *(self.y <= self.yedges[ybin+1])
+
+    def xindx(self,x):
+        """
+        NAME:
+           xindx
+        PURPOSE:
+           return the index corresponding to a [Fe/H] value
+        INPUT:
+           [Fe/H]
+        OUTPUT:
+           index
+        HISTORY:
+           2015-04-06 - Written - Bovy (IAS)
+        """
+        return int(math.floor((x-self.xmin)/self.dx))
+
+    def yindx(self,y):
+        """
+        NAME:
+           yindx
+        PURPOSE:
+           return the index corresponding to a [a/Fe] value
+        INPUT:
+           [a/Fe]
+        OUTPUT:
+           index
+        HISTORY:
+           2015-04-06 - Written - Bovy (IAS)
+        """
+        return int(math.floor((y-self.ymin)/self.dy))
+
+    def plot(self,quant,func=numpy.median,minnstar=20.,submediany=False,
+             returnz=False,justcalc=False,
+             **kwargs):
+        """
+        NAME:
+           plot
+        PURPOSE:
+           make a plot of a quantity as a function of X and Y
+        INPUT:
+           quant - the quantity (string that returns the quantity, like 
+           'METALS') or a function of the data
+           func - function of quantity to plot
+           minnstar= minimum number of stars (20)
+           submeany= subtract the median y
+           justcalc= (False) if True, do not plot
+           bovy_plot.bovy_dens2d kwargs
+        OUTPUT:
+           plot to output device
+        HISTORY:
+           2015-04-06 - Written - Bovy (IAS)
+        """
+        #First create 2D
+        nx= int((self.xmax-self.xmin)/self.dx)
+        ny= int((self.ymax-self.ymin)/self.dy)
+        gx= numpy.linspace(self.xmin+self.dx/2.,self.xmax-self.dx/2.,nx)
+        gy= numpy.linspace(self.ymin+self.dy/2.,self.ymax-self.dy/2.,ny)
+        z2d= numpy.empty((nx,ny))
+        if isinstance(quant,numpy.ndarray):
+            z2d= numpy.reshape(quant,(nx,ny))
+            for ii in range(z2d.shape[0]):
+                for jj in range(z2d.shape[1]):
+                    tdata= self(gx[ii],gy[jj])
+                    if len(tdata) < minnstar:
+                        z2d[ii,jj]= numpy.nan
+        else:
+            nbins= 0
+            for ii in range(z2d.shape[0]):
+                for jj in range(z2d.shape[1]):
+                    tdata= self(gx[ii],gy[jj])
+                    if len(tdata) < minnstar:
+                        z2d[ii,jj]= numpy.nan
+                    else:
+                        nbins+= 1
+                        if hasattr(quant, '__call__'):
+                            z2d[ii,jj]= func(quant(tdata))
+                        else:
+                            z2d[ii,jj]= func(tdata[quant])
+                if submediany:
+                    z2d[ii,:]-= \
+                        numpy.median(z2d[ii,True-numpy.isnan(z2d[ii,:])])
+        if justcalc:
+            if returnz:
+                return z2d
+            else:
+                return None
+        #Now plot
+        xrange= kwargs.pop('xrange',[self.xmin,self.xmax])
+        yrange= kwargs.pop('yrange',[self.ymin,self.ymax])
+        if not kwargs.has_key('colorbar'):
+            kwargs['colorbar']= True
+        if not kwargs.has_key('shrink'):
+            kwargs['shrink']= 0.78
+        if not kwargs.has_key('vmin'):
+            kwargs['vmin']= numpy.nanmin(z2d)
+        if not kwargs.has_key('vmax'):
+            kwargs['vmax']= numpy.nanmax(z2d)
+        xlabel= r'$[\mathrm{Fe/H}]$'
+        ylabel= _AFELABEL
+        out= bovy_plot.bovy_dens2d(z2d.T,origin='lower',cmap='jet',
+                                   interpolation='nearest',
+                                   xlabel=xlabel,ylabel=ylabel,
+                                   xrange=xrange,yrange=yrange,
+                                   **kwargs)
+        if returnz:
+            return z2d
+        else:
+            return out
+        
+    
