@@ -215,3 +215,66 @@ def gaussexpdisk(R,phi,z,glon=False,
     return numpy.fabs(params[1])/2.*numpy.exp(-params[1]*numpy.fabs(z))\
         *numpy.exp(-params[0]**2./2.*((R-Rm)**2.-(_R0-Rm)**2.))
 
+
+def logspiral(R,phi,tanp=numpy.tan(9.4/180.*numpy.pi),
+              Rref=9.9,phiref=14.2/180.*numpy.pi,
+              width=0.38,phimin=-21./180.*numpy.pi,phimax=88./180.*numpy.pi):
+    """
+    NAME:
+       logspiral
+    PURPOSE:
+       return the overdensity due to a logarithmic spiral (default parameters: Perseus arm)
+    INPUT:
+       R - Galactocentric radius (/kpc)
+       phi - Galactocentric azimuth (/rad)
+       tanp= tan of the pitch angle
+       Rref= reference radius
+       phiref= reference phi
+       width= width in radius (/kpc)
+       phimin, phimax= extent of the arm in azimuth
+    OUTPUT:
+       overdensity (unit amplitude)
+    HISTORY:
+       2015-04-06 - Written - Bovy (IAS)
+    """
+    phi[phi > 180.]-= 360.
+    Rs= Rref*numpy.exp(-(phi-phiref)*tanp)
+    w= width*numpy.sqrt(1.+tanp**2.)
+    out= numpy.zeros_like(R)
+    gindx= (phi > phimin)*(phi < phimax)
+    out[gindx]= 1./numpy.sqrt(2.*numpy.pi)/w\
+        *numpy.exp(-0.5*(R-Rs)[gindx]**2./w**2.)
+    return out
+
+@scalarDecorator
+@glonDecorator
+def brokenexpdiskfixedspiral(R,phi,z,glon=False,
+                             params=[1./3.,1./0.3,1./4.,numpy.log(10.),
+                                     numpy.log(0.1)]):
+    """
+    NAME:
+       brokenexpdiskfixedspiral
+    PURPOSE:
+       density of a broken exponential disk (two scale lengths) + a fixed spiral
+    INPUT:
+       R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
+       glon= (False) if True, input coordinates above are (l,b,D)
+       params= parameters [1/hR,1/hz,1/hR2,log[Rbreak],log[spamp]]
+    OUTPUT:
+       density
+    HISTORY:
+       2015-04-06 - Written - Bovy (IAS)
+    """
+    Rb= numpy.exp(params[3])
+    spamp= numpy.exp(params[4])
+    out= numpy.empty_like(R)
+    sR= R[R <= Rb]
+    bR= R[R > Rb]
+    out[R <= Rb]= \
+        numpy.exp(-params[0]*(sR-_R0))
+    out[R > Rb]=\
+        numpy.exp(-params[2]*(bR-_R0))\
+        *numpy.exp(params[2]*(Rb-_R0)-params[0]*(Rb-_R0))
+    return numpy.fabs(params[1])/2.*(out+spamp*logspiral(R,phi))\
+        *numpy.exp(-params[1]*numpy.fabs(z))
+

@@ -130,6 +130,8 @@ def _setup_densfunc(type):
         return densprofiles.brokenexpdisk
     elif type.lower() == 'gaussexp':
         return densprofiles.gaussexpdisk
+    elif type.lower() == 'brokenexpfixedspiral':
+        return densprofiles.brokenexpdiskfixedspiral
 def _setup_initparams_densfunc(type,data):
     """Return the initial parameters of the density for this type, might depend on the data"""
     if type.lower() == 'exp':
@@ -142,6 +144,8 @@ def _setup_initparams_densfunc(type,data):
         return [1./6.,1./0.3,1./2.,numpy.log(14.)]
     elif type.lower() == 'gaussexp':
         return [1./3.,1./0.3,numpy.log(10.)]
+    elif type.lower() == 'brokenexpfixedspiral':
+        return [1./6.,1./0.3,1./2.,numpy.log(14.),numpy.log(1.)]
 
 ########################### EFFECTIVE VOLUME SETUP ############################
 def _setup_effvol(locations,effsel,distmods):
