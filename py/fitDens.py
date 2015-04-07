@@ -43,10 +43,10 @@ def fitDens(data,
     dataphi= data['RC_GALPHI_H']
     dataz= data['RC_GALZ_H']
     # Optimize
-    out= optimize.fmin_powell(lambda x: _mloglike(x,densfunc,type,
-                                                  dataR,dataphi,dataz,
-                                                  effsel,Rgrid,phigrid,zgrid),
-                              init,disp=verbose)
+    out= optimize.fmin(lambda x: _mloglike(x,densfunc,type,
+                                           dataR,dataphi,dataz,
+                                           effsel,Rgrid,phigrid,zgrid),
+                       init,disp=verbose)
     if mcmc:
         samples= bovy_mcmc.markovpy(out,
                                     0.2,
@@ -155,7 +155,7 @@ def _setup_initparams_densfunc(type,data):
     elif type.lower() == 'tribrokenexp':
         return [1./3.,1./0.3,1./3.,numpy.log(8.)]
     elif type.lower() == 'symbrokenexp':
-        return [-0.4,1./0.3,numpy.log(10.)]
+        return [0.4,1./0.3,numpy.log(10.)]
     elif type.lower() == 'gaussexp':
         return [1./3.,1./0.3,numpy.log(10.)]
     elif type.lower() == 'brokenquadexp':
