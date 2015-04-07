@@ -43,14 +43,14 @@ def fitDens(data,
     dataphi= data['RC_GALPHI_H']
     dataz= data['RC_GALZ_H']
     # Optimize
-    out= optimize.fmin_powell(lambda x: _mloglike(x,densfunc,
+    out= optimize.fmin_powell(lambda x: _mloglike(x,densfunc,type,
                                                   dataR,dataphi,dataz,
                                                   effsel,Rgrid,phigrid,zgrid),
                               init,disp=verbose)
     if mcmc:
         samples= bovy_mcmc.markovpy(out,
                                     0.2,
-                                    lambda x: loglike(x,densfunc,
+                                    lambda x: loglike(x,densfunc,type,
                                                       dataR,dataphi,dataz,
                                                       effsel,Rgrid,
                                                       phigrid,zgrid),
@@ -68,7 +68,7 @@ def _mloglike(*args,**kwargs):
     """Minus the log likelihood"""
     return -loglike(*args,**kwargs)
 
-def loglike(params,densfunc,
+def loglike(params,densfunc,type,
             dataR,dataphi,dataz,
             effsel,Rgrid,phigrid,zgrid):
     """
@@ -88,6 +88,8 @@ def loglike(params,densfunc,
        2015-03-24 - Written - Bovy (IAS)
     """
     # Check priors
+    if not _check_range_params_densfunc(params,type):
+        return -numpy.finfo(numpy.dtype(numpy.float64)).max
     #raise NotImplementedError("Need to implement priors")
     # Setup the density function
     tdensfunc= lambda x,y,z: densfunc(x,y,z,params=params)
@@ -128,6 +130,8 @@ def _setup_densfunc(type):
         return densprofiles.twoexpdisk
     elif type.lower() == 'brokenexp':
         return densprofiles.brokenexpdisk
+    elif type.lower() == 'tribrokenexp':
+        return densprofiles.tribrokenexpdisk
     elif type.lower() == 'symbrokenexp':
         return densprofiles.symbrokenexpdisk
     elif type.lower() == 'gaussexp':
@@ -148,6 +152,8 @@ def _setup_initparams_densfunc(type,data):
         return [1./3.,1./0.3,1./4.,1./0.5,densprofiles.logit(0.5)]
     elif type.lower() == 'brokenexp':
         return [1./6.,1./0.3,1./2.,numpy.log(8.)]
+    elif type.lower() == 'tribrokenexp':
+        return [1./3.,1./0.3,1./3.,numpy.log(8.)]
     elif type.lower() == 'symbrokenexp':
         return [-0.4,1./0.3,numpy.log(10.)]
     elif type.lower() == 'gaussexp':
@@ -158,6 +164,61 @@ def _setup_initparams_densfunc(type,data):
         return [1./3.,1./0.3,numpy.log(10.)]
     elif type.lower() == 'brokenexpfixedspiral':
         return [1./6.,1./0.3,1./2.,numpy.log(14.),numpy.log(1.)]
+def _check_range_params_densfunc(params,type):
+    """Check that the current parameters are in a reasonable range (prior)"""
+    # Second parameter is always a scale height, which we don't allow neg.
+    if params[1] < 0.: return False
+    if type.lower() == 'exp':
+        if numpy.fabs(params[0]) > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+    elif type.lower() == 'expplusconst':
+        if numpy.fabs(params[0]) > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+    elif type.lower() == 'twoexp':
+        if numpy.fabs(params[0]) > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if numpy.fabs(params[2]) > 2.: return False
+        if numpy.fabs(params[3]) > 20.: return False
+    elif type.lower() == 'brokenexp':
+        if numpy.fabs(params[0]) > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if numpy.fabs(params[2]) > 2.: return False
+        if numpy.exp(params[3]) > 16.: return False
+    elif type.lower() == 'tribrokenexp':
+        if params[0] < 0.: return False
+        if params[0] > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if params[2] < 0.: return False
+        if params[2] > 2.: return False
+        if numpy.exp(params[3]) > 16.: return False
+    elif type.lower() == 'symbrokenexp':
+        if params[0] < 0.: return False
+        if params[0] > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if numpy.exp(params[2]) > 16.: return False
+    elif type.lower() == 'gaussexp':
+        if params[0] < 0.: return False
+        if params[0] > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if numpy.exp(params[2]) > 16.: return False
+    elif type.lower() == 'brokenquadexp':
+        if params[0] < 0.: return False
+        if params[0] > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if params[2] < 0.: return False
+        if params[2] > 2.: return False
+        if numpy.exp(params[3]) > 16.: return False
+    elif type.lower() == 'symbrokenquadexp':
+        if params[0] < 0.: return False
+        if params[0] > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if numpy.exp(params[2]) > 16.: return False
+    elif type.lower() == 'brokenexpfixedspiral':
+        if numpy.fabs(params[0]) > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if numpy.fabs(params[2]) > 2.: return False
+        if numpy.exp(params[3]) > 16.: return False
+    return True
 
 ########################### EFFECTIVE VOLUME SETUP ############################
 def _setup_effvol(locations,effsel,distmods):
