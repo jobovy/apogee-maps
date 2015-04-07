@@ -188,9 +188,9 @@ def _setup_mockparams_densfunc(type,sample):
         if sample.lower() == 'lowlow':
             return [-0.2,1./.3,0.2,numpy.log(11.)]
         elif sample.lower() == 'solar':
-            return [-1./6.,1./0.3,1./2.,numpy.log(14.)]
+            return [-1./6.,1./0.3,1./2.,numpy.log(8.)]
         else:
-            return [-1./6.,1./0.3,1./2.,numpy.log(14.)]
+            return [-1./6.,1./0.3,1./2.,numpy.log(6.)]
     elif type.lower() == 'gaussexp':
         if sample.lower() == 'lowlow':
             return [.4,1./0.3,numpy.log(11.)]

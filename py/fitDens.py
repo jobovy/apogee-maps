@@ -184,6 +184,7 @@ def _check_range_params_densfunc(params,type):
         if numpy.fabs(params[1]) > 20.: return False
         if numpy.fabs(params[2]) > 2.: return False
         if numpy.exp(params[3]) > 16.: return False
+        if numpy.exp(params[3]) < 1.: return False
     elif type.lower() == 'tribrokenexp':
         if params[0] < 0.: return False
         if params[0] > 2.: return False
@@ -191,16 +192,19 @@ def _check_range_params_densfunc(params,type):
         if params[2] < 0.: return False
         if params[2] > 2.: return False
         if numpy.exp(params[3]) > 16.: return False
+        if numpy.exp(params[3]) < 1.: return False
     elif type.lower() == 'symbrokenexp':
         if params[0] < 0.: return False
         if params[0] > 2.: return False
         if numpy.fabs(params[1]) > 20.: return False
         if numpy.exp(params[2]) > 16.: return False
+        if numpy.exp(params[2]) < 1.: return False
     elif type.lower() == 'gaussexp':
         if params[0] < 0.: return False
         if params[0] > 2.: return False
         if numpy.fabs(params[1]) > 20.: return False
         if numpy.exp(params[2]) > 16.: return False
+        if numpy.exp(params[2]) < 1.: return False
     elif type.lower() == 'brokenquadexp':
         if params[0] < 0.: return False
         if params[0] > 2.: return False
@@ -208,16 +212,19 @@ def _check_range_params_densfunc(params,type):
         if params[2] < 0.: return False
         if params[2] > 2.: return False
         if numpy.exp(params[3]) > 16.: return False
+        if numpy.exp(params[3]) < 1.: return False
     elif type.lower() == 'symbrokenquadexp':
         if params[0] < 0.: return False
         if params[0] > 2.: return False
         if numpy.fabs(params[1]) > 20.: return False
         if numpy.exp(params[2]) > 16.: return False
+        if numpy.exp(params[2]) < 1.: return False
     elif type.lower() == 'brokenexpfixedspiral':
         if numpy.fabs(params[0]) > 2.: return False
         if numpy.fabs(params[1]) > 20.: return False
         if numpy.fabs(params[2]) > 2.: return False
         if numpy.exp(params[3]) > 16.: return False
+        if numpy.exp(params[3]) < 1.: return False
     return True
 
 ########################### EFFECTIVE VOLUME SETUP ############################
