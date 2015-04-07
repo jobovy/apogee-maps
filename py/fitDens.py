@@ -128,8 +128,14 @@ def _setup_densfunc(type):
         return densprofiles.twoexpdisk
     elif type.lower() == 'brokenexp':
         return densprofiles.brokenexpdisk
+    elif type.lower() == 'symbrokenexp':
+        return densprofiles.symbrokenexpdisk
     elif type.lower() == 'gaussexp':
         return densprofiles.gaussexpdisk
+    elif type.lower() == 'brokenquadexp':
+        return densprofiles.brokenquadexpdisk
+    elif type.lower() == 'symbrokenquadexp':
+        return densprofiles.symbrokenquadexpdisk
     elif type.lower() == 'brokenexpfixedspiral':
         return densprofiles.brokenexpdiskfixedspiral
 def _setup_initparams_densfunc(type,data):
@@ -141,8 +147,14 @@ def _setup_initparams_densfunc(type,data):
     elif type.lower() == 'twoexp':
         return [1./3.,1./0.3,1./4.,1./0.5,densprofiles.logit(0.5)]
     elif type.lower() == 'brokenexp':
-        return [1./6.,1./0.3,1./2.,numpy.log(14.)]
+        return [1./6.,1./0.3,1./2.,numpy.log(8.)]
+    elif type.lower() == 'symbrokenexp':
+        return [-0.4,1./0.3,numpy.log(10.)]
     elif type.lower() == 'gaussexp':
+        return [1./3.,1./0.3,numpy.log(10.)]
+    elif type.lower() == 'brokenquadexp':
+        return [1./3.,1./0.3,1./3.,numpy.log(10.)]
+    elif type.lower() == 'symbrokenquadexp':
         return [1./3.,1./0.3,numpy.log(10.)]
     elif type.lower() == 'brokenexpfixedspiral':
         return [1./6.,1./0.3,1./2.,numpy.log(14.),numpy.log(1.)]

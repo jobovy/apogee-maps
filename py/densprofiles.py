@@ -195,6 +195,26 @@ def brokenexpdisk(R,phi,z,glon=False,
 
 @scalarDecorator
 @glonDecorator
+def symbrokenexpdisk(R,phi,z,glon=False,
+                     params=[1./3.,1./0.3,numpy.log(10.)]):
+    """
+    NAME:
+       symbrokenexpdisk
+    PURPOSE:
+       density of a broken exponential disk, symmetric around a break
+    INPUT:
+       R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
+       glon= (False) if True, input coordinates above are (l,b,D)
+       params= parameters [1/hR,1/hz,log[Rbreak]]
+    OUTPUT:
+       density or log density
+    HISTORY:
+       2015-04-06 - Written - Bovy (IAS)
+    """
+    return brokenexpdisk(R,phi,z,glon=False,
+                         params=[params[0],params[1],-2.*params[0],params[2]])
+@scalarDecorator
+@glonDecorator
 def gaussexpdisk(R,phi,z,glon=False,
                  params=[1./3.,1./0.3,numpy.log(10.)]):
     """
@@ -215,6 +235,58 @@ def gaussexpdisk(R,phi,z,glon=False,
     return numpy.fabs(params[1])/2.*numpy.exp(-params[1]*numpy.fabs(z))\
         *numpy.exp(-params[0]**2./2.*((R-Rm)**2.-(_R0-Rm)**2.))
 
+@scalarDecorator
+@glonDecorator
+def brokenquadexpdisk(R,phi,z,glon=False,
+                      params=[1./3.,1./0.3,1./4.,numpy.log(10.)]):
+    """
+    NAME:
+       brokenquadexpdisk
+    PURPOSE:
+       density of a broken exponential squared disk (two scale lengths)
+    INPUT:
+       R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
+       glon= (False) if True, input coordinates above are (l,b,D)
+       params= parameters [1/hR,1/hz,1/hR2,log[Rbreak]]
+    OUTPUT:
+       density or log density
+    HISTORY:
+       2015-04-06 - Written - Bovy (IAS)
+    """
+    Rb= numpy.exp(params[3])
+    out= numpy.empty_like(R)
+    sR= R[R <= Rb]
+    bR= R[R > Rb]
+    sz= z[R <= Rb]
+    bz= z[R > Rb]
+    out[R <= Rb]= \
+        numpy.fabs(params[1])/2.*numpy.exp(-params[0]**2./2.*(sR-_R0)**2.-params[1]*numpy.fabs(sz))
+    out[R > Rb]=\
+        numpy.exp(-params[2]**2./2.*(bR-_R0)**2.-params[1]*numpy.fabs(bz))\
+        *numpy.fabs(params[1])/2.*numpy.exp(params[2]**2./2.*(Rb-_R0)**2.-params[0]**2./2.*(Rb-_R0)**2.)
+    return out
+
+@scalarDecorator
+@glonDecorator
+def symbrokenquadexpdisk(R,phi,z,glon=False,
+                         params=[1./3.,1./0.3,numpy.log(10.)]):
+    """
+    NAME:
+       symbrokenquadexpdisk
+    PURPOSE:
+       density of a broken exponential squared disk, symmetric around a break
+    INPUT:
+       R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
+       glon= (False) if True, input coordinates above are (l,b,D)
+       params= parameters [1/hR,1/hz,log[Rbreak]]
+    OUTPUT:
+       density or log density
+    HISTORY:
+       2015-04-06 - Written - Bovy (IAS)
+    """
+    return brokenquadexpdisk(R,phi,z,glon=False,
+                             params=[params[0],params[1],
+                                     -2.*params[0],params[2]])
 
 def logspiral(R,phi,tanp=numpy.tan(9.4/180.*numpy.pi),
               Rref=9.9,phiref=14.2/180.*numpy.pi,

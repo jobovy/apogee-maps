@@ -256,7 +256,6 @@ class MAPs:
            2015-04-06 - Written - Bovy (IAS)
         """
         if data is None: data= get_rcsample()
-        print len(data)
         self.data= data
         self.dx= dfeh
         self.dy= dafe
