@@ -240,7 +240,7 @@ def get_highfehsample():
 class MAPs:
     """Class that pixelizes the data sample in [Fe/H] and [a/Fe]"""
     def __init__(self,data=None,dfeh=0.1,dafe=0.05,fehmin=-0.65,fehmax=0.45,
-                afemin=-0.075,afemax=0.325):
+                afemin=-0.075,afemax=0.275):
         """
         NAME:
            __init__
