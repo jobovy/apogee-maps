@@ -134,6 +134,10 @@ def _setup_densfunc(type):
         return densprofiles.tribrokenexpdisk
     elif type.lower() == 'symbrokenexp':
         return densprofiles.symbrokenexpdisk
+    elif type.lower() == 'brokenexpflare':
+        return densprofiles.brokenexpflaredisk
+    elif type.lower() == 'tribrokenexpflare':
+        return densprofiles.tribrokenexpflaredisk
     elif type.lower() == 'gaussexp':
         return densprofiles.gaussexpdisk
     elif type.lower() == 'brokenquadexp':
@@ -151,11 +155,17 @@ def _setup_initparams_densfunc(type,data):
     elif type.lower() == 'twoexp':
         return [1./3.,1./0.3,1./4.,1./0.5,densprofiles.logit(0.5)]
     elif type.lower() == 'brokenexp':
-        return [1./6.,1./0.3,1./2.,numpy.log(8.)]
+        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H']))]
     elif type.lower() == 'tribrokenexp':
-        return [1./3.,1./0.3,1./3.,numpy.log(8.)]
+        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H']))]
     elif type.lower() == 'symbrokenexp':
         return [0.4,1./0.3,numpy.log(10.)]
+    elif type.lower() == 'brokenexpflare':
+        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+                 -1./5.]
+    elif type.lower() == 'tribrokenexpflare':
+        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+                 -1./5.]
     elif type.lower() == 'gaussexp':
         return [1./3.,1./0.3,numpy.log(10.)]
     elif type.lower() == 'brokenquadexp':
@@ -199,6 +209,20 @@ def _check_range_params_densfunc(params,type):
         if numpy.fabs(params[1]) > 20.: return False
         if numpy.exp(params[2]) > 16.: return False
         if numpy.exp(params[2]) < 1.: return False
+    elif type.lower() == 'brokenexpflare':
+        if numpy.fabs(params[0]) > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if numpy.fabs(params[2]) > 2.: return False
+        if numpy.exp(params[3]) > 16.: return False
+        if numpy.exp(params[3]) < 1.: return False
+    elif type.lower() == 'tribrokenexpflare':
+        if params[0] < 0.: return False
+        if params[0] > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if params[2] < 0.: return False
+        if params[2] > 2.: return False
+        if numpy.exp(params[3]) > 16.: return False
+        if numpy.exp(params[3]) < 1.: return False
     elif type.lower() == 'gaussexp':
         if params[0] < 0.: return False
         if params[0] > 2.: return False
