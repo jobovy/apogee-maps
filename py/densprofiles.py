@@ -244,6 +244,35 @@ def symbrokenexpdisk(R,phi,z,glon=False,
     """
     return brokenexpdisk(R,phi,z,glon=False,
                          params=[-params[0],params[1],2.*params[0],params[2]])
+
+@scalarDecorator
+@glonDecorator
+def brokenexpflaredisk(R,phi,z,glon=False,
+                       params=[1./3.,1./0.3,1./4.,numpy.log(10.),1./5.]):
+    """
+    NAME:
+       brokenexpflaredisk
+    PURPOSE:
+       density of a broken exponential disk (two scale lengths), with a flaring vertical profile
+    INPUT:
+       R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
+       glon= (False) if True, input coordinates above are (l,b,D)
+       params= parameters [1/hR,1/hz,1/hR2,log[Rbreak]]
+    OUTPUT:
+       density or log density
+    HISTORY:
+       2015-03-24 - Written - Bovy (IAS)
+    """
+    Rb= numpy.exp(params[3])
+    out= numpy.empty_like(R)
+    sR= R[R <= Rb]
+    bR= R[R > Rb]
+    tinvhz= params[1]*numpy.exp((R-_R0)*params[4])
+    out[R <= Rb]= numpy.exp(-params[0]*(sR-_R0))
+    out[R > Rb]= numpy.exp(-params[2]*(bR-_R0))\
+        *numpy.exp(params[2]*(Rb-_R0)-params[0]*(Rb-_R0))
+    return numpy.fabs(tinvhz)/2.*out*numpy.exp(-tinvhz*numpy.fabs(z))
+
 @scalarDecorator
 @glonDecorator
 def gaussexpdisk(R,phi,z,glon=False,
