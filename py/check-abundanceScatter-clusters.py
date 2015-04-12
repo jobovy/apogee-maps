@@ -8,8 +8,8 @@ import read_clusterdata
 import define_rcsample
 from galpy.util import bovy_plot
 # Minimum and maximum Teff to consider
-_TEFFMIN= 4000.
-_TEFFMAX= 5000.
+_TEFFMIN= 4500.
+_TEFFMAX= 5200.
 def checkAbundanceScatterClusters():
     # First read the cluster data
     cldata= read_clusterdata.read_caldata()
