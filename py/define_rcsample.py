@@ -53,22 +53,7 @@ def get_rcsample():
     data['RC_GALZ_H']= Z
     # Add the average alpha/Fe
     data= esutil.numpy_util.add_fields(data,[('AVG_ALPHAFE', float)])
-    weight_o= numpy.ones(len(data))
-    weight_s= numpy.ones(len(data))
-    weight_si= numpy.ones(len(data))
-    weight_ca= numpy.ones(len(data))
-    weight_mg= numpy.ones(len(data))
-    weight_o[data['O_H'] == -9999.0]= 0.
-    weight_s[data['S_H'] == -9999.0]= 0.
-    weight_si[data['SI_H'] == -9999.0]= 0.
-    weight_ca[data['CA_H'] == -9999.0]= 0.
-    weight_mg[data['MG_H'] == -9999.0]= 0.
-    data['AVG_ALPHAFE']= (weight_o*data['O_H']+weight_s*data['S_H']
-                          +weight_si*data['SI_H']+weight_ca*data['CA_H']
-                          +weight_mg*data['MG_H'])/(weight_o+weight_s
-                                                    +weight_si+weight_ca
-                                                    +weight_mg)\
-                                                    -data['FE_H']-0.05
+    data['AVG_ALPHAFE']= avg_alphafe(data)
     # Remove locations outside of the Pan-STARRS dust map
     # In the Southern hemisphere
     data= data[data['LOCATION_ID'] != 4266] #240,-18
@@ -85,6 +70,24 @@ def get_rcsample():
     # Remove stars w/ DM < 8.49, because for standard candle RC, these cannot be in the sample
     data= data[data['RC_DM_H'] > 8.49]
     return data
+
+def avg_alphafe(data):    
+    weight_o= numpy.ones(len(data))
+    weight_s= numpy.ones(len(data))
+    weight_si= numpy.ones(len(data))
+    weight_ca= numpy.ones(len(data))
+    weight_mg= numpy.ones(len(data))
+    weight_o[data['O_H'] == -9999.0]= 0.
+    weight_s[data['S_H'] == -9999.0]= 0.
+    weight_si[data['SI_H'] == -9999.0]= 0.
+    weight_ca[data['CA_H'] == -9999.0]= 0.
+    weight_mg[data['MG_H'] == -9999.0]= 0.
+    return (weight_o*data['O_H']+weight_s*data['S_H']
+            +weight_si*data['SI_H']+weight_ca*data['CA_H']
+            +weight_mg*data['MG_H'])/(weight_o+weight_s
+                                      +weight_si+weight_ca
+                                      +weight_mg)\
+                                      -data['FE_H']-0.05
     
 # Define the low-alpha, low-iron sample
 def _lowlow_lowfeh(afe):
