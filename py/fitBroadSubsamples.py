@@ -9,6 +9,7 @@ import numpy
 import matplotlib
 matplotlib.use('Agg')
 from galpy.util import bovy_plot, save_pickles
+from matplotlib import pyplot
 import define_rcsample
 import fitDens
 import compareDataModel
@@ -235,8 +236,9 @@ def plotCompareData(sample,savename,plotname):
                                     1.2*numpy.amax(pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]))],
                             color='k',
                             xlabel=r'$\mu$')
-        bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),color='r',
-                            lw=2.*_LW,overplot=True,zorder=12)
+        line_mar= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
+                                      color='r',
+                                      lw=2.*_LW,overplot=True,zorder=12)
         bovy_plot.bovy_text(r'$%i / %i\ \mathrm{stars}$' \
                                 % (numpy.sum(data_index),
                                    len(ldata))
@@ -249,32 +251,55 @@ def plotCompareData(sample,savename,plotname):
                                                    copy.deepcopy(effsel)[index],
                                                    distmods,type='brokenexpflare',
                                                    coord='dm')
-        bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),color='b',
-                            lw=_LW,overplot=True,zorder=13)
+        line_g15= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
+                                      color='b',
+                                      lw=_LW,overplot=True,zorder=13)
         # Drimmel
         Xs,pdt= compareDataModel.predict_spacedist(bf_brexp_drim,
                                                    numpy.array(locations)[index],
                                                    copy.deepcopy(effsel_drim)[index],
                                                    distmods,type='brokenexpflare',
                                                    coord='dm')
-        bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),color='gold',
-                            lw=_LW,overplot=True,zorder=12)
+        line_drim= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
+                                       color='gold',
+                                       lw=_LW,overplot=True,zorder=12)
         # Sale
         Xs,pdt= compareDataModel.predict_spacedist(bf_brexp_sale,
                                                    numpy.array(locations)[index],
                                                    copy.deepcopy(effsel_sale)[index],
                                                    distmods,type='brokenexpflare',
                                                    coord='dm')
-        bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),color='c',
-                            lw=_LW,overplot=True,zorder=12)
+        line_sale= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
+                                       color='c',
+                                       lw=_LW,overplot=True,zorder=12)
         # Zero
         Xs,pdt= compareDataModel.predict_spacedist(bf_brexp_zero,
                                                    numpy.array(locations)[index],
                                                    copy.deepcopy(effsel_zero)[index],
                                                    distmods,type='brokenexpflare',
                                                    coord='dm')
-        bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),color='k',
-                            ls='--',lw=_LW,overplot=True,zorder=10)
+        line_zero= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
+                                       color='k',
+                                       ls='-',lw=_LW,overplot=True,zorder=10)
+        # Marshall + exp
+        Xs,pdt= compareDataModel.predict_spacedist(bf_exp,
+                                                   numpy.array(locations)[index],
+                                                   copy.deepcopy(effsel_mar)[index],
+                                                   distmods,type='expplusconst',
+                                                   coord='dm')
+        line_exp= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
+                                      color='r',
+                                      lw=2*_LW,overplot=True,zorder=10,ls=':')
+        # Marshall + twoexp
+        Xs,pdt= compareDataModel.predict_spacedist(bf_twoexp,
+                                                   numpy.array(locations)[index],
+                                                   copy.deepcopy(effsel_mar)[index],
+                                                   distmods,type='brokentwoexp',
+                                                   coord='dm')
+        line_twoexp= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
+                                         color='r',
+                                         lw=2*_LW,overplot=True,zorder=11,
+                                         ls='--')
         if sample.lower() == 'lowlow' or sample.lower() == 'highalpha':
             if loc.lower() == 'highb':
                 bovy_plot.bovy_text(r'$|b| > 10^\circ$',title=True,size=14.)
@@ -287,6 +312,41 @@ def plotCompareData(sample,savename,plotname):
             elif loc.lower() == 'outdisk':
                 bovy_plot.bovy_text(r'$140^\circ < l < 250^\circ, |b| \leq 10^\circ$',
                                     title=True,size=14.)
+            # Legend
+            if loc.lower() == 'meddisk':
+                pyplot.legend((line_mar[0],line_exp[0],line_twoexp[0]),
+                              (r'$\mathrm{Marshall\ et\ al.\ (2006)}$'
+                               +'\n'+r'$\mathrm{broken\ PL\ w/\ flare}$',
+                               r'$\mathrm{exp.\ disk}$',
+                               r'$\mathrm{broken\ PL\ w/\ 2}\ h_Z$'),
+                              loc='lower right',bbox_to_anchor=(.66,.375),
+                              numpoints=8,
+                              prop={'size':14},
+                              frameon=False)
+            elif loc.lower() == 'outdisk':
+                pyplot.legend((line_g15[0],line_sale[0],line_drim[0],
+                               line_zero[0]),
+                              (r'$\mathrm{Green\ et\ al.\ (2015)}$',
+                               r'$\mathrm{Sale\ et\ al.\ (2014)}$',
+                               r'$\mathrm{Drimmel\ et\ al.\ (2003)}$',
+                               r'$\mathrm{zero\ extinction}$'),
+                              loc='lower right',bbox_to_anchor=(.66,.375),
+                              numpoints=8,
+                              prop={'size':14},
+                              frameon=False)
+        if loc.lower() == 'highb':
+            if sample.lower() == 'lowlow':
+                bovy_plot.bovy_text(r'$\mathrm{low\ [Fe/H]}$',
+                                    top_right=True,size=14.)
+            elif sample.lower() == 'solar':
+                bovy_plot.bovy_text(r'$\mathrm{solar}$',
+                                    top_right=True,size=14.)
+            elif sample.lower() == 'highfeh':
+                bovy_plot.bovy_text(r'$\mathrm{high\ [Fe/H]}$',
+                                    top_right=True,size=14.)
+            elif sample.lower() == 'highalpha':
+                bovy_plot.bovy_text(r'$\mathrm{high}\ [\alpha/\mathrm{Fe]}$',
+                                    top_right=True,size=14.)
         bovy_plot.bovy_end_print(plotname.replace('LOC',loc))
     return None
 
