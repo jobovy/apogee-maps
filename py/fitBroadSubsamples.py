@@ -337,16 +337,16 @@ def plotCompareData(sample,savename,plotname):
         if loc.lower() == 'highb':
             if sample.lower() == 'lowlow':
                 bovy_plot.bovy_text(r'$\mathrm{low\ [Fe/H]}$',
-                                    top_right=True,size=14.)
+                                    top_right=True,size=18.)
             elif sample.lower() == 'solar':
                 bovy_plot.bovy_text(r'$\mathrm{solar}$',
-                                    top_right=True,size=14.)
+                                    top_right=True,size=18.)
             elif sample.lower() == 'highfeh':
                 bovy_plot.bovy_text(r'$\mathrm{high\ [Fe/H]}$',
-                                    top_right=True,size=14.)
+                                    top_right=True,size=18.)
             elif sample.lower() == 'highalpha':
                 bovy_plot.bovy_text(r'$\mathrm{high}\ [\alpha/\mathrm{Fe]}$',
-                                    top_right=True,size=14.)
+                                    top_right=True,size=18.)
         bovy_plot.bovy_end_print(plotname.replace('LOC',loc))
     return None
 
