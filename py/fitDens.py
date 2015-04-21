@@ -207,6 +207,7 @@ def _check_range_params_densfunc(params,type):
         if numpy.fabs(params[0]) > 2.: return False
         if numpy.fabs(params[1]) > 20.: return False
         if numpy.exp(params[2]) > 1.: return False
+        if params[2] < -20.: return False
     elif type.lower() == 'twoexp':
         if numpy.fabs(params[0]) > 2.: return False
         if numpy.fabs(params[1]) > 20.: return False
