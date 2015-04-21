@@ -8,10 +8,7 @@ import copy
 import numpy
 import matplotlib
 matplotlib.use('Agg')
-from galpy.util import bovy_plot, bovy_coords, save_pickles
-import triangle
-import mwdust
-import densprofiles
+from galpy.util import bovy_plot, save_pickles
 import define_rcsample
 import fitDens
 import compareDataModel
