@@ -15,7 +15,7 @@ import densprofiles
 import define_rcsample
 import fitDens
 import compareDataModel
-_NSAMPLES= 3000
+_NSAMPLES= 50000
 _LW= 1.5
 # Globals
 locations= None
@@ -231,9 +231,9 @@ def plotCompareData(sample,savename,plotname):
                                                    coord='dm')
         bovy_plot.bovy_hist(ldata['RC_DM_H'][data_index],
                             histtype='step',normed=True,
-                            lw=2.*_LW,
+                            lw=_LW,
                             range=[7.,15.5],
-                            bins=round(numpy.sqrt(numpy.sum(data_index))),
+                            bins=round(numpy.sqrt(numpy.sum(data_index))*2.),
                             yrange=[0.,
                                     1.2*numpy.amax(pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]))],
                             color='k',
