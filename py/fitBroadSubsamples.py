@@ -64,9 +64,9 @@ def fitBroadSubsamples(sample,savename):
         # a) expplusconst
         bf_exp, samples_exp, ml_exp= fit(type='expplusconst')
         # b) brokenexpflare
-        bf_brexp, samples_brexp, ml_brexp= fit(type='brokenexpflare')
+        bf_brexp, samples_brexp, ml_brexp= fit(type='tribrokenexpflare')
         # c) brokentwoexp
-        bf_twoexp, samples_twoexp, ml_twoexp= fit(type='brokentwoexp')
+        bf_twoexp, samples_twoexp, ml_twoexp= fit(type='tribrokentwoexp')
         save_pickles(savename,
                      bf_exp,bf_brexp,bf_twoexp,
                      ml_exp,ml_brexp,ml_twoexp,
@@ -74,17 +74,17 @@ def fitBroadSubsamples(sample,savename):
     # Do the rest of the fits as justfit
     global bf_brexp_g15, ml_brexp_g15, bf_brexp_drim, ml_brexp_drim
     global bf_brexp_sale, ml_brexp_sale, bf_brexp_zero, ml_brexp_zero
-    bf_brexp_g15, ml_brexp_g15= fit(type='brokenexpflare',dmap='green15',
+    bf_brexp_g15, ml_brexp_g15= fit(type='tribrokenexpflare',dmap='green15',
                                     justfit=True,init=bf_brexp) 
-    bf_brexp_drim, ml_brexp_drim= fit(type='brokenexpflare',dmap='drimmel03',
+    bf_brexp_drim, ml_brexp_drim= fit(type='tribrokenexpflare',dmap='drimmel03',
                                       justfit=True,init=bf_brexp)
-    bf_brexp_sale, ml_brexp_sale= fit(type='brokenexpflare',dmap='sale14',
+    bf_brexp_sale, ml_brexp_sale= fit(type='tribrokenexpflare',dmap='sale14',
                                       justfit=True,init=bf_brexp)
-    bf_brexp_zero, ml_brexp_zero= fit(type='brokenexpflare',dmap='zero',
+    bf_brexp_zero, ml_brexp_zero= fit(type='tribrokenexpflare',dmap='zero',
                                       justfit=True,init=bf_brexp)
     return None
 
-def fit(type='brokenexpflare',dmap='marshall06',init=None,justfit=False):
+def fit(type='tribrokenexpflare',dmap='marshall06',init=None,justfit=False):
     # Get the correct selection function
     tlocations= copy.deepcopy(locations)
     tdistmods= copy.deepcopy(distmods)
@@ -210,7 +210,7 @@ def load_data(sample):
 
 def writeTable(sample,savename,tablename):
     delimiter= ' & '
-    types= ['brokenexpflare','expplusconst','brokentwoexp']
+    types= ['tribrokenexpflare','expplusconst','brokentwoexp']
     densmodels= ['broken exp. w/ flare','single exp.',
                  'broken exp. w/ 2 $h_Z$']
     extmaps= ['\citet{Marshall06a}',
@@ -235,19 +235,19 @@ def writeTable(sample,savename,tablename):
         printline+= _format_results(types[0],extmaps[0])
         tablefile.write(printline+'\\\\\n')
         # Green
-        printline= delimiter+densmodels[0]+delimiter+extmaps[1]+delimiter
+        printline= delimiter+delimiter+extmaps[1]+delimiter
         printline+= _format_results_noerr(types[0],extmaps[1])       
         tablefile.write(printline+'\\\\\n')
         # Sale
-        printline= delimiter+densmodels[0]+delimiter+extmaps[2]+delimiter
+        printline= delimiter+delimiter+extmaps[2]+delimiter
         printline+= _format_results_noerr(types[0],extmaps[2])       
         tablefile.write(printline+'\\\\\n')
         # Drimmel
-        printline= delimiter+densmodels[0]+delimiter+extmaps[3]+delimiter
+        printline= delimiter+delimiter+extmaps[3]+delimiter
         printline+= _format_results_noerr(types[0],extmaps[3])       
         tablefile.write(printline+'\\\\\n')
         # Zero
-        printline= delimiter+densmodels[0]+delimiter+extmaps[4]+delimiter
+        printline= delimiter+delimiter+extmaps[4]+delimiter
         printline+= _format_results_noerr(types[0],extmaps[4])       
         tablefile.write(printline+'\\\\\n')
         # Exp.
@@ -261,10 +261,10 @@ def writeTable(sample,savename,tablename):
     return None
 
 def _format_results(type,extmap):
-    if type.lower() == 'brokenexpflare':
+    if type.lower() == 'tribrokenexpflare':
         tsamples= samples_brexp
-        out= {'hr1':numpy.median(-1./tsamples[0]),
-              'hr1err':numpy.std(-1./tsamples[0]),
+        out= {'hr1':numpy.median(1./tsamples[0]),
+              'hr1err':numpy.std(1./tsamples[0]),
               'hr2':numpy.median(1./tsamples[2]),
               'hr2err':numpy.std(1./tsamples[2]),
               'rmax':numpy.median(numpy.exp(tsamples[3])),
@@ -272,23 +272,29 @@ def _format_results(type,extmap):
               'hz':numpy.median(1./tsamples[1]),
               'hzerr':numpy.std(1./tsamples[1]),
               'rf':numpy.median(tsamples[4]),
-              'rferr':numpy.std(tsamples[4])}
-        return "{hr1:.2f}$\pm${hr1err:.2f}&{hr2:.2f}$\pm${hr2err:.2f}&{rmax:.2f}$\pm${rmaxerr:.2f}&{hz:.3f}$\pm${hzerr:.3f}&{rf:.2f}$\pm${rferr:.2f}&".format(**out)
+              'rferr':numpy.std(tsamples[4]),
+              'ml':0.}
+        if out['hr1'] > 10.:
+            out['hr1']= sorted(1./tsamples[0])[int(round(0.05*tsamples.shape[1]))]
+            return "$>{hr1:.1f}$&${hr2:.1f}\pm{hr2err:.1f}$&${rmax:.1f}\pm{rmaxerr:.1f}$&${hz:.2f}\pm{hzerr:.2f}$&${rf:.2f}\pm{rferr:.2f}$&\ldots&{ml:.0f}".format(**out)
+        else:
+            return "${hr1:.1f}\pm{hr1err:.1f}$&${hr2:.1f}\pm{hr2err:.1f}$&${rmax:.1f}\pm{rmaxerr:.1f}$&${hz:.2f}\pm{hzerr:.2f}$&${rf:.2f}\pm{rferr:.2f}$&\ldots&{ml:.0f}".format(**out)
     elif type.lower() == 'expplusconst':
         tsamples= samples_exp
         out= {'hr':numpy.median(1./tsamples[0]),
               'hrerr':numpy.std(1./tsamples[0]),
               'hz':numpy.median(1./tsamples[1]),
-              'hzerr':numpy.std(1./tsamples[1])}
+              'hzerr':numpy.std(1./tsamples[1]),
+              'ml':-2.*(ml_exp-ml_brexp)}
         if out['hr'] > 10.:
             out['hr']= sorted(1./tsamples[0])[int(round(0.05*tsamples.shape[1]))]
-            return "$>{hr:.2f}$&&&{hz:.3f}$\pm${hzerr:.3f}&&".format(**out)
+            return "$>{hr:.1f}$&\ldots&\ldots&${hz:.2f}\pm{hzerr:.2f}$&\ldots&\ldots&{ml:.0f}".format(**out)
         else:
-            return "{hr:.2f}$\pm${hrerr:.2f}&&{hz:.3f}$\pm${hzerr:.3f}&&".format(**out)
-    if type.lower() == 'brokentwoexp':
+            return "${hr:.1f}\pm{hrerr:.1f}$&\ldots&\ldots&${hz:.2f}\pm{hzerr:.2f}$&\ldots&&{ml:.0f}".format(**out)
+    if type.lower() == 'tribrokentwoexp':
         tsamples= samples_twoexp
-        out= {'hr1':numpy.median(-1./tsamples[0]),
-              'hr1err':numpy.std(-1./tsamples[0]),
+        out= {'hr1':numpy.median(1./tsamples[0]),
+              'hr1err':numpy.std(1./tsamples[0]),
               'hr2':numpy.median(1./tsamples[2]),
               'hr2err':numpy.std(1./tsamples[2]),
               'rmax':numpy.median(numpy.exp(tsamples[3])),
@@ -298,27 +304,34 @@ def _format_results(type,extmap):
               'amp':numpy.median(densprofiles.ilogit(tsamples[4])),
               'amperr':numpy.std(densprofiles.ilogit(tsamples[4])),
               'hz2':numpy.median(1./tsamples[5]),
-              'hz2err':numpy.std(1./tsamples[5])}
-        return "{hr1:.2f}$\pm${hr1err:.2f}&{hr2:.2f}$\pm${hr2err:.2f}&{rmax:.2f}$\pm${rmaxerr:.2f}&{hz1:.3f}$\pm${hz1err:.3f}&{amp:.2f}$\pm${amperr:.2f}&{hz2:.3f}$\pm${hz2err:.3f}".format(**out)
+              'hz2err':numpy.std(1./tsamples[5]),
+              'ml':-2.*(ml_twoexp-ml_brexp)}
+        return "${hr1:.1f}\pm{hr1err:.1f}$&${hr2:.1f}\pm{hr2err:.1f}$&${rmax:.1f}\pm{rmaxerr:.1f}$&${hz1:.2f}\pm{hz1err:.2f}$&${amp:.2f}\pm{amperr:.2f}$&${hz2:.2f}\pm{hz2err:.2f}$&{ml:.0f}".format(**out)
                 
 def _format_results_noerr(type,extmap):
-    if type.lower() == 'brokenexpflare':
+    if type.lower() == 'tribrokenexpflare':
         if 'Mar' in extmap:
             tbf= bf_brexp
+            tml= ml_brexp
         elif 'Gre' in extmap:
             tbf= bf_brexp_g15
+            tml= ml_brexp_g15
         elif 'Dri' in extmap:
             tbf= bf_brexp_drim
+            tml= ml_brexp_drim
         elif 'Sal' in extmap:
             tbf= bf_brexp_sale
+            tml= ml_brexp_sale
         elif 'zero' in extmap:
             tbf= bf_brexp_zero
-        out= {'hr1':numpy.median(-1./tbf[0]),
+            tml= ml_brexp_zero
+        out= {'hr1':numpy.median(1./tbf[0]),
               'hr2':numpy.median(1./tbf[2]),
               'rmax':numpy.median(numpy.exp(tbf[3])),
               'hz':numpy.median(1./tbf[1]),
-              'rf':numpy.median(tbf[4])}
-        return "{hr1:.2f}&{hr2:.2f}&{rmax:.2f}&{hz:.3f}&{rf:.2f}&".format(**out)
+              'rf':numpy.median(tbf[4]),
+              'ml':-2.*(tml-ml_brexp)}
+        return "{hr1:.1f}&{hr2:.1f}&{rmax:.1f}&{hz:.2f}&{rf:.2f}&\ldots&{ml:.0f}".format(**out)
                 
 def plotCompareData(sample,savename,plotname):
     locs= ['highb','outdisk','meddisk','indisk']
@@ -330,7 +343,7 @@ def plotCompareData(sample,savename,plotname):
                                               numpy.array(locations),
                                               copy.deepcopy(effsel_mar),
                                               distmods,
-                                              type='brokenexpflare',coord='dm')
+                                              type='tribrokenexpflare',coord='dm')
     for loc, index, data_index in zip(locs,indices,data_indices):
         bovy_plot.bovy_print()
         # High |b|
@@ -338,7 +351,7 @@ def plotCompareData(sample,savename,plotname):
         Xs,pdt= compareDataModel.predict_spacedist(bf_brexp,
                                                    numpy.array(locations)[index],
                                                    copy.deepcopy(effsel_mar)[index],
-                                                   distmods,type='brokenexpflare',
+                                                   distmods,type='tribrokenexpflare',
                                                    coord='dm')
         bovy_plot.bovy_hist(ldata['RC_DM_H'][data_index],
                             histtype='step',normed=True,
@@ -362,7 +375,7 @@ def plotCompareData(sample,savename,plotname):
         Xs,pdt= compareDataModel.predict_spacedist(bf_brexp_g15,
                                                    numpy.array(locations)[index],
                                                    copy.deepcopy(effsel)[index],
-                                                   distmods,type='brokenexpflare',
+                                                   distmods,type='tribrokenexpflare',
                                                    coord='dm')
         line_g15= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
                                       color='b',
@@ -371,7 +384,7 @@ def plotCompareData(sample,savename,plotname):
         Xs,pdt= compareDataModel.predict_spacedist(bf_brexp_drim,
                                                    numpy.array(locations)[index],
                                                    copy.deepcopy(effsel_drim)[index],
-                                                   distmods,type='brokenexpflare',
+                                                   distmods,type='tribrokenexpflare',
                                                    coord='dm')
         line_drim= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
                                        color='gold',
@@ -380,7 +393,7 @@ def plotCompareData(sample,savename,plotname):
         Xs,pdt= compareDataModel.predict_spacedist(bf_brexp_sale,
                                                    numpy.array(locations)[index],
                                                    copy.deepcopy(effsel_sale)[index],
-                                                   distmods,type='brokenexpflare',
+                                                   distmods,type='tribrokenexpflare',
                                                    coord='dm')
         line_sale= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
                                        color='c',
@@ -389,7 +402,7 @@ def plotCompareData(sample,savename,plotname):
         Xs,pdt= compareDataModel.predict_spacedist(bf_brexp_zero,
                                                    numpy.array(locations)[index],
                                                    copy.deepcopy(effsel_zero)[index],
-                                                   distmods,type='brokenexpflare',
+                                                   distmods,type='tribrokenexpflare',
                                                    coord='dm')
         line_zero= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
                                        color='k',
@@ -407,7 +420,7 @@ def plotCompareData(sample,savename,plotname):
         Xs,pdt= compareDataModel.predict_spacedist(bf_twoexp,
                                                    numpy.array(locations)[index],
                                                    copy.deepcopy(effsel_mar)[index],
-                                                   distmods,type='brokentwoexp',
+                                                   distmods,type='tribrokentwoexp',
                                                    coord='dm')
         line_twoexp= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
                                          color='r',
@@ -432,7 +445,7 @@ def plotCompareData(sample,savename,plotname):
                                +'\n'+r'$\mathrm{broken\ exp.\ w/\ flare}$',
                                r'$\mathrm{single\ exp.}$',
                                r'$\mathrm{broken\ exp.\ w/\ 2}\ h_Z$'),
-                              loc='lower right',bbox_to_anchor=(.66,.375),
+                              loc='lower right',bbox_to_anchor=(.66,.42),
                               numpoints=8,
                               prop={'size':14},
                               frameon=False)
@@ -443,7 +456,7 @@ def plotCompareData(sample,savename,plotname):
                                r'$\mathrm{Sale\ et\ al.\ (2014)}$',
                                r'$\mathrm{Drimmel\ et\ al.\ (2003)}$',
                                r'$\mathrm{zero\ extinction}$'),
-                              loc='lower right',bbox_to_anchor=(.66,.375),
+                              loc='lower right',bbox_to_anchor=(.66,.42),
                               numpoints=8,
                               prop={'size':14},
                               frameon=False)
