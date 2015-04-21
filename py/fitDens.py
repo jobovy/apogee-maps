@@ -14,7 +14,9 @@ def fitDens(data,
             locations,effsel,distmods,
             type='exp',
             mcmc=False,nsamples=10000,
-            verbose=True):
+            verbose=True,
+            init=None,
+            retMaxL=False):
     """
     NAME:
        fitDens
@@ -29,13 +31,17 @@ def fitDens(data,
        mcmc= (False) run MCMC or not
        nsamples= (10000) number of MCMC samples to obtain
        verbose= (True) set this to False for no optimize convergence messages
+       init= (None) if set, these are the initial conditions
+       retMaxL= (False) if True, return the maximum likelihood
     OUTPUT:
+       (best-fit, samples, maximum-likelihood) based on options
     HISTORY:
        2015-03-24 - Written - Bovy (IAS)
     """
     # Setup the density function and its initial parameters
     densfunc= _setup_densfunc(type)
-    init= _setup_initparams_densfunc(type,data)
+    if init is None:
+        init= _setup_initparams_densfunc(type,data)
     # Setup the integration of the effective volume
     effsel, Rgrid, phigrid, zgrid= _setup_effvol(locations,effsel,distmods)
     # Get the data's R,phi,z
@@ -60,9 +66,14 @@ def fitDens(data,
                                     nsamples=nsamples,
                                     nwalkers=2*len(out))
         if verbose: print_samples_qa(samples)
-        return (out,numpy.array(samples).T)
+        out= (out,numpy.array(samples).T,)
     else:
-        return out
+        out= (out,)
+    if retMaxL:
+        out= out+(loglike(out[0],densfunc,type,dataR,dataphi,dataz,
+                          effsel,Rgrid,
+                          phigrid,zgrid),)
+    return out
 
 def _mloglike(*args,**kwargs):
     """Minus the log likelihood"""
