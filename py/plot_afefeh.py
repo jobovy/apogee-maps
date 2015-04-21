@@ -83,6 +83,15 @@ def plot_afefeh(plotfilename):
     pyplot.plot([lowfeh,highfeh],[define_rcsample._highfeh_highafe(lowfeh),
                                   define_rcsample._highfeh_highafe(highfeh)],
                 'k--',lw=2.)
+    # Label them
+    bovy_plot.bovy_text(-0.3,0.265,r'$\mathrm{high}\ [\alpha/\mathrm{Fe}]$',
+                         size=15.,backgroundcolor='w')
+    bovy_plot.bovy_text(-0.875,0.05,r'$\mathrm{low\ [Fe/H]}$',
+                         size=15.,backgroundcolor='w')
+    bovy_plot.bovy_text(0.1,-0.125,r'$\mathrm{high\ [Fe/H]}$',
+                         size=15.,backgroundcolor='w')
+    bovy_plot.bovy_text(-0.125,-0.125,r'$\mathrm{solar}$',
+                         size=15.,backgroundcolor='w')
     bovy_plot.bovy_end_print(plotfilename)
     return None
 
