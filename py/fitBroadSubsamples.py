@@ -210,7 +210,7 @@ def load_data(sample):
 
 def writeTable(sample,savename,tablename):
     delimiter= ' & '
-    types= ['tribrokenexpflare','expplusconst','brokentwoexp']
+    types= ['tribrokenexpflare','expplusconst','tribrokentwoexp']
     densmodels= ['broken exp. w/ flare','single exp.',
                  'broken exp. w/ 2 $h_Z$']
     extmaps= ['\citet{Marshall06a}',
@@ -268,17 +268,17 @@ def _format_results(type,extmap):
               'hr2':numpy.median(tsamples[2]),
               'hr2err':numpy.std(tsamples[2]),
               'rmax':numpy.median(numpy.exp(tsamples[3])),
-              'rmaxerr':numpy.std(numpy.exp(tsamples[3])),
+              'rmaxerr':1.4826*numpy.median(numpy.fabs(numpy.exp(tsamples[3])-numpy.median(numpy.exp(tsamples[3])))),
               'hz':numpy.median(1./tsamples[1]),
               'hzerr':numpy.std(1./tsamples[1]),
               'rf':numpy.median(tsamples[4]),
               'rferr':numpy.std(tsamples[4]),
               'ml':0.}
-        if out['hr1'] > 10.:
-            out['hr1']= sorted(1./tsamples[0])[int(round(0.05*tsamples.shape[1]))]
-            return "$>{hr1:.1f}$&${hr2:.1f}\pm{hr2err:.1f}$&${rmax:.1f}\pm{rmaxerr:.1f}$&${hz:.2f}\pm{hzerr:.2f}$&${rf:.2f}\pm{rferr:.2f}$&\ldots&{ml:.0f}".format(**out)
+        if out['rmax'] < 4.:
+            out['rmax']= sorted(numpy.exp(tsamples[3]))[int(round(0.95*tsamples.shape[1]))]
+            return "${hr1:.2f}\pm{hr1err:.2f}$&${hr2:.2f}\pm{hr2err:.2f}$&$<{rmax:.1f}$&${hz:.2f}\pm{hzerr:.2f}$&${rf:.2f}\pm{rferr:.2f}$&\ldots&{ml:.0f}".format(**out)
         else:
-            return "${hr1:.1f}\pm{hr1err:.1f}$&${hr2:.1f}\pm{hr2err:.1f}$&${rmax:.1f}\pm{rmaxerr:.1f}$&${hz:.2f}\pm{hzerr:.2f}$&${rf:.2f}\pm{rferr:.2f}$&\ldots&{ml:.0f}".format(**out)
+            return "${hr1:.2f}\pm{hr1err:.2f}$&${hr2:.2f}\pm{hr2err:.2f}$&${rmax:.1f}\pm{rmaxerr:.1f}$&${hz:.2f}\pm{hzerr:.2f}$&${rf:.2f}\pm{rferr:.2f}$&\ldots&{ml:.0f}".format(**out)
     elif type.lower() == 'expplusconst':
         tsamples= samples_exp
         out= {'hr':numpy.median(tsamples[0]),
@@ -286,9 +286,10 @@ def _format_results(type,extmap):
               'hz':numpy.median(1./tsamples[1]),
               'hzerr':numpy.std(1./tsamples[1]),
               'ml':-2.*(ml_exp-ml_brexp)}
-        return "${hr:.1f}\pm{hrerr:.1f}$&\ldots&\ldots&${hz:.2f}\pm{hzerr:.2f}$&\ldots&&{ml:.0f}".format(**out)
+        return "\ldots&${hr:.2f}\pm{hrerr:.2f}$&\ldots&${hz:.2f}\pm{hzerr:.2f}$&\ldots&&{ml:.0f}".format(**out)
     if type.lower() == 'tribrokentwoexp':
         tsamples= samples_twoexp
+        hzindx= numpy.fabs((1./tsamples[1]-1./tsamples[5])*tsamples[1]) > 0.5
         out= {'hr1':numpy.median(tsamples[0]),
               'hr1err':numpy.std(tsamples[0]),
               'hr2':numpy.median(tsamples[2]),
@@ -297,12 +298,11 @@ def _format_results(type,extmap):
               'rmaxerr':numpy.std(numpy.exp(tsamples[3])),
               'hz1':numpy.median(1./tsamples[1]),
               'hz1err':numpy.std(1./tsamples[1]),
-              'amp':numpy.median(densprofiles.ilogit(tsamples[4])),
-              'amperr':numpy.std(densprofiles.ilogit(tsamples[4])),
-              'hz2':numpy.median(1./tsamples[5]),
-              'hz2err':numpy.std(1./tsamples[5]),
+              'amp':sorted(densprofiles.ilogit(tsamples[4,hzindx]))[int(round(0.95*numpy.sum(hzindx)))],
+              'hz2':numpy.median(1./tsamples[5,hzindx]),
+              'hz2err':numpy.std(1./tsamples[5,hzindx]),
               'ml':-2.*(ml_twoexp-ml_brexp)}
-        return "${hr1:.1f}\pm{hr1err:.1f}$&${hr2:.1f}\pm{hr2err:.1f}$&${rmax:.1f}\pm{rmaxerr:.1f}$&${hz1:.2f}\pm{hz1err:.2f}$&${amp:.2f}\pm{amperr:.2f}$&${hz2:.2f}\pm{hz2err:.2f}$&{ml:.0f}".format(**out)
+        return "${hr1:.2f}\pm{hr1err:.2f}$&${hr2:.2f}\pm{hr2err:.2f}$&${rmax:.1f}\pm{rmaxerr:.1f}$&${hz1:.2f}\pm{hz1err:.2f}$&$<{amp:.2f}$&${hz2:.2f}\pm{hz2err:.2f}$&{ml:.0f}".format(**out)
                 
 def _format_results_noerr(type,extmap):
     if type.lower() == 'tribrokenexpflare':
@@ -327,7 +327,7 @@ def _format_results_noerr(type,extmap):
               'hz':numpy.median(1./tbf[1]),
               'rf':numpy.median(tbf[4]),
               'ml':-2.*(tml-ml_brexp)}
-        return "{hr1:.1f}&{hr2:.1f}&{rmax:.1f}&{hz:.2f}&{rf:.2f}&\ldots&{ml:.0f}".format(**out)
+        return "{hr1:.2f}&{hr2:.2f}&{rmax:.1f}&{hz:.2f}&{rf:.2f}&\ldots&{ml:.0f}".format(**out)
                 
 def plotCompareData(sample,savename,plotname):
     locs= ['highb','outdisk','meddisk','indisk']
@@ -349,13 +349,14 @@ def plotCompareData(sample,savename,plotname):
                                                    copy.deepcopy(effsel_mar)[index],
                                                    distmods,type='tribrokenexpflare',
                                                    coord='dm')
+        yrange=[0.,
+                1.4*numpy.amax(pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]))]
         bovy_plot.bovy_hist(ldata['RC_DM_H'][data_index],
                             histtype='step',normed=True,
                             lw=_LW,
                             range=[7.,15.5],
                             bins=round(numpy.sqrt(numpy.sum(data_index))*2.),
-                            yrange=[0.,
-                                    1.2*numpy.amax(pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]))],
+                            yrange=yrange,
                             color='k',
                             xlabel=r'$\mu$')
         line_mar= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
