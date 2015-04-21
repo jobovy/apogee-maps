@@ -12,6 +12,7 @@ from galpy.util import bovy_plot, save_pickles
 from matplotlib import pyplot
 import define_rcsample
 import fitDens
+import densprofiles
 import compareDataModel
 _NSAMPLES= 50000
 _LW= 1.5
@@ -207,6 +208,118 @@ def load_data(sample):
             data_inDiskIndx[ii]= True
     return None
 
+def writeTable(sample,savename,tablename):
+    delimiter= ' & '
+    types= ['brokenexpflare','expplusconst','brokentwoexp']
+    densmodels= ['broken exp. w/ flare','single exp.',
+                 'broken exp. w/ 2 $h_Z$']
+    extmaps= ['\citet{Marshall06a}',
+              '\citet{Green15a}',
+              '\citet{Sale14a}',
+              '\citet{Drimmel03a}',
+              'zero']
+    with open(tablename,'w') as tablefile:
+        # Start w/ fiducial fit
+        if sample.lower() == 'lowlow':
+            printline= 'low [Fe/H]'
+        elif sample.lower() == 'solar':
+            printline= 'solar'
+        elif sample.lower() == 'highfeh':
+            printline= 'high [Fe/H]'
+        elif sample.lower() == 'highalpha':
+            printline= 'high [$\\alpha$/Fe]'
+        printline+= delimiter
+        # Fiducial
+        printline+= densmodels[0]+delimiter
+        printline+= extmaps[0]+delimiter
+        printline+= _format_results(types[0],extmaps[0])
+        tablefile.write(printline+'\\\\\n')
+        # Green
+        printline= delimiter+densmodels[0]+delimiter+extmaps[1]+delimiter
+        printline+= _format_results_noerr(types[0],extmaps[1])       
+        tablefile.write(printline+'\\\\\n')
+        # Sale
+        printline= delimiter+densmodels[0]+delimiter+extmaps[2]+delimiter
+        printline+= _format_results_noerr(types[0],extmaps[2])       
+        tablefile.write(printline+'\\\\\n')
+        # Drimmel
+        printline= delimiter+densmodels[0]+delimiter+extmaps[3]+delimiter
+        printline+= _format_results_noerr(types[0],extmaps[3])       
+        tablefile.write(printline+'\\\\\n')
+        # Zero
+        printline= delimiter+densmodels[0]+delimiter+extmaps[4]+delimiter
+        printline+= _format_results_noerr(types[0],extmaps[4])       
+        tablefile.write(printline+'\\\\\n')
+        # Exp.
+        printline= delimiter+densmodels[1]+delimiter+extmaps[0]+delimiter
+        printline+= _format_results(types[1],extmaps[0])       
+        tablefile.write(printline+'\\\\\n')
+        # twoexp
+        printline= delimiter+densmodels[2]+delimiter+extmaps[0]+delimiter
+        printline+= _format_results(types[2],extmaps[0])       
+        tablefile.write(printline+'\\\\\n')
+    return None
+
+def _format_results(type,extmap):
+    if type.lower() == 'brokenexpflare':
+        tsamples= samples_brexp
+        out= {'hr1':numpy.median(-1./tsamples[0]),
+              'hr1err':numpy.std(-1./tsamples[0]),
+              'hr2':numpy.median(1./tsamples[2]),
+              'hr2err':numpy.std(1./tsamples[2]),
+              'rmax':numpy.median(numpy.exp(tsamples[3])),
+              'rmaxerr':numpy.std(numpy.exp(tsamples[3])),
+              'hz':numpy.median(1./tsamples[1]),
+              'hzerr':numpy.std(1./tsamples[1]),
+              'rf':numpy.median(tsamples[4]),
+              'rferr':numpy.std(tsamples[4])}
+        return "{hr1:.2f}$\pm${hr1err:.2f}&{hr2:.2f}$\pm${hr2err:.2f}&{rmax:.2f}$\pm${rmaxerr:.2f}&{hz:.3f}$\pm${hzerr:.3f}&{rf:.2f}$\pm${rferr:.2f}&".format(**out)
+    elif type.lower() == 'expplusconst':
+        tsamples= samples_exp
+        out= {'hr':numpy.median(1./tsamples[0]),
+              'hrerr':numpy.std(1./tsamples[0]),
+              'hz':numpy.median(1./tsamples[1]),
+              'hzerr':numpy.std(1./tsamples[1])}
+        if out['hr'] > 10.:
+            out['hr']= sorted(1./tsamples[0])[int(round(0.05*tsamples.shape[1]))]
+            return "$>{hr:.2f}$&&&{hz:.3f}$\pm${hzerr:.3f}&&".format(**out)
+        else:
+            return "{hr:.2f}$\pm${hrerr:.2f}&&{hz:.3f}$\pm${hzerr:.3f}&&".format(**out)
+    if type.lower() == 'brokentwoexp':
+        tsamples= samples_twoexp
+        out= {'hr1':numpy.median(-1./tsamples[0]),
+              'hr1err':numpy.std(-1./tsamples[0]),
+              'hr2':numpy.median(1./tsamples[2]),
+              'hr2err':numpy.std(1./tsamples[2]),
+              'rmax':numpy.median(numpy.exp(tsamples[3])),
+              'rmaxerr':numpy.std(numpy.exp(tsamples[3])),
+              'hz1':numpy.median(1./tsamples[1]),
+              'hz1err':numpy.std(1./tsamples[1]),
+              'amp':numpy.median(densprofiles.ilogit(tsamples[4])),
+              'amperr':numpy.std(densprofiles.ilogit(tsamples[4])),
+              'hz2':numpy.median(1./tsamples[5]),
+              'hz2err':numpy.std(1./tsamples[5])}
+        return "{hr1:.2f}$\pm${hr1err:.2f}&{hr2:.2f}$\pm${hr2err:.2f}&{rmax:.2f}$\pm${rmaxerr:.2f}&{hz1:.3f}$\pm${hz1err:.3f}&{amp:.2f}$\pm${amperr:.2f}&{hz2:.3f}$\pm${hz2err:.3f}".format(**out)
+                
+def _format_results_noerr(type,extmap):
+    if type.lower() == 'brokenexpflare':
+        if 'Mar' in extmap:
+            tbf= bf_brexp
+        elif 'Gre' in extmap:
+            tbf= bf_brexp_g15
+        elif 'Dri' in extmap:
+            tbf= bf_brexp_drim
+        elif 'Sal' in extmap:
+            tbf= bf_brexp_sale
+        elif 'zero' in extmap:
+            tbf= bf_brexp_zero
+        out= {'hr1':numpy.median(-1./tbf[0]),
+              'hr2':numpy.median(1./tbf[2]),
+              'rmax':numpy.median(numpy.exp(tbf[3])),
+              'hz':numpy.median(1./tbf[1]),
+              'rf':numpy.median(tbf[4])}
+        return "{hr1:.2f}&{hr2:.2f}&{rmax:.2f}&{hz:.3f}&{rf:.2f}&".format(**out)
+                
 def plotCompareData(sample,savename,plotname):
     locs= ['highb','outdisk','meddisk','indisk']
     indices= [highbIndx,outDiskIndx,betwDiskIndx,inDiskIndx]
@@ -316,9 +429,9 @@ def plotCompareData(sample,savename,plotname):
             if loc.lower() == 'meddisk':
                 pyplot.legend((line_mar[0],line_exp[0],line_twoexp[0]),
                               (r'$\mathrm{Marshall\ et\ al.\ (2006)}$'
-                               +'\n'+r'$\mathrm{broken\ PL\ w/\ flare}$',
-                               r'$\mathrm{exp.\ disk}$',
-                               r'$\mathrm{broken\ PL\ w/\ 2}\ h_Z$'),
+                               +'\n'+r'$\mathrm{broken\ exp.\ w/\ flare}$',
+                               r'$\mathrm{single\ exp.}$',
+                               r'$\mathrm{broken\ exp.\ w/\ 2}\ h_Z$'),
                               loc='lower right',bbox_to_anchor=(.66,.375),
                               numpoints=8,
                               prop={'size':14},
@@ -363,6 +476,6 @@ if __name__ == '__main__':
     # First, do the fits
     fitBroadSubsamples(sample,savename)
     # Then write the table
-    #writeTable(sample,savename,tablename)
+    writeTable(sample,savename,tablename)
     # And make the plot comparing data and model
     plotCompareData(sample,savename,plotname)
