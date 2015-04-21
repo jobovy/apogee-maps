@@ -263,10 +263,10 @@ def writeTable(sample,savename,tablename):
 def _format_results(type,extmap):
     if type.lower() == 'tribrokenexpflare':
         tsamples= samples_brexp
-        out= {'hr1':numpy.median(1./tsamples[0]),
-              'hr1err':numpy.std(1./tsamples[0]),
-              'hr2':numpy.median(1./tsamples[2]),
-              'hr2err':numpy.std(1./tsamples[2]),
+        out= {'hr1':numpy.median(tsamples[0]),
+              'hr1err':numpy.std(tsamples[0]),
+              'hr2':numpy.median(tsamples[2]),
+              'hr2err':numpy.std(tsamples[2]),
               'rmax':numpy.median(numpy.exp(tsamples[3])),
               'rmaxerr':numpy.std(numpy.exp(tsamples[3])),
               'hz':numpy.median(1./tsamples[1]),
@@ -281,22 +281,18 @@ def _format_results(type,extmap):
             return "${hr1:.1f}\pm{hr1err:.1f}$&${hr2:.1f}\pm{hr2err:.1f}$&${rmax:.1f}\pm{rmaxerr:.1f}$&${hz:.2f}\pm{hzerr:.2f}$&${rf:.2f}\pm{rferr:.2f}$&\ldots&{ml:.0f}".format(**out)
     elif type.lower() == 'expplusconst':
         tsamples= samples_exp
-        out= {'hr':numpy.median(1./tsamples[0]),
-              'hrerr':numpy.std(1./tsamples[0]),
+        out= {'hr':numpy.median(tsamples[0]),
+              'hrerr':numpy.std(tsamples[0]),
               'hz':numpy.median(1./tsamples[1]),
               'hzerr':numpy.std(1./tsamples[1]),
               'ml':-2.*(ml_exp-ml_brexp)}
-        if out['hr'] > 10.:
-            out['hr']= sorted(1./tsamples[0])[int(round(0.05*tsamples.shape[1]))]
-            return "$>{hr:.1f}$&\ldots&\ldots&${hz:.2f}\pm{hzerr:.2f}$&\ldots&\ldots&{ml:.0f}".format(**out)
-        else:
-            return "${hr:.1f}\pm{hrerr:.1f}$&\ldots&\ldots&${hz:.2f}\pm{hzerr:.2f}$&\ldots&&{ml:.0f}".format(**out)
+        return "${hr:.1f}\pm{hrerr:.1f}$&\ldots&\ldots&${hz:.2f}\pm{hzerr:.2f}$&\ldots&&{ml:.0f}".format(**out)
     if type.lower() == 'tribrokentwoexp':
         tsamples= samples_twoexp
-        out= {'hr1':numpy.median(1./tsamples[0]),
-              'hr1err':numpy.std(1./tsamples[0]),
-              'hr2':numpy.median(1./tsamples[2]),
-              'hr2err':numpy.std(1./tsamples[2]),
+        out= {'hr1':numpy.median(tsamples[0]),
+              'hr1err':numpy.std(tsamples[0]),
+              'hr2':numpy.median(tsamples[2]),
+              'hr2err':numpy.std(tsamples[2]),
               'rmax':numpy.median(numpy.exp(tsamples[3])),
               'rmaxerr':numpy.std(numpy.exp(tsamples[3])),
               'hz1':numpy.median(1./tsamples[1]),
@@ -325,8 +321,8 @@ def _format_results_noerr(type,extmap):
         elif 'zero' in extmap:
             tbf= bf_brexp_zero
             tml= ml_brexp_zero
-        out= {'hr1':numpy.median(1./tbf[0]),
-              'hr2':numpy.median(1./tbf[2]),
+        out= {'hr1':numpy.median(tbf[0]),
+              'hr2':numpy.median(tbf[2]),
               'rmax':numpy.median(numpy.exp(tbf[3])),
               'hz':numpy.median(1./tbf[1]),
               'rf':numpy.median(tbf[4]),
