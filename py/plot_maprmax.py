@@ -20,7 +20,7 @@ def plot_maprmax(savefilename,plotname):
     maps= define_rcsample.MAPs()
     plotthis= numpy.zeros(len(bf))+numpy.nan
     for ii, map in enumerate(maps.map()):
-        tmed= numpy.nanmedian(numpy.exp(samples[ii,3]))
+        tmed= numpy.median(numpy.exp(samples[ii,3])[True-numpy.isnan(numpy.exp(samples[ii,3]))])
         if tmed < 5.:
             tmed= 0.
         plotthis[ii]= tmed
@@ -28,7 +28,8 @@ def plot_maprmax(savefilename,plotname):
     maps.plot(plotthis,
               vmin=5.,vmax=13.,
               minnstar=15,
-              zlabel=r'$R_{\mathrm{peak}}\,(\mathrm{kpc})$')
+              zlabel=r'$R_{\mathrm{peak}}\,(\mathrm{kpc})$',
+              shrink=0.68)
     # Sequences
     haloc= define_rcsample.highalphalocus()
     bovy_plot.bovy_plot(haloc[:,0],haloc[:,1],'-',color='0.75',
@@ -46,6 +47,7 @@ def plot_maprmax(savefilename,plotname):
                     size=16.,color='w')
     t.set_bbox(dict(alpha=0.5,color=cm.coolwarm(0.),
                     edgecolor='none'))
+    pyplot.tight_layout()
     bovy_plot.bovy_end_print(plotname,dpi=300)
     return None
 
