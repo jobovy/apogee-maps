@@ -26,16 +26,19 @@ def triangleMAPs(savefilename,basename):
         for tbf,tsamples,ext in zip([bf,bf_g15,bf_zero],
                                     [samples,samples_g15,samples_zero],
                                     ['fid','g15','zero']):
-            triangle.corner(tsamples[ii,].T,quantiles=[0.16, 0.5, 0.84],
-                            labels=labels,
-                            show_titles=True,title_args={"fontsize": 12},
-                            bins=21)
-            bovy_plot.bovy_text(r'$[\mathrm{{Fe/H}}] = {feh:.1f},$'\
-                                    .format(feh=tfeh)+'\n'
-                                +r'$[\alpha/\mathrm{{Fe}}] = {afe:.2f}$'\
-                                    .format(afe=tafe),
-                                top_left=True,size=16.)
-            bovy_plot.bovy_end_print(basename+"_%i_%s.png" % (ii,ext))
+            try:
+                triangle.corner(tsamples[ii,].T,quantiles=[0.16, 0.5, 0.84],
+                                labels=labels,
+                                show_titles=True,title_args={"fontsize": 12},
+                                bins=21)
+            except ValueError: pass
+            else:
+                bovy_plot.bovy_text(r'$[\mathrm{{Fe/H}}] = {feh:.1f},$'\
+                                        .format(feh=tfeh)+'\n'
+                                    +r'$[\alpha/\mathrm{{Fe}}] = {afe:.2f}$'\
+                                        .format(afe=tafe),
+                                    top_left=True,size=16.)
+                bovy_plot.bovy_end_print(basename+"_%i_%s.png" % (ii,ext))
     return None
 
 if __name__ == '__main__':
