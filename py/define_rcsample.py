@@ -3,6 +3,8 @@
 ###############################################################################
 import math
 import numpy
+import statsmodels.api as sm
+lowess= sm.nonparametric.lowess
 import esutil
 from galpy.util import bovy_coords, bovy_plot
 import apogee.tools.read as apread
@@ -236,6 +238,25 @@ def get_highfehsample():
         *(data[_AFETAG] > _highfeh_lowafe(data[_FEHTAG]))\
         *(data[_AFETAG] <= _highfeh_highafe(data[_FEHTAG]))
     return data[indx]
+
+###############################################################################
+# high and low alpha locus
+###############################################################################
+def highalphalocus():
+    data= get_rcsample()
+    indx= (data[_AFETAG] > (0.2-0.1)/(-0.6--0.125)*(data[_FEHTAG]--0.125)+0.11)\
+        *(data[_FEHTAG] < -0.125)\
+        +(data[_AFETAG] > 0.05/(-0.6--0.125)*(data[_FEHTAG]--0.125)+0.11)\
+        *(data[_FEHTAG] >= -0.125)*(data[_FEHTAG] < 0.225)\
+        +(data[_FEHTAG] >= 0.225)
+    return lowess(data[_AFETAG][indx],data[_FEHTAG][indx],frac=0.6)
+def lowalphalocus():
+    data= get_rcsample()
+    indx= (data[_AFETAG] > (0.2-0.1)/(-0.6--0.125)*(data[_FEHTAG]--0.125)+0.11)\
+        *(data[_FEHTAG] < -0.125)\
+        +(data[_AFETAG] > 0.05/(-0.6--0.125)*(data[_FEHTAG]--0.125)+0.11)\
+        *(data[_FEHTAG] >= -0.125)*(data[_FEHTAG] < 0.225)
+    return lowess(data[_AFETAG][True-indx],data[_FEHTAG][True-indx],frac=0.6)
 
 ###############################################################################
 # pixelization in (feh,afe)

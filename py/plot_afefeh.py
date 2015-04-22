@@ -92,6 +92,10 @@ def plot_afefeh(plotfilename):
                          size=15.,backgroundcolor='w')
     bovy_plot.bovy_text(-0.125,-0.125,r'$\mathrm{solar}$',
                          size=15.,backgroundcolor='w')
+    haloc= define_rcsample.highalphalocus()
+    bovy_plot.bovy_plot(haloc[:,0],haloc[:,1],'k-',lw=2.,overplot=True)
+    haloc= define_rcsample.lowalphalocus()
+    bovy_plot.bovy_plot(haloc[:,0],haloc[:,1],'k-',lw=2.,overplot=True)
     bovy_plot.bovy_end_print(plotfilename)
     return None
 
