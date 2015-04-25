@@ -38,7 +38,7 @@ def plot_maphz(plotname):
               vmin=200.,vmax=1000.,
               minnstar=15,
               zlabel=r'$h_Z\,(\mathrm{pc})$',
-              shrink=0.68)
+              shrink=0.655)
     # Sequences
     haloc= define_rcsample.highalphalocus()
     bovy_plot.bovy_plot(haloc[:,0],haloc[:,1],'-',color='0.75',
