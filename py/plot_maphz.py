@@ -24,12 +24,12 @@ def plot_maphz(plotname):
     plotthisz= numpy.zeros(len(bf))+numpy.nan
     plotthisze= numpy.zeros(len(bf))+numpy.nan
     for ii, map in enumerate(maps.map()):
-        if numpy.nanmedian(numpy.exp(samples[ii,3])) < 5.:
-            tmed= numpy.nanmedian(1./samplesnf[ii,1])
-            terr= numpy.nanstd(1./samplesnf[ii,1])
+        if numpy.median(numpy.exp(samples[ii,3])[True-numpy.isnan(numpy.exp(samples[ii,3]))]) < 5.:
+            tmed= numpy.median((1./samplesnf[ii,1])[True-numpy.isnan(1./samplesnf[ii,1])])
+            terr= numpy.std((1./samplesnf[ii,1])[True-numpy.isnan(1./samplesnf[ii,1])])
         else:
-            tmed= numpy.nanmedian(1./samplesff[ii,1])
-            terr= numpy.nanstd(1./samplesff[ii,1])
+            tmed= numpy.median((1./samplesff[ii,1])[True-numpy.isnan(1./samplesff[ii,1])])
+            terr= numpy.std((1./samplesff[ii,1])[True-numpy.isnan(1./samplesff[ii,1])])
         plotthisz[ii]= tmed
         plotthisze[ii]= terr
     plotthisz[plotthisze/plotthisz > 0.2]= numpy.nan
