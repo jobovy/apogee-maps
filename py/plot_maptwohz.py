@@ -21,13 +21,15 @@ def plot_maphz(plotname):
     plotthisz2= numpy.zeros(len(bf))+numpy.nan
     plotthisz2e= numpy.zeros(len(bf))+numpy.nan
     for ii, map in enumerate(maps.map()):
-        hzindx= densprofiles.ilogit(samples[ii,4]) > 0.15
-        tmed= numpy.nanmedian(1./samples[ii,1,hzindx])
-        terr= numpy.nanstd(1./samples[ii,1,hzindx])
+        hzindx= (True-numpy.isnan(samples[ii,4]))\
+            *(True-numpy.isnan(samples[ii,5]))\
+            *(densprofiles.ilogit(samples[ii,4]) > 0.15)
+        tmed= numpy.median(1./samples[ii,1,hzindx])
+        terr= numpy.std(1./samples[ii,1,hzindx])
         plotthisz1[ii]= tmed
         plotthisz1e[ii]= terr
-        tmed= numpy.nanmedian(1./samples[ii,5,hzindx])
-        terr= numpy.nanstd(1./samples[ii,5,hzindx])
+        tmed= numpy.median(1./samples[ii,5,hzindx])
+        terr= numpy.std(1./samples[ii,5,hzindx])
         plotthisz2[ii]= tmed
         plotthisz2e[ii]= terr
     plotthisz1[plotthisz1e/plotthisz1 > 0.5]= numpy.nan
