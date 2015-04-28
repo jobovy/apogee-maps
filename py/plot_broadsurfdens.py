@@ -9,13 +9,12 @@ matplotlib.use('Agg')
 from galpy.util import bovy_plot
 from matplotlib import pyplot
 import densprofiles
-_SKIP= 1
+_SKIP= 10
 _SIGNIF= 0.025
 def plot_broadsurfdens(plotname):
     broads= ['lowlow','solar','highfeh','highalpha']
-    hatchs= ['/','\\','//','\\\\']
     anorms= [2.,.25,0.01,50.]
-    bovy_plot.bovy_print(fig_width=10.,fig_height=3.5)
+    bovy_plot.bovy_print(fig_width=8.,fig_height=3.)
     overplot= False
     for ii, broad in enumerate(broads):
         # Restore the fits
@@ -62,9 +61,7 @@ def plot_broadsurfdens(plotname):
         pyplot.fill_between(Rs,
                             numpy.exp(numpy.sort(ldp,axis=1)[:,int(round(_SIGNIF*nsamples))])/norm,
                             numpy.exp(numpy.sort(ldp,axis=1)[:,int(round((1.-_SIGNIF)*nsamples))])/norm,
-#                            hatch=hatchs[ii],
                             color='0.65',
-#                            facecolor=(0,0,0,0),
                             lw=0.)
         overplot= True
     # Label
@@ -75,7 +72,7 @@ def plot_broadsurfdens(plotname):
                         size=15.,backgroundcolor='w')
     bovy_plot.bovy_text(labelx,0.6,r'$\mathrm{low\ [Fe/H]}$',
                          size=15.,backgroundcolor='w')
-    bovy_plot.bovy_text(labelx,300.,r'$\mathrm{high}\ [\alpha/\mathrm{Fe}]$',
+    bovy_plot.bovy_text(labelx,150.,r'$\mathrm{high}\ [\alpha/\mathrm{Fe}]$',
                          size=15.,backgroundcolor='w')
     bovy_plot.bovy_end_print(plotname)
 
