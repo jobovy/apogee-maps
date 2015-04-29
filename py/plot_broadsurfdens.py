@@ -45,10 +45,20 @@ def plot_broadsurfdens(plotname):
             Rb= numpy.tile(numpy.exp(samples[3]),(len(Rs),1))
             ihRin= numpy.tile(samples[0],(len(Rs),1))
             ihRout= numpy.tile(samples[2],(len(Rs),1))
-            ldp[tRs <= Rb]= ihRin[tRs<=Rb]*(tRs[tRs<=Rb]-densprofiles._R0)
-            ldp[tRs > Rb]= -ihRout[tRs>Rb]*(tRs[tRs>Rb]-densprofiles._R0)\
-                +ihRout[tRs>Rb]*(Rb[tRs>Rb]-densprofiles._R0)\
-                +ihRin[tRs>Rb]*(Rb[tRs>Rb]-densprofiles._R0)
+            # Rb >= R0
+            leRb= (tRs <= Rb)*(Rb >= densprofiles._R0)
+            ldp[leRb]= ihRin[leRb]*(tRs[leRb]-densprofiles._R0)
+            gtRb= (tRs > Rb)*(Rb >= densprofiles._R0)
+            ldp[gtRb]= -ihRout[gtRb]*(tRs[gtRb]-densprofiles._R0)\
+                +ihRout[gtRb]*(Rb[gtRb]-densprofiles._R0)\
+                +ihRin[gtRb]*(Rb[gtRb]-densprofiles._R0)
+            # Rb < R0
+            leRb= (tRs <= Rb)*(Rb < densprofiles._R0)
+            ldp[leRb]= ihRin[leRb]*(tRs[leRb]-densprofiles._R0)\
+                -ihRout[leRb]*(Rb[leRb]-densprofiles._R0)\
+                -ihRin[leRb]*(Rb[leRb]-densprofiles._R0)
+            gtRb= (tRs > Rb)*(Rb < densprofiles._R0)
+            ldp[gtRb]= -ihRout[gtRb]*(tRs[gtRb]-densprofiles._R0)
         norm= numpy.exp(numpy.median(ldp,axis=1))[numpy.argmin(numpy.fabs(Rs-densprofiles._R0))]/anorms[ii]        
         bovy_plot.bovy_plot(Rs,numpy.exp(numpy.median(ldp,axis=1))/norm,
                             'k-',
