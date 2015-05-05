@@ -2,6 +2,8 @@
 # plot_spatial_broad.py: plot the spatial distribution of broad samples
 ###############################################################################
 import sys
+import matplotlib
+matplotlib.use('Agg')
 from galpy.util import bovy_plot
 import define_rcsample
 def plot_spatial_broad(plotname):
