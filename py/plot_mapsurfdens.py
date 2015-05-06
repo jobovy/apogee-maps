@@ -52,9 +52,9 @@ def plot_mapsurfdens(plotname):
         if tfeh == -0.0: tfeh= 0.0
         print ii, tfeh, len(map)
         anorm= 10**(-10.*tfeh)
-        if tfeh > 0.2: anorm= 10**(-14.*tfeh) 
-        if tfeh > 0.3: anorm= 10**(-13.*tfeh) 
-        if tfeh < -0.4: anorm= 10**(-14.*tfeh)
+        if tfeh > 0.3: anorm= 10**(-12.*tfeh) 
+        if tfeh < -0.4: anorm= 10**(-12.*tfeh)
+        anorm= 1./anorm # re-order
         norm= numpy.exp(numpy.median(ldp,axis=1))[numpy.argmin(numpy.fabs(Rs-densprofiles._R0))]/anorm
         bovy_plot.bovy_plot(Rs,numpy.exp(numpy.median(ldp,axis=1))/norm,
                             '-',
@@ -63,7 +63,7 @@ def plot_mapsurfdens(plotname):
                             xlabel=r'$R\,(\mathrm{kpc})$',
                             ylabel=r'$\Sigma(R)$',
                             xrange=[0.,16.],
-                            yrange=[0.00000001,1100000000.],
+                            yrange=[0.000000001,9000000.],
                             semilogy=True)
         pyplot.fill_between(Rs,
                             numpy.exp(numpy.sort(ldp,axis=1)[:,int(round(_SIGNIF*nsamples))])/norm,
@@ -73,12 +73,12 @@ def plot_mapsurfdens(plotname):
         overplot= True
         if ii == 9:
             bovy_plot.bovy_text(2.,
-                                10.**7.,
+                                10.**6.,
                                 r'$[\mathrm{Fe/H}]$',size=16.,color='k')
         bovy_plot.bovy_text(2.,(numpy.exp(numpy.median(ldp,axis=1))/norm)[0],
                             r'$%+.1f$' % tfeh,size=16.,
                             color=cmap((tfeh+0.5)*0.95/0.9+0.05))
-    bovy_plot.bovy_text(0.75,10.**8.25,
+    bovy_plot.bovy_text(10.,10.**6.,
                         r'$\mathrm{low-}[\alpha/\mathrm{Fe}]\ \mathrm{MAPs}$',
                         size=16.)
     bovy_plot.bovy_end_print(plotname)
