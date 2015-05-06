@@ -39,11 +39,13 @@ def plot_maprmax(savefilename,plotname):
     bovy_plot.bovy_plot(haloc[:,0],haloc[:,1],'-',color='0.75',
                         lw=2.5,overplot=True)
     # Label
-    t= pyplot.text(-0.51,0.235,r'$\mathrm{single}$',
-                    size=16.,color='w')
-    t.set_bbox(dict(alpha=0.5,color=cm.coolwarm(0.),
-                    edgecolor='none'))
-    t= pyplot.text(-0.475,0.195,r'$\mathrm{exponential}$',
+    #t= pyplot.text(-0.51,0.235,r'$\mathrm{single}$',
+    #                size=16.,color='w')
+    #t.set_bbox(dict(alpha=0.5,color=cm.coolwarm(0.),
+    #                edgecolor='none'))
+    #t= pyplot.text(-0.475,0.195,r'$\mathrm{exponential}$',
+    #                size=16.,color='w')
+    t= pyplot.text(-0.525,0.195,r'$R_{\mathrm{peak}} < 5\,\mathrm{kpc}$',
                     size=16.,color='w')
     t.set_bbox(dict(alpha=0.5,color=cm.coolwarm(0.),
                     edgecolor='none'))
