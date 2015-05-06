@@ -13,7 +13,8 @@ _SKIP= 10
 _SIGNIF= 0.025
 def plot_broadsurfdens(plotname):
     broads= ['lowlow','solar','highfeh','highalpha']
-    anorms= [2.,.25,0.01,50.]
+    #anorms= [2.,.25,0.01,50.]
+    anorms= [0.004,.20,5.,50.]
     bovy_plot.bovy_print(fig_width=8.,fig_height=3.)
     overplot= False
     for ii, broad in enumerate(broads):
@@ -76,11 +77,11 @@ def plot_broadsurfdens(plotname):
         overplot= True
     # Label
     labelx= 1.
-    bovy_plot.bovy_text(labelx,0.01,r'$\mathrm{high\ [Fe/H]}$',
+    bovy_plot.bovy_text(labelx,5.,r'$\mathrm{high\ [Fe/H]}$',
                         size=15.,backgroundcolor='w')
-    bovy_plot.bovy_text(labelx,0.1,r'$\mathrm{solar}$',
+    bovy_plot.bovy_text(labelx,0.085,r'$\mathrm{solar}$',
                         size=15.,backgroundcolor='w')
-    bovy_plot.bovy_text(labelx,0.6,r'$\mathrm{low\ [Fe/H]}$',
+    bovy_plot.bovy_text(labelx,0.001,r'$\mathrm{low\ [Fe/H]}$',
                          size=15.,backgroundcolor='w')
     bovy_plot.bovy_text(labelx,150.,r'$\mathrm{high}\ [\alpha/\mathrm{Fe}]$',
                          size=15.,backgroundcolor='w')
