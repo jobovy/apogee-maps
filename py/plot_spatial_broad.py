@@ -13,6 +13,10 @@ def plot_spatial_broad(plotname):
                  define_rcsample.get_solarsample,
                  define_rcsample.get_highfehsample]
     names= ['lowlow','highalpha','solar','highfeh']
+    labels= [r'$\mathrm{low\ [Fe/H]}$',
+             r'$\mathrm{high}\ [\alpha/\mathrm{Fe}]$',
+             r'$\mathrm{solar}$',
+             r'$\mathrm{high\ [Fe/H]}$']            
     for ii in range(4):
         data= load_funcs[ii]()
         if ii == 1:
@@ -30,6 +34,12 @@ def plot_spatial_broad(plotname):
                             ylabel=ylabel,
                             onedhists=True,
                             bins=31)
+        if ii != 1:
+            bovy_plot.bovy_text(labels[ii],top_left=True,
+                                size=24)
+        else:
+            bovy_plot.bovy_text(labels[ii],bottom_left=True,
+                                size=24)
         bovy_plot.bovy_end_print(plotname.replace('SAMPLE',names[ii]))
     return None
 
