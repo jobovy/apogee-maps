@@ -341,7 +341,8 @@ def plotCompareData(sample,savename,plotname):
                                               distmods,
                                               type='tribrokenexpflare',coord='dm')
     for loc, index, data_index in zip(locs,indices,data_indices):
-        bovy_plot.bovy_print()
+        bovy_plot.bovy_print(axes_labelsize=20,text_fontsize=20,
+                             xtick_labelsize=20,ytick_labelsize=20)
         # High |b|
         # Marshall is fiducial
         Xs,pdt= compareDataModel.predict_spacedist(bf_brexp,
@@ -349,8 +350,14 @@ def plotCompareData(sample,savename,plotname):
                                                    copy.deepcopy(effsel_mar)[index],
                                                    distmods,type='tribrokenexpflare',
                                                    coord='dm')
-        yrange=[0.,
-                1.4*numpy.amax(pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]))]
+        if (sample.lower() == 'solar' and \
+                (loc.lower() == 'outdisk' or loc.lower() == 'highb')) \
+                or (sample.lower() == 'highfeh' and loc.lower() == 'highb'):
+            yrange=[0.,
+                    1.6*numpy.amax(pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]))]
+        else:
+            yrange=[0.,
+                    1.4*numpy.amax(pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]))]
         bovy_plot.bovy_hist(ldata['RC_DM_H'][data_index],
                             histtype='step',normed=True,
                             lw=_LW,
@@ -362,12 +369,14 @@ def plotCompareData(sample,savename,plotname):
         line_mar= bovy_plot.bovy_plot(Xs,pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]),
                                       color='r',
                                       lw=2.*_LW,overplot=True,zorder=12)
-        bovy_plot.bovy_text(r'$%i / %i\ \mathrm{stars}$' \
-                                % (numpy.sum(data_index),
+        bovy_plot.bovy_text(r'$%i\%% = %i / %i\ \mathrm{stars}$' \
+                                % (int(round(float(numpy.sum(data_index))/len(ldata)*100.)),
+                                   numpy.sum(data_index),
                                    len(ldata))
-                            +'\n'+r'$%i / %i\ \mathrm{predicted}$' \
-                                % (numpy.sum(pdt)/numpy.sum(pd)*len(ldata),len(ldata)),
-                            top_left=True,size=14.)
+                            +'\n'+r'$%i\%% = %i / %i\ \mathrm{predicted}$' \
+                                % (int(round(numpy.sum(pdt)/numpy.sum(pd)*100.)),
+                                   numpy.sum(pdt)/numpy.sum(pd)*len(ldata),len(ldata)),
+                            top_left=True,size=16.)
         # Green
         Xs,pdt= compareDataModel.predict_spacedist(bf_brexp_g15,
                                                    numpy.array(locations)[index],
@@ -425,16 +434,29 @@ def plotCompareData(sample,savename,plotname):
                                          ls='--')
         if sample.lower() == 'lowlow' or sample.lower() == 'highalpha':
             if loc.lower() == 'highb':
-                bovy_plot.bovy_text(r'$|b| > 10^\circ$',title=True,size=14.)
+                pyplot.annotate(r'$|b| > 10^\circ$',
+                                (0.5,1.085),xycoords='axes fraction',
+                                horizontalalignment='center',
+                                verticalalignment='top',
+                                size=20.)
             elif loc.lower() == 'indisk':
-                bovy_plot.bovy_text(r'$l < 70^\circ, |b| \leq 10^\circ$',
-                                    title=True,size=14.)
+                pyplot.annotate(r'$l < 70^\circ, |b| \leq 10^\circ$',
+                                (0.5,1.085),xycoords='axes fraction',
+                                horizontalalignment='center',
+                                verticalalignment='top',
+                                size=20.)
             elif loc.lower() == 'meddisk':
-                bovy_plot.bovy_text(r'$70^\circ \leq l \leq 140^\circ, |b| \leq 10^\circ$',
-                                    title=True,size=14.)
+                pyplot.annotate(r'$70^\circ \leq l \leq 140^\circ, |b| \leq 10^\circ$',
+                                (0.5,1.085),xycoords='axes fraction',
+                                horizontalalignment='center',
+                                verticalalignment='top',
+                                size=20.)
             elif loc.lower() == 'outdisk':
-                bovy_plot.bovy_text(r'$140^\circ < l < 250^\circ, |b| \leq 10^\circ$',
-                                    title=True,size=14.)
+                pyplot.annotate(r'$140^\circ < l < 250^\circ, |b| \leq 10^\circ$',
+                                (0.5,1.085),xycoords='axes fraction',
+                                horizontalalignment='center',
+                                verticalalignment='top',
+                                size=20.)
             # Legend
             if loc.lower() == 'meddisk':
                 pyplot.legend((line_mar[0],line_exp[0],line_twoexp[0]),
