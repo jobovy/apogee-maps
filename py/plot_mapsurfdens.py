@@ -78,6 +78,9 @@ def plot_mapsurfdens(plotname):
         bovy_plot.bovy_text(2.,(numpy.exp(numpy.median(ldp,axis=1))/norm)[0],
                             r'$%+.1f$' % tfeh,size=16.,
                             color=cmap((tfeh+0.5)*0.95/0.9+0.05))
+    bovy_plot.bovy_text(0.75,10.**8.25,
+                        r'$\mathrm{low-}[\alpha/\mathrm{Fe}]\ \mathrm{MAPs}$',
+                        size=16.)
     bovy_plot.bovy_end_print(plotname)
 
 if __name__ == '__main__':
