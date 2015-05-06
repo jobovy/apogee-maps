@@ -19,7 +19,8 @@ def plot_spatial_broad(plotname):
             ylabel= r'$Z\,(\mathrm{kpc})$'
         else:
             ylabel= ' '
-        bovy_plot.bovy_print()
+        bovy_plot.bovy_print(axes_labelsize=24,text_fontsize=24,
+                             xtick_labelsize=24,ytick_labelsize=24)
         bovy_plot.bovy_plot(data['RC_GALR_H'],
                             data['RC_GALZ_H'],
                             'k.',ms=2.,
