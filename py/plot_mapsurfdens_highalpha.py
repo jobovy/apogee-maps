@@ -82,6 +82,7 @@ def plot_mapsurfdens(plotname):
     bovy_plot.bovy_text(10.,10.**1.,
                         r'$\mathrm{high-}[\alpha/\mathrm{Fe}]\ \mathrm{MAPs}$',
                         size=16.)
+    pyplot.minorticks_off()
     bovy_plot.bovy_end_print(plotname)
 
 if __name__ == '__main__':
