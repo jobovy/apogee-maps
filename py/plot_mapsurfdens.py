@@ -17,7 +17,7 @@ def plot_mapsurfdens(plotname):
         bf= numpy.array(pickle.load(savefile))
         samples_brexp= numpy.array(pickle.load(savefile))
     plotmaps= [9,16,23,29,36,43,50,57,64,71]
-    bovy_plot.bovy_print(fig_width=8.,fig_height=8.)
+    bovy_plot.bovy_print(fig_width=8.,fig_height=6.)
     maps= define_rcsample.MAPs()
     cmap= cm.coolwarm
     overplot= False
