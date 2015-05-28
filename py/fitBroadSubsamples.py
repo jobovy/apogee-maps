@@ -360,7 +360,7 @@ def plotCompareData(sample,savename,plotname):
                     1.4*numpy.amax(pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]))]
         bovy_plot.bovy_hist(ldata['RC_DM_H'][data_index],
                             histtype='step',normed=True,
-                            lw=_LW,
+                            lw=_LW,hatch='//',
                             range=[7.,15.5],
                             bins=round(numpy.sqrt(numpy.sum(data_index))*2.),
                             yrange=yrange,
