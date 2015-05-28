@@ -68,7 +68,7 @@ def plot_afe_spectra(savename,plotname):
     # Now plot the various elements
     colormap= cm.seismic
     colorFunc= lambda afe: afe/0.25
-    widths= [3.5,3.]
+    widths= [3.5,2.]
     yranges= [[-0.05,0.02],[-0.03,0.01]]
     for ee, elem in enumerate(['S','Ca1']):
         for ii in range(5):
@@ -101,7 +101,7 @@ def plot_afe_spectra(savename,plotname):
                 'zorder':int(numpy.floor(numpy.random.uniform()*5)),
                 'color':colormap(colorFunc(ii*0.05)),
                 'overplot':ii>0,
-                'fig_width':5.,
+                'fig_width':4.5,
                 'markLines':True}
         if ii>0: kwargs.pop('fig_width')
         if ii != 4: 
@@ -168,6 +168,33 @@ def plot_afe_spectra(savename,plotname):
         bovy_plot.bovy_text(r'$\mathrm{O}$',
                             top_left=True,fontsize=10,backgroundcolor='w')
     bovy_plot.bovy_end_print(plotname.replace('ELEM','O'))
+    # Also do Ti
+    for ii in range(5):
+        tindx= (fehdata[define_rcsample._AFETAG] > ii*0.05-0.025)\
+            *(fehdata[define_rcsample._AFETAG] <= (ii+1)*0.05-0.025)
+        args= (apstack.median(pr[tindx][:12]),)
+        kwargs={'startindxs':[1121,2100,2899],
+                'endindxs':[1146,2124,2922],
+                'yrange':[-0.05,0.02],
+                'ylabel':'',
+                'cleanZero':False,
+                '_markwav':apwindow.lines('Ti'),
+                'zorder':int(numpy.floor(numpy.random.uniform()*5)),
+                'color':colormap(colorFunc(ii*0.05)),
+                'overplot':ii>0,
+                'fig_width':2.5,
+                'markLines':True}
+        if ii>0: kwargs.pop('fig_width')
+        if ii != 4: 
+            kwargs.pop('_markwav')
+            kwargs.pop('markLines')
+        kwargs['_startendskip']= 0
+        kwargs['_noxticks']= True
+        kwargs['_labelwav']= True
+        splot.waveregions(*args,**kwargs)                          
+        bovy_plot.bovy_text(r'$\mathrm{Ti}$',
+                            top_left=True,fontsize=10,backgroundcolor='w')
+    bovy_plot.bovy_end_print(plotname.replace('ELEM','Ti'))
     return None
 
 if __name__ == '__main__':
