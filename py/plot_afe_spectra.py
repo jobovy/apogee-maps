@@ -155,7 +155,7 @@ def plot_afe_spectra(savename,plotname):
                 'zorder':int(numpy.floor(numpy.random.uniform()*5)),
                 'color':colormap(colorFunc(ii*0.05)),
                 'overplot':ii>0,
-                'fig_width':4.5,
+                'fig_width':5.,
                 'markLines':True}
         if ii>0: kwargs.pop('fig_width')
         if ii != 4: 
@@ -173,7 +173,7 @@ def plot_afe_spectra(savename,plotname):
         tindx= (fehdata[define_rcsample._AFETAG] > ii*0.05-0.025)\
             *(fehdata[define_rcsample._AFETAG] <= (ii+1)*0.05-0.025)
         args= (apstack.median(pr[tindx][:12]),)
-        kwargs={'startindxs':[1121,2100,2899],
+        kwargs={'startindxs':[1116,2100,2899],
                 'endindxs':[1146,2124,2922],
                 'yrange':[-0.05,0.02],
                 'ylabel':'',
@@ -182,7 +182,7 @@ def plot_afe_spectra(savename,plotname):
                 'zorder':int(numpy.floor(numpy.random.uniform()*5)),
                 'color':colormap(colorFunc(ii*0.05)),
                 'overplot':ii>0,
-                'fig_width':2.5,
+                'fig_width':3.5,
                 'markLines':True}
         if ii>0: kwargs.pop('fig_width')
         if ii != 4: 
