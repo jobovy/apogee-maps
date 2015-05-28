@@ -55,13 +55,14 @@ def plot_mapflarepdf(savename,plotname):
             allxcovar= pickle.load(savefile)
     # Now plot
     cmap= cm.coolwarm
+    xrange= [-0.37,0.25]
     if 'lowalpha' in savename:
-        xrange= [-0.4,0.2]
+#        xrange= [-0.4,0.2]
         yrange= [0.,30.]
         combDiv= 2.
         colorFunc= lambda x: cmap((x+0.5)*0.95/0.9+0.05)
     else:
-        xrange= [-0.3,0.3]
+#        xrange= [-0.3,0.3]
         yrange= [0.,13.5]
         colorFunc= lambda x: cmap((x+0.4)*0.95/0.5+0.05)
         combDiv= 1.5
