@@ -2,7 +2,7 @@
 # gaia_rc.py: functions for the RC in Gaia
 ###############################################################################
 import numpy
-from scipy import optimize
+from scipy import interpolate
 import isodist
 from apogee.samples import rc
 from apogee.util import localfehdist
@@ -32,16 +32,39 @@ def G(age,Z,iso):
     return (numpy.nansum(w*outG)/numpy.nansum(w),
             numpy.sqrt(numpy.nansum(w*outG**2.)/numpy.nansum(w)
                        -(numpy.nansum(w*outG)/numpy.nansum(w))**2.))
-def Gdist(tG,iso):
+def Gdist(tG,ZG):
     """The distribution of G for the local metallicity distribution
     REWRITE TO TAKE A Z(G) FUNCTION OBTAINED THROUGH INTERPOLATION"""
     try:
-        tZ= optimize.brenth(lambda x: G(9.7,x,iso)[0]-tG,0.0001,0.06)
+        tZ= ZG(tG)
+        tjac= numpy.fabs(ZG.derivatives(tG)[0]*0.017/tZ/numpy.log(10.))
     except ValueError:
         return 0.
     # Add Jacobian
-    return localfehdist(isodist.Z2FEH(tZ,zsolar=0.017))*1.
+    return localfehdist(isodist.Z2FEH(tZ,zsolar=0.017))*tjac
+def sample_Gdist(iso,n=1000):
+    """Sample from the distribution of MG"""
+    # First calculate the ditribution
+    Gs= numpy.linspace(0.1,1.9,201)
+    ZG= load_ZG(iso)
+    pG= numpy.array([Gdist(g,ZG) for g in Gs])
+    pGmax= numpy.nanmax(pG)
+    # Now rejection sample
+    
+
 def load_iso():
-    Zs= [0.0035,0.017,0.035]
+    Zs= numpy.arange(0.0005,0.0605,0.0005)
     return isodist.PadovaIsochrone(type='sdss-2mass',parsec=True,
                                    Z=Zs)
+def load_ZG(iso,s=0.00005):
+    """Return a function that gives Z as a function of G"""
+    Zs= iso.Zs()
+    Zs= Zs[Zs < 0.05]
+    tage= iso.logages()[62]
+    Gs= numpy.array([G(tage,z,iso)[0] for z in Zs])
+    sindx= numpy.argsort(Gs)
+    Zs= Zs[sindx]
+    Gs= Gs[sindx]
+    goodIndx= True-numpy.isnan(Gs)
+    return interpolate.UnivariateSpline(Gs[goodIndx],Zs[goodIndx],k=3,
+                                        s=s)
