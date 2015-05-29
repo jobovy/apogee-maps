@@ -37,7 +37,7 @@ def Gdist(tG,ZG):
     REWRITE TO TAKE A Z(G) FUNCTION OBTAINED THROUGH INTERPOLATION"""
     try:
         tZ= ZG(tG)
-        tjac= numpy.fabs(ZG.derivatives(tG)[0]*0.017/tZ/numpy.log(10.))
+        tjac= numpy.fabs(ZG.derivatives(tG)[0]/tZ/numpy.log(10.))
     except ValueError:
         return 0.
     # Add Jacobian
@@ -45,13 +45,20 @@ def Gdist(tG,ZG):
 def sample_Gdist(iso,n=1000):
     """Sample from the distribution of MG"""
     # First calculate the ditribution
-    Gs= numpy.linspace(0.1,1.9,201)
+    Gmin, Gmax= 0.1, 0.9
+    Gs= numpy.linspace(Gmin,Gmax,201)
     ZG= load_ZG(iso)
     pG= numpy.array([Gdist(g,ZG) for g in Gs])
     pGmax= numpy.nanmax(pG)
     # Now rejection sample
-    
-
+    out= []
+    while len(out) < n:
+        # generate uniformly
+        new= numpy.random.uniform(size=2*(n-len(out)))*(Gmax-Gmin)+Gmin
+        pnew= numpy.array([Gdist(nn,ZG) for nn in new])
+        out.extend(list(new[numpy.random.uniform(size=2*(n-len(out)))*pGmax \
+                                < pnew]))
+    return numpy.array(out[:n])
 def load_iso():
     Zs= numpy.arange(0.0005,0.0605,0.0005)
     return isodist.PadovaIsochrone(type='sdss-2mass',parsec=True,
