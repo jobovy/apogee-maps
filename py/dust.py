@@ -21,6 +21,11 @@ _PRELOADGREEN15SAMPLES= False
 pix_info= None
 dsamples= None
 best_fit= None
+# we load these in the load_combined function, but then re-use them
+_PRELOADCOMBINED= False
+pix_info= None
+dsamples= None
+best_fit= None
 
 def load_green15(dist,nside_out=None,nest=True,samples=False,samplenum=0):
     """
@@ -66,6 +71,58 @@ def load_green15(dist,nside_out=None,nest=True,samples=False,samplenum=0):
             pix_val_n= 0.460*dsamples[indx,samplenum,tpix]
         else:
             pix_val_n= 0.460*best_fit[indx,tpix]
+        # Determine nested index of each selected pixel in upsampled map
+        mult_factor = (nside_max/nside)**2
+        pix_idx_n = pix_info['healpix_index'][indx]*mult_factor
+        # Write the selected pixels into the upsampled map
+        for offset in range(mult_factor):
+            pix_val[pix_idx_n+offset] = pix_val_n[:]
+    # If the desired nside is less than the maximum nside in the map, degrade
+    if not nside_out is None and nside_out < nside_max:
+        pix_val= healpy.pixelfunc.ud_grade(pix_val,
+                                           nside_out,pess=False,
+                                           order_in='NEST', 
+                                           order_out='NEST')
+    if nest:
+        return pix_val
+    else:
+        return healpy.pixelfunc.reorder(pix_val,n2r=True)
+
+def load_combined(dist,nside_out=None,nest=True):
+    """
+    NAME:
+       load_combined
+    PURPOSE:
+       load the combineddust map at a given distance
+    INPUT:
+       dist - distance in kpc (nearest bin in the map will be returned)
+       nside_out=  desired output nside (default is max in dust map)
+       nest= (True) if True, return in nested format, else in ring format
+    OUTPUT:
+       map(s) in HEALPIX nested scheme (or ring if nest=False)
+    HISTORY:
+       2015-05-30 - Written - Bovy (IAS)
+    """
+    # Load the data
+    if not _PRELOADCOMBINED:
+        global pix_info
+        global best_fit
+        with h5py.File('test.h5','r') as combdata:
+            pix_info= combdata['/pixel_info'][:]
+            best_fit= combdata['/best_fit'][:]
+    # Distance pixel
+    tpix= numpy.argmin(numpy.fabs(dist-_GREEN15DISTS))
+    # Construct an empty map at the highest HEALPix resolution present in the map; code snippets adapted from http://argonaut.skymaps.info/usage
+    nside_max= numpy.max(pix_info['nside'])
+    npix= healpy.pixelfunc.nside2npix(nside_max)
+    pix_val= numpy.empty(npix,dtype='f8')
+    pix_val[:] = healpy.UNSEEN
+    # Fill the upsampled map
+    for nside in numpy.unique(pix_info['nside']):
+        # Get indices of all pixels at current nside level
+        indx= pix_info['nside'] == nside
+        # Extract A_H of each selected pixel
+        pix_val_n= 0.460*best_fit[indx,tpix]
         # Determine nested index of each selected pixel in upsampled map
         mult_factor = (nside_max/nside)**2
         pix_idx_n = pix_info['healpix_index'][indx]*mult_factor
