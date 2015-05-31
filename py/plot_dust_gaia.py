@@ -18,11 +18,11 @@ def plot_dust_gaia(dist,plotname):
     healpy.visufunc.mollview(green15map,
                              nest=True,
                              xsize=4000,min=0.,
-                             max=round(10.*(12.8-dm+1.49))/10.,
+                             max=round(10.*(20.-dm-0.68))/10.,
                              format=r'$%g$',
                              title=r'$\mathrm{Extinction\ to\ %.1f\,kpc}$' % dist,
                              cmap='gist_yarg',
-                             unit='$A_H\,(\mathrm{mag})$')
+                             unit='$A_G\,(\mathrm{mag})$')
     bovy_plot.bovy_end_print(plotname)
 
 if __name__ == '__main__':

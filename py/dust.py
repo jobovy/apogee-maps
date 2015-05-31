@@ -13,6 +13,7 @@ def distmod2dist(distmod):
     return 10.**(distmod/5.-2.)
 
 _greendir= os.path.join(os.getenv('DUST_DIR'),'green15')
+_bovydir= os.path.join(os.getenv('DUST_DIR'),'bovy15')
 _GREEN15DISTMODS= numpy.linspace(4.,19.,31)
 _GREEN15DISTS= distmod2dist(_GREEN15DISTMODS)
 # we load these in the load_green15 function, but then re-use them
@@ -93,7 +94,7 @@ def load_combined(dist,nside_out=None,nest=True):
     NAME:
        load_combined
     PURPOSE:
-       load the combineddust map at a given distance
+       load the combineddust map at a given distance (in Gaia G)
     INPUT:
        dist - distance in kpc (nearest bin in the map will be returned)
        nside_out=  desired output nside (default is max in dust map)
@@ -107,7 +108,7 @@ def load_combined(dist,nside_out=None,nest=True):
     if not _PRELOADCOMBINED:
         global pix_info
         global best_fit
-        with h5py.File('test.h5','r') as combdata:
+        with h5py.File(os.path.join(_bovydir,'dust-map-3d.h5'),'r') as combdata:
             pix_info= combdata['/pixel_info'][:]
             best_fit= combdata['/best_fit'][:]
     # Distance pixel
@@ -121,8 +122,8 @@ def load_combined(dist,nside_out=None,nest=True):
     for nside in numpy.unique(pix_info['nside']):
         # Get indices of all pixels at current nside level
         indx= pix_info['nside'] == nside
-        # Extract A_H of each selected pixel
-        pix_val_n= 0.460*best_fit[indx,tpix]
+        # Extract A_G of each selected pixel
+        pix_val_n= 0.86*2.35*best_fit[indx,tpix] #include 14% recalibration
         # Determine nested index of each selected pixel in upsampled map
         mult_factor = (nside_max/nside)**2
         pix_idx_n = pix_info['healpix_index'][indx]*mult_factor
