@@ -20,7 +20,6 @@ def plot_dust_gaia(dist,plotname):
                              xsize=4000,min=0.,
                              max=round(10.*(20.-dm-0.68))/10.,
                              format=r'$%g$',
-                             title=r'$\mathrm{Extinction\ to\ %.1f\,kpc}$' % dist,
                              cmap='gist_yarg',
                              unit='$A_G\,(\mathrm{mag})$')
     bovy_plot.bovy_end_print(plotname)
