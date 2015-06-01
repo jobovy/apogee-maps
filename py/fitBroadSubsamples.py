@@ -359,8 +359,9 @@ def plotCompareData(sample,savename,plotname):
             yrange=[0.,
                     1.4*numpy.amax(pdt/numpy.sum(pdt)/(Xs[1]-Xs[0]))]
         bovy_plot.bovy_hist(ldata['RC_DM_H'][data_index],
-                            histtype='step',normed=True,
-                            lw=_LW,hatch='//',
+                            histtype='step',
+                            normed=True,
+                            lw=2.*_LW,
                             range=[7.,15.5],
                             bins=round(numpy.sqrt(numpy.sum(data_index))*2.),
                             yrange=yrange,
