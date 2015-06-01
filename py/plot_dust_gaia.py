@@ -2,6 +2,7 @@
 # plot_dust_gaia: plot the dust-map at X for Gaia
 ###############################################################################
 import sys
+import numpy
 import healpy
 import matplotlib
 matplotlib.use('Agg')
@@ -14,6 +15,10 @@ def plot_dust_gaia(dist,plotname):
     green15map= dust.load_combined(dist,nest=True,nside_out=_NSIDE)
     dm= dust.dist2distmod(dist)
     green15map[green15map == healpy.UNSEEN]= -1.
+    print "%i are NaN" % (numpy.sum(numpy.isnan(green15map)))
+    #theta, phi= healpy.pixelfunc.pix2ang(_NSIDE,numpy.arange(healpy.pixelfunc.nside2npix(_NSIDE)),nest=True)
+    #print (numpy.pi/2.-theta)[numpy.isnan(green15map)]/numpy.pi*180.
+    #print phi[numpy.isnan(green15map)]/numpy.pi*180.
     # plot it
     healpy.visufunc.mollview(green15map,
                              nest=True,
