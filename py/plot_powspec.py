@@ -128,10 +128,10 @@ def plot_powspec(dist,basename,plotname):
                                ylabel=r'$(2l+1)\,C^{\mathrm{cross}}_l$',
                                xrange=[0.5,20000],
                                yrange=yrange,
-                               zorder=3)
+                               zorder=1)
     line2= bovy_plot.bovy_plot(ell[1:],
                                (2.*ell[1:]+1.)*numpy.fabs(combinedmcr[1:]),
-                               'r-',overplot=True)
+                               'r-',overplot=True,zorder=2)
     # Add legend
     if dist == 5.:
         pyplot.legend((line1[0],line2[0]),
