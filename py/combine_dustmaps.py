@@ -150,8 +150,36 @@ def store_h5(picklename):
     outfile.close()
     return None    
 
+def fix_nans(picklename):
+    """Marshall has a few NaNs, replace these with Drimmel"""
+    with h5py.File(picklename.replace('.sav','.h5'),'r') as combdata:
+        pix_info= combdata['/pixel_info'][:]
+        best_fit= combdata['/best_fit'][:]
+    nanIndx= numpy.isnan(best_fit[:,0])
+    print("Found %i NaNs ..." % numpy.sum(nanIndx))
+    theta, phi= healpy.pixelfunc.pix2ang(pix_info['nside'].astype('int32'),
+                                         pix_info['healpix_index'].astype('int64'),
+                                         nest=True)
+    bb= (numpy.pi/2.-theta)/_DEGTORAD
+    ll= phi/_DEGTORAD
+    indices= numpy.arange(len(pix_info['nside']))[nanIndx]
+    drimmelmap= mwdust.Drimmel03()   
+    for ii in range(numpy.sum(nanIndx)):
+        best_fit[indices[ii]]= drimmelmap(ll[ii],bb[ii],_GREEN15DISTS)
+    # Now save
+    nanIndx= numpy.isnan(best_fit[:,0])
+    print("Found %i NaNs ..." % numpy.sum(nanIndx))
+    # Save to h5 file
+    outfile= h5py.File(picklename.replace('.sav','.h5'),"w")
+    outfile.create_dataset("pixel_info", data=pix_info)
+    outfile.create_dataset("best_fit",data=best_fit)
+    outfile.close()
+    return None
+
 if __name__ == '__main__':
-    if len(sys.argv) > 2:
+    if len(sys.argv) > 2 and sys.argv[2] == 'fixnans':
+        fix_nans(sys.argv[1])
+    elif len(sys.argv) > 2:
         store_h5(sys.argv[1])
     else:
         combine_dustmap(sys.argv[1])
