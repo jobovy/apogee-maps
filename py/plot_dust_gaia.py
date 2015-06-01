@@ -26,6 +26,7 @@ def plot_dust_gaia(dist,plotname):
                              max=round(10.*(20.-dm-0.68))/10.,
                              format=r'$%g$',
                              cmap='gist_yarg',
+                             title="",
                              unit='$A_G\,(\mathrm{mag})$')
     bovy_plot.bovy_end_print(plotname)
 
