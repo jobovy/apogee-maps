@@ -361,7 +361,7 @@ def plotCompareData(sample,savename,plotname):
         bovy_plot.bovy_hist(ldata['RC_DM_H'][data_index],
                             histtype='step',
                             normed=True,
-                            lw=2.*_LW,
+                            lw=_LW,hatch='/',
                             range=[7.,15.5],
                             bins=round(numpy.sqrt(numpy.sum(data_index))*2.),
                             yrange=yrange,
@@ -493,7 +493,8 @@ def plotCompareData(sample,savename,plotname):
             elif sample.lower() == 'highalpha':
                 bovy_plot.bovy_text(r'$\mathrm{high}\ [\alpha/\mathrm{Fe]}$',
                                     top_right=True,size=18.)
-        bovy_plot.bovy_end_print(plotname.replace('LOC',loc))
+        pyplot.tight_layout(pad=0.3,rect=(0,0,1.,0.94))
+        bovy_plot.bovy_end_print(plotname.replace('LOC',loc),dpi=300)
     return None
 
 if __name__ == '__main__':
