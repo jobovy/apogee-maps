@@ -5,6 +5,7 @@
 import sys
 import os, os.path
 import pickle
+import copy
 import numpy
 from scipy import signal
 import healpy
@@ -56,19 +57,29 @@ def plot_distanceintegral(savename,plotname):
             area[ii]= numpy.sum(cosb*densmap*combinedmask)
         save_pickles(savename,area)
     # Plot the power spectrum
-    psdx, psd= signal.periodogram(area*dust._GREEN15DISTS**3./numpy.sum(area*dust._GREEN15DISTS**3.),
-                                  fs=(dust._GREEN15DISTMODS[1]-dust._GREEN15DISTMODS[0]),
-                                  detrend=lambda x: x,scaling='spectrum')
-    bovy_plot.bovy_print(fig_height=3.)
-    matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{yfonts}"]
-    bovy_plot.bovy_plot(psdx[1:]*2.*numpy.pi,psd[1:],
-                        'k-',loglog=True,
-                        xlabel=r'$2\pi\,k_\mu\,(\mathrm{mag}^{-1})$',
-                        ylabel=r'$P_k$',
-                        xrange=[0.04,4.])
-    bovy_plot.bovy_text(r'$\mathrm{normalized}\ D^3\,\nu_*(\mu|\theta)\,\textswab{S}(\mu)$',
-                        bottom_left=True,size=16.)
-    bovy_plot.bovy_end_print(plotname)                                  
+    if False:
+        psdx, psd= signal.periodogram(area*dust._GREEN15DISTS**3./numpy.sum(area*dust._GREEN15DISTS**3.),
+                                      fs=(dust._GREEN15DISTMODS[1]-dust._GREEN15DISTMODS[0]),
+                                      detrend=lambda x: x,scaling='spectrum')
+        bovy_plot.bovy_print(fig_height=3.)
+        matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{yfonts}"]
+        bovy_plot.bovy_plot(psdx[1:]*2.*numpy.pi,psd[1:],
+                            'k-',loglog=True,
+                            xlabel=r'$2\pi\,k_\mu\,(\mathrm{mag}^{-1})$',
+                            ylabel=r'$P_k$',
+                            xrange=[0.04,4.])
+        bovy_plot.bovy_text(r'$\mathrm{normalized}\ D^3\,\nu_*(\mu|\theta)\,\textswab{S}(\mu)$',
+                            bottom_left=True,size=16.)
+        bovy_plot.bovy_end_print(plotname)               
+    else:
+        bovy_plot.bovy_print(fig_height=3.)
+        matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{yfonts}"]
+        bovy_plot.bovy_plot(dust._GREEN15DISTMODS,
+                            area*dust._GREEN15DISTS**3.,
+                            'k-',
+                            xlabel=r'$\mu\,(\mathrm{mag}^{-1})$',
+                            ylabel=r'$D^3\,\nu_*(\mu|\theta)\,\textswab{S}(\mu)$')
+        bovy_plot.bovy_end_print(plotname)       
     return None
 
 if __name__ == '__main__':
