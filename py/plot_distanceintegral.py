@@ -40,7 +40,8 @@ def plot_distanceintegral(savename,plotname):
         area= multi.parallel_map(lambda x: distanceIntegrand(\
                 dust._GREEN15DISTS[x],cosb,Gsamples),
                                  range(len(dust._GREEN15DISTS)),
-                                 numcores=numpy.amin([len(dust._GREEN15DISTS),
+                                 numcores=numpy.amin([16,
+                                                      len(dust._GREEN15DISTS),
                                                       multiprocessing.cpu_count()]))
 
         save_pickles(savename,area)
@@ -80,12 +81,17 @@ def distanceIntegrand(dist,cosb,Gsamples):
     # Sample over the distribution of MG
     combinedmask= numpy.zeros_like(combinedmap)
     G0= 0.68+dust.dist2distmod(dist)
+    if dust.dist2distmod(dist) == 9.5 or dust.dist2distmod(dist) == 10.5:
+        print numpy.sum(numpy.isnan(combinedmap))
     for jj in range(_NGSAMPLES):
         combinedmask+= ((combinedmap > (_GMIN-G0-Gsamples[jj]+0.68))\
                             *(combinedmap < (_GMAX-G0-Gsamples[jj]+0.68))).astype('float')
     combinedmask/= _NGSAMPLES
+    if dust.dist2distmod(dist) == 9.5 or dust.dist2distmod(dist) == 10.5:
+        print numpy.sum(combinedmask)
+        print dust.dist2distmod(dist), numpy.sum(cosb*densmap*combinedmask)
     # Compute cross correlation
-    return numpy.sum(cosb*densmap*combinedmask)
+    return float(numpy.sum(cosb*densmap*combinedmask))
 
 if __name__ == '__main__':
     plot_distanceintegral(sys.argv[1], # savefilename
