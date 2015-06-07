@@ -5,13 +5,13 @@
 import sys
 import os, os.path
 import pickle
-import copy
 import numpy
 from scipy import signal
 import healpy
 import matplotlib
 matplotlib.use('Agg')
-from galpy.util import save_pickles, bovy_plot
+from galpy.util import save_pickles, bovy_plot, multi
+import multiprocessing
 #from matplotlib import pyplot
 #from matplotlib.ticker import NullFormatter
 #from scipy import interpolate
@@ -29,7 +29,6 @@ def plot_distanceintegral(savename,plotname):
         with open(savename,'rb') as savefile:
             area= pickle.load(savefile)
     else:
-        area= numpy.zeros_like(dust._GREEN15DISTS)
         # For samping over the absolute magnitude distribution
         iso= gaia_rc.load_iso()
         Gsamples= gaia_rc.sample_Gdist(iso,n=_NGSAMPLES)
@@ -38,23 +37,12 @@ def plot_distanceintegral(savename,plotname):
                                              numpy.arange(healpy.pixelfunc.nside2npix(_NSIDE)),
                                              nest=True)
         cosb= numpy.sin(theta)
-        for ii, dist in enumerate(dust._GREEN15DISTS):
-            print "Working on distance %i: %.1f kpc" % (ii,dist)
-            # Calculate the density
-            densmap= densprofiles.healpixelate(dist,densprofiles.expdisk,
-                                               [1./3.,1./0.3],nside=_NSIDE,
-                                               nest=False)
-            # Load the dust map
-            combinedmap= dust.load_combined(dist,nest=False,nside_out=_NSIDE)
-            # Sample over the distribution of MG
-            combinedmask= numpy.zeros_like(combinedmap)
-            G0= 0.68+dust.dist2distmod(dist)
-            for jj in range(_NGSAMPLES):
-                combinedmask+= ((combinedmap > (_GMIN-G0-Gsamples[jj]+0.68))\
-                                    *(combinedmap < (_GMAX-G0-Gsamples[jj]+0.68))).astype('float')
-                combinedmask/= _NGSAMPLES
-            # Compute cross correlation
-            area[ii]= numpy.sum(cosb*densmap*combinedmask)
+        area= multi.parallel_map(lambda x: distanceIntegrand(\
+                dust._GREEN15DISTS[x],cosb,Gsamples),
+                                 range(len(dust._GREEN15DISTS)),
+                                 numcores=numpy.amin([len(dust._GREEN15DISTS),
+                                                      multiprocessing.cpu_count()]))
+
         save_pickles(savename,area)
     # Plot the power spectrum
     if False:
@@ -81,6 +69,23 @@ def plot_distanceintegral(savename,plotname):
                             ylabel=r'$D^3\,\nu_*(\mu|\theta)\,\textswab{S}(\mu)$')
         bovy_plot.bovy_end_print(plotname)       
     return None
+
+def distanceIntegrand(dist,cosb,Gsamples):
+    # Calculate the density
+    densmap= densprofiles.healpixelate(dist,densprofiles.expdisk,
+                                       [1./3.,1./0.3],nside=_NSIDE,
+                                       nest=False)
+    # Load the dust map
+    combinedmap= dust.load_combined(dist,nest=False,nside_out=_NSIDE)
+    # Sample over the distribution of MG
+    combinedmask= numpy.zeros_like(combinedmap)
+    G0= 0.68+dust.dist2distmod(dist)
+    for jj in range(_NGSAMPLES):
+        combinedmask+= ((combinedmap > (_GMIN-G0-Gsamples[jj]+0.68))\
+                            *(combinedmap < (_GMAX-G0-Gsamples[jj]+0.68))).astype('float')
+    combinedmask/= _NGSAMPLES
+    # Compute cross correlation
+    return numpy.sum(cosb*densmap*combinedmask)
 
 if __name__ == '__main__':
     plot_distanceintegral(sys.argv[1], # savefilename
