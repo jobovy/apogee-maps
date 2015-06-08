@@ -6,7 +6,7 @@ import sys
 import os, os.path
 import pickle
 import numpy
-from scipy import signal
+from scipy import signal, integrate, interpolate
 import healpy
 import matplotlib
 matplotlib.use('Agg')
@@ -46,7 +46,7 @@ def plot_distanceintegral(savename,plotname):
 
         save_pickles(savename,area)
     # Plot the power spectrum
-    if False:
+    if True:
         psdx, psd= signal.periodogram(area*dust._GREEN15DISTS**3./numpy.sum(area*dust._GREEN15DISTS**3.),
                                       fs=(dust._GREEN15DISTMODS[1]-dust._GREEN15DISTMODS[0]),
                                       detrend=lambda x: x,scaling='spectrum')
@@ -68,7 +68,12 @@ def plot_distanceintegral(savename,plotname):
                             'k-',
                             xlabel=r'$\mu\,(\mathrm{mag}^{-1})$',
                             ylabel=r'$D^3\,\nu_*(\mu|\theta)\,\textswab{S}(\mu)$')
-        bovy_plot.bovy_end_print(plotname)       
+        bovy_plot.bovy_end_print(plotname)
+    spl= interpolate.InterpolatedUnivariateSpline(dust._GREEN15DISTMODS,
+                                                  area*dust._GREEN15DISTS**3.,
+                                                  k=5)
+    fthder= [spl.derivatives(dm)[4] for dm in dust._GREEN15DISTMODS]
+    print "Simpson error= ", 0.5**4./180.*numpy.mean(numpy.fabs(fthder))/integrate.simps(area*dust._GREEN15DISTS**3.,dx=0.5)
     return None
 
 def distanceIntegrand(dist,cosb,Gsamples):
