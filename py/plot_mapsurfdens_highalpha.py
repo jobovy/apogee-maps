@@ -52,9 +52,9 @@ def plot_mapsurfdens(plotname):
         if tfeh == 0.35: tfeh= 0.4
         if tfeh == -0.0: tfeh= 0.0
         print ii, tfeh, len(map)
-        anorm= 10**(-10.*tfeh)
-        if tfeh > 0.3: anorm= 10**(-12.*tfeh) 
-        if tfeh < -0.4: anorm= 10**(-12.*tfeh)
+        anorm= 10**(-10.*(-tfeh-0.4))
+        #if (-tfeh-0.4) > 0.3: anorm= 10**(-12.*(-tfeh+0.4)) 
+        if (-tfeh-0.4) == -0.2: anorm= 10**(-11.*(-tfeh-0.4))
         anorm= 1./anorm # re-order
         anorm/= 3.
         norm= numpy.exp(numpy.median(ldp,axis=1))[numpy.argmin(numpy.fabs(Rs-densprofiles._R0))]/anorm
@@ -62,7 +62,7 @@ def plot_mapsurfdens(plotname):
                             '-',
                             color=cmap((tfeh+0.4)*0.95/0.5+0.05),
                             lw=2.,overplot=overplot,
-                            ylabel=r'$\Sigma(R)$',
+                            ylabel=r'$\Sigma(R)\times\mathrm{constant}$',
                             xrange=[0.,16.],
                             yrange=[0.000001,90.],
                             semilogy=True)

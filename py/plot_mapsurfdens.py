@@ -61,7 +61,7 @@ def plot_mapsurfdens(plotname):
                             color=cmap((tfeh+0.5)*0.95/0.9+0.05),
                             lw=2.,overplot=overplot,
                             xlabel=r'$R\,(\mathrm{kpc})$',
-                            ylabel=r'$\Sigma(R)$',
+                            ylabel=r'$\Sigma(R)\times\mathrm{constant}$',
                             xrange=[0.,16.],
                             yrange=[0.000000001,9000000.],
                             semilogy=True)

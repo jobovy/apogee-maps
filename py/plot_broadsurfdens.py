@@ -65,7 +65,7 @@ def plot_broadsurfdens(plotname):
                             'k-',
                             lw=2.,overplot=overplot,
                             xlabel=r'$R\,(\mathrm{kpc})$',
-                            ylabel=r'$\Sigma(R) + \mathrm{constant}$',
+                            ylabel=r'$\Sigma(R)\times\mathrm{constant}$',
                             xrange=[0.,16.],
                             yrange=[0.0003,900.],
                             semilogy=True)
