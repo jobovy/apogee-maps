@@ -97,10 +97,12 @@ def plot_mapflarepdf(savename,plotname):
                                            +allxamp[ii,1]/numpy.sqrt(allxcovar[ii,1,0,0])*numpy.exp(-0.5*(txs-allxmean[ii,1,0])**2./allxcovar[ii,1,0,0]))
     comb/= numpy.sum(comb)*(txs[1]-txs[0])
     pyplot.plot(txs,comb/combDiv,'k-',lw=2.,zorder=20)
-    bovy_plot.bovy_text(xrange[0]+0.25*(xrange[1]-xrange[0])+0.03*('highalpha' in savename),
+    pyplot.plot([0.,0.],[0.,50.],'k--',lw=1.5,zorder=0)
+    t= pyplot.text(xrange[0]+0.25*(xrange[1]-xrange[0])+0.03*('highalpha' in savename),
                         0.8*yrange[1],
                         r'$R_{\mathrm{flare}}^{-1} = %.2f \pm %.2f\,\mathrm{kpc}^{-1}$' % (numpy.sum(comb*txs)/numpy.sum(comb), numpy.sqrt(numpy.sum(comb*txs**2.)/numpy.sum(comb)-(numpy.sum(comb*txs)/numpy.sum(comb))**2.)),
                         size=18.)
+    t.set_bbox(dict(color='w',edgecolor='none'))
     if 'lowalpha' in savename:
         bovy_plot.bovy_text(r'$\mathrm{low-}[\alpha/\mathrm{Fe}]\ \mathrm{MAPs}$',
                             top_left=True,
