@@ -29,7 +29,7 @@ def plot_maprmax(savefilename,plotname):
               vmin=5.,vmax=13.,
               minnstar=15,
               zlabel=r'$R_{\mathrm{peak}}\,(\mathrm{kpc})$',
-              shrink=0.68)
+              shrink=0.68,cmap='coolwarm_r')
     # Sequences
     haloc= define_rcsample.highalphalocus()
     bovy_plot.bovy_plot(haloc[:,0],haloc[:,1],'-',color='0.75',
@@ -47,7 +47,7 @@ def plot_maprmax(savefilename,plotname):
     #                size=16.,color='w')
     t= pyplot.text(-0.525,0.195,r'$R_{\mathrm{peak}} < 5\,\mathrm{kpc}$',
                     size=16.,color='w')
-    t.set_bbox(dict(alpha=0.5,color=cm.coolwarm(0.),
+    t.set_bbox(dict(alpha=0.5,color=cm.coolwarm_r(0.),
                     edgecolor='none'))
     pyplot.tight_layout()
     bovy_plot.bovy_end_print(plotname,dpi=300)
