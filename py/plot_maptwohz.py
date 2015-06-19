@@ -36,8 +36,8 @@ def plot_maphz(plotname):
     bovy_plot.bovy_print()
     bovy_plot.bovy_plot(plotthisz2*1000.,plotthisz1*1000.,'ko',
                         xrange=[0.,1200.],yrange=[0.,1200.],
-                        xlabel=r'$\mathrm{2nd\ scale\ height\,(pc)}$',
-                        ylabel=r'$\mathrm{1st\ scale\ height\,(pc)}$',zorder=2)
+                        xlabel=r'$2^\mathrm{nd}\ \mathrm{scale\ height\,(pc)}$',
+                        ylabel=r'$1^\mathrm{st}\ \mathrm{scale\ height\,(pc)}$',zorder=2)
     bovy_plot.bovy_plot([0,1200],[0,1200],'k--',overplot=True,lw=2.)
     pyplot.errorbar(plotthisz2*1000.,plotthisz1*1000.,
                     yerr=plotthisz1e*1000.,

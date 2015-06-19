@@ -58,7 +58,7 @@ def plot_mapflare(plotname):
                             color=cmap((tfeh+0.5)),
                             lw=0.,zorder=ii)
         pyplot.plot(Rs,Rs*0.+300.+offset,color=cmap((tfeh+0.5)*0.95/0.9+0.05),
-                    lw=0.8,zorder=ii+5)
+                    ls='--',lw=2.*0.8,zorder=ii+5)
         overplot= True
         if ii == 16:
             bovy_plot.bovy_text(2.,
