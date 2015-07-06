@@ -59,7 +59,7 @@ def plot_distanceintegral_smallpatch(savename,plotname):
         theta, phi= healpy.pixelfunc.pix2ang(_NSIDE_HIRES,hpIndx,nest=True)
         cosb= numpy.sin(theta)
         area= multi.parallel_map(lambda x: distanceIntegrandHires(\
-                _HIRESGREEN15DISTS[x],theta,phi,cosb,Gsamples),
+                _HIRESGREEN15DISTS[x],theta,phi,cosb,Gsamples,dmap),
                                  range(len(_HIRESGREEN15DISTS)),
                                  numcores=numpy.amin([16,
                                                       len(_HIRESGREEN15DISTS),
@@ -97,11 +97,14 @@ def plot_distanceintegral_smallpatch(savename,plotname):
     print "Simpson error= ", 0.5**4./180.*numpy.mean(numpy.fabs(fthder))/integrate.simps(area*_HIRESGREEN15DISTS**3.,dx=0.5)
     return None
 
-def distanceIntegrandHires(dist,theta,phi,cosb,Gsamples,hpIndx,dmap):
+def distanceIntegrandHires(dist,theta,phi,cosb,Gsamples,dmap):
     # Calculate the density
-    densmap= densprofiles.expdist(phi,numpy.pi/2.-theta,
+    densmap= densprofiles.expdisk(phi,numpy.pi/2.-theta,
                                   dist*numpy.ones(len(theta)),glon=True,
                                   params=[1./3.,1./0.3])
+    # Distance pixel
+    tpix= numpy.argmin(numpy.fabs(dist-_HIRESGREEN15DISTS))
+    dmap= dmap[:,tpix]
     # Sample over the distribution of MG
     combinedmask= numpy.zeros_like(dmap)
     G0= 0.68+dust.dist2distmod(dist)
