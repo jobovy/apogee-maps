@@ -69,11 +69,11 @@ def plot_distanceintegral_smallpatch(savename,plotname):
     # Plot the power spectrum
     if True:
         psdx, psd= signal.periodogram(area*_HIRESGREEN15DISTS**3./numpy.sum(area*_HIRESGREEN15DISTS**3.),
-                                      fs=(_HIRESGREEN15DISTMODS[1]-_HIRESGREEN15DISTMODS[0]),
+                                      fs=1./(_HIRESGREEN15DISTMODS[1]-_HIRESGREEN15DISTMODS[0]),
                                       detrend=lambda x: x,scaling='spectrum')
         bovy_plot.bovy_print(fig_height=3.)
         matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{yfonts}"]
-        bovy_plot.bovy_plot(psdx[1:]*2.*numpy.pi,psd[1:],
+        bovy_plot.bovy_plot(psdx[1:],psd[1:],
                             'k-',loglog=True,
                             xlabel=r'$2\pi\,k_\mu\,(\mathrm{mag}^{-1})$',
                             ylabel=r'$P_k$',
