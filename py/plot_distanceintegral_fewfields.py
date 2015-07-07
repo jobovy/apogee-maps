@@ -94,7 +94,10 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
                                                 params=[1./3.,1./0.3])
                     area_cdens[ff,ii]= float(numpy.sum(cosb[ipixIndx]*cdens\
                                                            *combinedmask))
-        save_pickles(savename,area)
+        if apogee:
+            save_pickles(savename,area,area_cdens)
+        else:
+            save_pickles(savename,area)
     # Plot the power spectrum
     if True:
         bovy_plot.bovy_print(fig_height=3.)
