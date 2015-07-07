@@ -52,10 +52,14 @@ def load_green15(dist,nside_out=None,nest=True,samples=False,samplenum=0):
         with h5py.File(os.path.join(_greendir,'dust-map-3d.h5'),'r') as greendata:
             pix_info= greendata['/pixel_info'][:]
             best_fit= greendata['/best_fit'][:]
+        global _PRELOADGREEN15
+        _PRELOADGREEN15= True
     if not _PRELOADGREEN15SAMPLES and samples:
         global dsamples
         with h5py.File(os.path.join(_greendir,'dust-map-3d.h5'),'r') as greendata:
             dsamples= greendata['/samples'][:]
+        global _PRELOADGREEN15SAMPLES
+        _PRELOADGREEN15SAMPLES= True
     # Distance pixel
     tpix= numpy.argmin(numpy.fabs(dist-_GREEN15DISTS))
     # Construct an empty map at the highest HEALPix resolution present in the map; code snippets adapted from http://argonaut.skymaps.info/usage
@@ -111,6 +115,8 @@ def load_combined(dist,nside_out=None,nest=True):
         with h5py.File(os.path.join(_bovydir,'dust-map-3d.h5'),'r') as combdata:
             pix_info= combdata['/pixel_info'][:]
             best_fit= combdata['/best_fit'][:]
+        global _PRELOADCOMBINED
+        _PRELOADCOMBINED= True
     # Distance pixel
     tpix= numpy.argmin(numpy.fabs(dist-_GREEN15DISTS))
     # Construct an empty map at the highest HEALPix resolution present in the map; code snippets adapted from http://argonaut.skymaps.info/usage
