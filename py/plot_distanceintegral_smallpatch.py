@@ -21,7 +21,7 @@ import gaia_rc
 # magnitude limits for the survey
 _GMIN= 3.
 _GMAX= 20.
-_NGSAMPLES= 100
+_NGSAMPLES= 10000
 _HIRESGREEN15DISTMODS= numpy.linspace(4.,19.,61)
 _HIRESGREEN15DISTS= dust.distmod2dist(_HIRESGREEN15DISTMODS)
 _NSIDE_HIRES= 1024

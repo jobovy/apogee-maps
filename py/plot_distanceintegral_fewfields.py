@@ -72,15 +72,15 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
                                               params=[1./3.,1./0.3])
                 combinedmask= numpy.zeros(len(ipixs))
                 tcombinedmap= combinedmap[ipixIndx]
-                for jj in range(_NGSAMPLES):
-                    if apogee:
-                        # Loop through the three cohorts
-                        for c in ['short','medium','long']:
-                            hmin= apo.Hmin(locs[jj],cohort=c)
-                            hmax= apo.Hmax(locs[jj],cohort=c)
-                            combinedmask+= ((tcombinedmap > (hmin-H0))\
-                                                *(tcombinedmap < (hmax-H0))).astype('float')*apo(locs[jj],hmin+0.01)
-                    else:
+                if apogee:
+                    # Loop through the three cohorts
+                    for c in ['short','medium','long']:
+                        hmin= apo.Hmin(locs[ff],cohort=c)
+                        hmax= apo.Hmax(locs[ff],cohort=c)
+                        combinedmask+= ((tcombinedmap > (hmin-H0))\
+                                            *(tcombinedmap < (hmax-H0))).astype('float')*apo(locs[ff],hmin+0.01)
+                else:
+                    for jj in range(_NGSAMPLES):
                         combinedmask+= ((tcombinedmap > (_GMIN-G0-Gsamples[jj]+0.68))\
                                             *(tcombinedmap < (_GMAX-G0-Gsamples[jj]+0.68))).astype('float')
                 combinedmask/= _NGSAMPLES
