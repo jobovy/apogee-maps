@@ -128,7 +128,7 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
                                                       area[ff]*dust._GREEN15DISTS**3.,
                                                   k=5)
         fthder= [spl.derivatives(dm)[4] for dm in dust._GREEN15DISTMODS]
-        print "Simpson error (%f,%f)= %g" % (ls[ff],bs[ff],0.5**4./180.*numpy.mean(numpy.fabs(fthder))/integrate.simps(area[ff]*dust._GREEN15DISTS**3.,dx=0.5))
+        print "Simpson error (%f,%f)= %g, volume = %g" % (ls[ff],bs[ff],0.5**4./180.*numpy.mean(numpy.fabs(fthder))/integrate.simps(area[ff]*dust._GREEN15DISTS**3.,dx=0.5),numpy.sum(area[ff]*dust._GREEN15DISTS**3.))
     return None
 
 if __name__ == '__main__':
