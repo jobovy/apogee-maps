@@ -75,7 +75,7 @@ def plot_distanceintegral(savename,plotname,rmcenter=False,
                                                   area*dust._GREEN15DISTS**3.,
                                                   k=5)
     fthder= [spl.derivatives(dm)[4] for dm in dust._GREEN15DISTMODS]
-    print "Simpson error= ", 0.5**4./180.*numpy.mean(numpy.fabs(fthder))/integrate.simps(area*dust._GREEN15DISTS**3.,dx=0.5)
+    print "Simpson error= %g, volume= %g" % (0.5**4./180.*numpy.mean(numpy.fabs(fthder))/integrate.simps(area*dust._GREEN15DISTS**3.,dx=0.5),numpy.sum(area*dust._GREEN15DISTS**3.))
     return None
 
 def distanceIntegrand(dist,cosb,Gsamples,rmcenter,onlygreen):
@@ -114,6 +114,6 @@ def distanceIntegrand(dist,cosb,Gsamples,rmcenter,onlygreen):
 if __name__ == '__main__':
     plot_distanceintegral(sys.argv[1], # savefilename
                           sys.argv[2], # plotfilename
-                          rmcenter=(len(sys.argv) > 3)*('rmcenter' in sys.argv[3]),# remove the central part
-                          onlygreen=(len(sys.argv) > 3)*('onlygreen' in sys.argv[3]))
+                          rmcenter=(len(sys.argv) > 3) and ('rmcenter' in sys.argv[3]),# remove the central part
+                          onlygreen=(len(sys.argv) > 3) and ('onlygreen' in sys.argv[3]))
     

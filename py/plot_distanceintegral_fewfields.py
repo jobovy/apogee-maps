@@ -102,6 +102,8 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
     if True:
         bovy_plot.bovy_print(fig_height=3.)
         matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{yfonts}"]
+        colors=['b','g','r','c','gold','m','k','orange','y','b','g']
+        lss=['-','-','-','-','-','-','-','-','-','--','--']
         for ff in range(len(ls)):
             psdx, psd= signal.periodogram(area[ff]*dust._GREEN15DISTS**3./numpy.sum(area[ff]*dust._GREEN15DISTS**3.),
                                           fs=1./(dust._GREEN15DISTMODS[1]-dust._GREEN15DISTMODS[0]),
@@ -111,6 +113,7 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
                                 xlabel=r'$2\pi\,k_\mu\,(\mathrm{mag}^{-1})$',
                                 ylabel=r'$P_k$',
                                 xrange=[0.04,4.],
+                                color=colors[ff],ls=lss[ff],
                                 overplot=ff > 0)
             if ff == 0:
                 bovy_plot.bovy_text(r'$\mathrm{normalized}\ D^3\,\nu_*(\mu|\theta)\,\textswab{S}(\mu)$',
