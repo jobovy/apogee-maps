@@ -25,7 +25,8 @@ _GMIN= 3.
 _GMAX= 20.
 _NGSAMPLES= 10000
 _DEGTORAD= numpy.pi/180.
-def plot_distanceintegral(savename,plotname,rmcenter=False):
+def plot_distanceintegral(savename,plotname,rmcenter=False,
+                          onlygreen=False):
     if os.path.exists(savename):
         with open(savename,'rb') as savefile:
             area= pickle.load(savefile)
@@ -39,7 +40,7 @@ def plot_distanceintegral(savename,plotname,rmcenter=False):
                                              nest=True)
         cosb= numpy.sin(theta)
         area= multi.parallel_map(lambda x: distanceIntegrand(\
-                dust._GREEN15DISTS[x],cosb,Gsamples,rmcenter),
+                dust._GREEN15DISTS[x],cosb,Gsamples,rmcenter,onlygreen),
                                  range(len(dust._GREEN15DISTS)),
                                  numcores=numpy.amin([16,
                                                       len(dust._GREEN15DISTS),
@@ -77,13 +78,17 @@ def plot_distanceintegral(savename,plotname,rmcenter=False):
     print "Simpson error= ", 0.5**4./180.*numpy.mean(numpy.fabs(fthder))/integrate.simps(area*dust._GREEN15DISTS**3.,dx=0.5)
     return None
 
-def distanceIntegrand(dist,cosb,Gsamples,rmcenter):
+def distanceIntegrand(dist,cosb,Gsamples,rmcenter,onlygreen):
     # Calculate the density
     densmap= densprofiles.healpixelate(dist,densprofiles.expdisk,
                                        [1./3.,1./0.3],nside=_NSIDE,
                                        nest=False)
     # Load the dust map
-    combinedmap= dust.load_combined(dist,nest=False,nside_out=_NSIDE)
+    if onlygreen:
+        combinedmap= dust.load_green15(dist,nest=False,nside_out=_NSIDE)
+        combinedmap[combinedmap == healpy.UNSEEN]= 0.
+    else:
+        combinedmap= dust.load_combined(dist,nest=False,nside_out=_NSIDE)
     # Sample over the distribution of MG
     combinedmask= numpy.zeros_like(combinedmap)
     G0= 0.68+dust.dist2distmod(dist)
@@ -109,5 +114,6 @@ def distanceIntegrand(dist,cosb,Gsamples,rmcenter):
 if __name__ == '__main__':
     plot_distanceintegral(sys.argv[1], # savefilename
                           sys.argv[2], # plotfilename
-                          rmcenter=len(sys.argv) > 3) # remove the central part
+                          rmcenter=(len(sys.argv) > 3)*('rmcenter' in sys.argv[3]),# remove the central part
+                          onlygreen=(len(sys.argv) > 3)*('onlygreen' in sys.argv[3]))
     
