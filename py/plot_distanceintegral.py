@@ -24,7 +24,8 @@ _NSIDE= 2048
 _GMIN= 3.
 _GMAX= 20.
 _NGSAMPLES= 10000
-def plot_distanceintegral(savename,plotname):
+_DEGTORAD= numpy.pi/180.
+def plot_distanceintegral(savename,plotname,rmcenter=False):
     if os.path.exists(savename):
         with open(savename,'rb') as savefile:
             area= pickle.load(savefile)
@@ -38,7 +39,7 @@ def plot_distanceintegral(savename,plotname):
                                              nest=True)
         cosb= numpy.sin(theta)
         area= multi.parallel_map(lambda x: distanceIntegrand(\
-                dust._GREEN15DISTS[x],cosb,Gsamples),
+                dust._GREEN15DISTS[x],cosb,Gsamples,rmcenter),
                                  range(len(dust._GREEN15DISTS)),
                                  numcores=numpy.amin([16,
                                                       len(dust._GREEN15DISTS),
@@ -76,7 +77,7 @@ def plot_distanceintegral(savename,plotname):
     print "Simpson error= ", 0.5**4./180.*numpy.mean(numpy.fabs(fthder))/integrate.simps(area*dust._GREEN15DISTS**3.,dx=0.5)
     return None
 
-def distanceIntegrand(dist,cosb,Gsamples):
+def distanceIntegrand(dist,cosb,Gsamples,rmcenter):
     # Calculate the density
     densmap= densprofiles.healpixelate(dist,densprofiles.expdisk,
                                        [1./3.,1./0.3],nside=_NSIDE,
@@ -95,10 +96,18 @@ def distanceIntegrand(dist,cosb,Gsamples):
     if dust.dist2distmod(dist) == 9.5 or dust.dist2distmod(dist) == 10.5:
         print numpy.sum(combinedmask)
         print dust.dist2distmod(dist), numpy.sum(cosb*densmap*combinedmask)
+    # If rmcenter, rm the center of the MW
+    if rmcenter:
+        theta, phi= healpy.pixelfunc.pix2ang(_NSIDE,
+                                             numpy.arange(healpy.pixelfunc.nside2npix(_NSIDE)),
+                                             nest=True)
+        combinedmask[((phi < 20.*_DEGTORAD)+(phi > (360.-20.)*_DEGTORAD))\
+                         *(numpy.fabs(numpy.pi/2.-theta) < 20.*_DEGTORAD)]= 0.
     # Compute cross correlation
     return float(numpy.sum(cosb*densmap*combinedmask))
 
 if __name__ == '__main__':
     plot_distanceintegral(sys.argv[1], # savefilename
-                          sys.argv[2]) # plotfilename
+                          sys.argv[2], # plotfilename
+                          rmcenter=len(sys.argv) > 3) # remove the central part
     
