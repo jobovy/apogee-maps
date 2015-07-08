@@ -101,8 +101,8 @@ def distanceIntegrand(dist,cosb,Gsamples,rmcenter):
         theta, phi= healpy.pixelfunc.pix2ang(_NSIDE,
                                              numpy.arange(healpy.pixelfunc.nside2npix(_NSIDE)),
                                              nest=True)
-        combinedmask[((phi < 20.*_DEGTORAD)+(phi > (360.-20.)*_DEGTORAD))\
-                         *(numpy.fabs(numpy.pi/2.-theta) < 20.*_DEGTORAD)]= 0.
+        combinedmask[((phi < 25.*_DEGTORAD)+(phi > (360.-25.)*_DEGTORAD))\
+                         *(numpy.fabs(numpy.pi/2.-theta) < 25.*_DEGTORAD)]= 0.
     # Compute cross correlation
     return float(numpy.sum(cosb*densmap*combinedmask))
 
