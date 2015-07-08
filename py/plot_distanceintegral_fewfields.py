@@ -23,8 +23,8 @@ _NSIDE= 2048
 _DEGTORAD= numpy.pi/180.
 def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
     #ls and bs of the patches
-    ls= [280.,30.,12.,37.5,90.,127.5,30.,60.]
-    bs= [45.,4.,2.,0.,0.,0.,0.,0.]
+    ls= [280.,30.,12.,37.5,90.,127.5,30.,60.,20.,-20.,-40.]
+    bs= [45.,4.,2.,0.,0.,0.,0.,0.,0.,0.,0.]
     radius= 1.49
     locs= [4214,4244,4378,4312,4242,4318,4240,4241] # for apogee
     # If we are doing APOGEE selection, load the APOGEE selection function
