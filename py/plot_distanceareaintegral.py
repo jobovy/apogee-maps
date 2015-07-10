@@ -18,7 +18,7 @@ import densprofiles
 import dust
 import gaia_rc
 # nside to work at, 2048 is the max
-_NSIDE= 64 #2048
+_NSIDE= 2048
 # magnitude limits for the survey
 _GMIN= 3.
 _GMAX= 20.
@@ -36,7 +36,7 @@ def plot_distanceareaintegral(savename,plotname,rmcenter=False,
         # l and b of the pixels
         theta, phi= healpy.pixelfunc.pix2ang(_NSIDE,
                                              numpy.arange(healpy.pixelfunc.nside2npix(_NSIDE)),
-                                             nest=True)
+                                             nest=False)
         cosb= numpy.sin(theta)
         area= multi.parallel_map(lambda x: distanceAreaIntegrand(\
                 dust._GREEN15DISTS[x],cosb,Gsamples,rmcenter,onlygreen),
@@ -48,17 +48,16 @@ def plot_distanceareaintegral(savename,plotname,rmcenter=False,
         save_pickles(savename,area)
     # Plot the power spectrum
     area= numpy.array(area)
-    print area.shape
     if True:       
-        psdthis= ((area.T*dust._GREEN15DISTS**3.).T/numpy.sum((area.T*dust._GREEN15DISTS**3.),axis=1)).T
+        psdthis= ((area.T*dust._GREEN15DISTS**3.).T/numpy.sum((area.T*dust._GREEN15DISTS**3.),axis=1))
         psdx, psd= signal.periodogram(psdthis,
                                       fs=1./(dust._GREEN15DISTMODS[1]-dust._GREEN15DISTMODS[0]),
-                                      detrend=lambda x: x,scaling='spectrum')
-        print psd.shape
+                                      detrend=lambda x: x,scaling='spectrum',
+                                      axis=0)
         bovy_plot.bovy_print(fig_height=3.)
         matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{yfonts}"]
-        healpy.visufunc.mollview(numpy.log10(psd),
-                                 nest=True,
+        healpy.visufunc.mollview(numpy.log10(psd[-2]),
+                                 nest=False,
                                  xsize=4000,min=-10.,max=-3.,
                                  cmap='gist_yarg',
                                  title="")
@@ -92,7 +91,7 @@ def distanceAreaIntegrand(dist,cosb,Gsamples,rmcenter,onlygreen):
     if rmcenter:
         theta, phi= healpy.pixelfunc.pix2ang(_NSIDE,
                                              numpy.arange(healpy.pixelfunc.nside2npix(_NSIDE)),
-                                             nest=True)
+                                             nest=False)
         combinedmask[((phi < 25.*_DEGTORAD)+(phi > (360.-25.)*_DEGTORAD))\
                          *(numpy.fabs(numpy.pi/2.-theta) < 25.*_DEGTORAD)]= 0.
     # Compute cross correlation

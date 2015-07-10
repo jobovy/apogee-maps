@@ -37,7 +37,7 @@ def plot_distanceintegral(savename,plotname,rmcenter=False,
         # l and b of the pixels
         theta, phi= healpy.pixelfunc.pix2ang(_NSIDE,
                                              numpy.arange(healpy.pixelfunc.nside2npix(_NSIDE)),
-                                             nest=True)
+                                             nest=False)
         cosb= numpy.sin(theta)
         area= multi.parallel_map(lambda x: distanceIntegrand(\
                 dust._GREEN15DISTS[x],cosb,Gsamples,rmcenter,onlygreen),
@@ -105,7 +105,7 @@ def distanceIntegrand(dist,cosb,Gsamples,rmcenter,onlygreen):
     if rmcenter:
         theta, phi= healpy.pixelfunc.pix2ang(_NSIDE,
                                              numpy.arange(healpy.pixelfunc.nside2npix(_NSIDE)),
-                                             nest=True)
+                                             nest=False)
         combinedmask[((phi < 25.*_DEGTORAD)+(phi > (360.-25.)*_DEGTORAD))\
                          *(numpy.fabs(numpy.pi/2.-theta) < 25.*_DEGTORAD)]= 0.
     # Compute cross correlation

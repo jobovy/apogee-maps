@@ -56,12 +56,12 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
             # Loop through a few patches
             theta, phi= healpy.pixelfunc.pix2ang(_NSIDE,
                                                  numpy.arange(healpy.pixelfunc.nside2npix(_NSIDE)),
-                                                 nest=True)
+                                                 nest=False)
             cosb= numpy.sin(theta)
             for ff,(ll,bb) in enumerate(zip(ls,bs)):
                 vec= healpy.pixelfunc.ang2vec((90.-bb)*_DEGTORAD,ll*_DEGTORAD)
                 ipixs= healpy.query_disc(_NSIDE,vec,radius*_DEGTORAD,
-                                         inclusive=False,nest=True)
+                                         inclusive=False,nest=False)
                 ipixIndx= numpy.in1d(numpy.arange(healpy.pixelfunc.nside2npix(_NSIDE)),
                                      ipixs,assume_unique=True)
                 # Calculate the density
@@ -69,7 +69,7 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
                                               numpy.pi/2.-theta[ipixIndx],
                                               dist*numpy.ones(len(ipixs)),
                                               glon=True,
-                                              params=[1./3.,1./0.3])
+                                              params=[1./3.,1./0.3],nest=False)
                 combinedmask= numpy.zeros(len(ipixs))
                 tcombinedmap= combinedmap[ipixIndx]
                 if apogee:
@@ -91,7 +91,8 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
                     # Also store the approximation that the density is constant
                     cdens= densprofiles.expdisk(ll*_DEGTORAD,bb*_DEGTORAD,dist,
                                                 glon=True,
-                                                params=[1./3.,1./0.3])
+                                                params=[1./3.,1./0.3],
+                                                nest=False)
                     area_cdens[ff,ii]= float(numpy.sum(cosb[ipixIndx]*cdens\
                                                            *combinedmask))
         if apogee:

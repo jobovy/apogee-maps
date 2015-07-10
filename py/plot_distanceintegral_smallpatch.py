@@ -56,7 +56,7 @@ def plot_distanceintegral_smallpatch(savename,plotname):
         iso= gaia_rc.load_iso()
         Gsamples= gaia_rc.sample_Gdist(iso,n=_NGSAMPLES)
         # l and b of the pixels
-        theta, phi= healpy.pixelfunc.pix2ang(_NSIDE_HIRES,hpIndx,nest=True)
+        theta, phi= healpy.pixelfunc.pix2ang(_NSIDE_HIRES,hpIndx,nest=False)
         cosb= numpy.sin(theta)
         area= multi.parallel_map(lambda x: distanceIntegrandHires(\
                 _HIRESGREEN15DISTS[x],theta,phi,cosb,Gsamples,dmap),
@@ -101,7 +101,7 @@ def distanceIntegrandHires(dist,theta,phi,cosb,Gsamples,dmap):
     # Calculate the density
     densmap= densprofiles.expdisk(phi,numpy.pi/2.-theta,
                                   dist*numpy.ones(len(theta)),glon=True,
-                                  params=[1./3.,1./0.3])
+                                  params=[1./3.,1./0.3],nest=False)
     # Distance pixel
     tpix= numpy.argmin(numpy.fabs(dist-_HIRESGREEN15DISTS))
     dmap= dmap[:,tpix]
