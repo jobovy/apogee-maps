@@ -101,7 +101,7 @@ def distanceIntegrandHires(dist,theta,phi,cosb,Gsamples,dmap):
     # Calculate the density
     densmap= densprofiles.expdisk(phi,numpy.pi/2.-theta,
                                   dist*numpy.ones(len(theta)),glon=True,
-                                  params=[1./3.,1./0.3],nest=False)
+                                  params=[1./3.,1./0.3])
     # Distance pixel
     tpix= numpy.argmin(numpy.fabs(dist-_HIRESGREEN15DISTS))
     dmap= dmap[:,tpix]

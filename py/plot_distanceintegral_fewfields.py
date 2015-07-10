@@ -59,6 +59,7 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
                                                  nest=False)
             cosb= numpy.sin(theta)
             for ff,(ll,bb) in enumerate(zip(ls,bs)):
+                if ff >= len(ls)-3*apogee: break
                 vec= healpy.pixelfunc.ang2vec((90.-bb)*_DEGTORAD,ll*_DEGTORAD)
                 ipixs= healpy.query_disc(_NSIDE,vec,radius*_DEGTORAD,
                                          inclusive=False,nest=False)
@@ -69,7 +70,7 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
                                               numpy.pi/2.-theta[ipixIndx],
                                               dist*numpy.ones(len(ipixs)),
                                               glon=True,
-                                              params=[1./3.,1./0.3],nest=False)
+                                              params=[1./3.,1./0.3])
                 combinedmask= numpy.zeros(len(ipixs))
                 tcombinedmap= combinedmap[ipixIndx]
                 if apogee:
@@ -91,8 +92,7 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
                     # Also store the approximation that the density is constant
                     cdens= densprofiles.expdisk(ll*_DEGTORAD,bb*_DEGTORAD,dist,
                                                 glon=True,
-                                                params=[1./3.,1./0.3],
-                                                nest=False)
+                                                params=[1./3.,1./0.3])
                     area_cdens[ff,ii]= float(numpy.sum(cosb[ipixIndx]*cdens\
                                                            *combinedmask))
         if apogee:
@@ -106,6 +106,7 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
         colors=['b','g','r','c','gold','m','k','orange','y','b','g']
         lss=['-','-','-','-','-','-','-','-','-','--','--']
         for ff in range(len(ls)):
+            if ff >= len(ls)-3*apogee: break
             psdx, psd= signal.periodogram(area[ff]*dust._GREEN15DISTS**3./numpy.sum(area[ff]*dust._GREEN15DISTS**3.),
                                           fs=1./(dust._GREEN15DISTMODS[1]-dust._GREEN15DISTMODS[0]),
                                           detrend=lambda x: x,scaling='spectrum')
@@ -124,6 +125,7 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
         bovy_plot.bovy_print(fig_height=3.)
         matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{yfonts}"]
         for ff in range(len(ls)):
+            if ff >= len(ls)-3*apogee: break
             bovy_plot.bovy_plot(dust._GREEN15DISTMODS,
                                 area[ff]*dust._GREEN15DISTS**3.,
                                 'k-',
@@ -131,6 +133,7 @@ def plot_distanceintegral_fewfields(savename,plotname,apogee=False):
                                 ylabel=r'$D^3\,\nu_*(\mu|\theta)\,\textswab{S}(\mu)$')
         bovy_plot.bovy_end_print(plotname)
     for ff in range(len(ls)):
+        if ff >= len(ls)-3*apogee: break
         spl= interpolate.InterpolatedUnivariateSpline(dust._GREEN15DISTMODS,
                                                       area[ff]*dust._GREEN15DISTS**3.,
                                                   k=5)

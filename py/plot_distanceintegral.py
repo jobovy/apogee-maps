@@ -92,13 +92,11 @@ def distanceIntegrand(dist,cosb,Gsamples,rmcenter,onlygreen):
     # Sample over the distribution of MG
     combinedmask= numpy.zeros_like(combinedmap)
     G0= 0.68+dust.dist2distmod(dist)
-    if dust.dist2distmod(dist) == 9.5 or dust.dist2distmod(dist) == 10.5:
-        print numpy.sum(numpy.isnan(combinedmap))
     for jj in range(_NGSAMPLES):
         combinedmask+= ((combinedmap > (_GMIN-G0-Gsamples[jj]+0.68))\
                             *(combinedmap < (_GMAX-G0-Gsamples[jj]+0.68))).astype('float')
     combinedmask/= _NGSAMPLES
-    if dust.dist2distmod(dist) == 9.5 or dust.dist2distmod(dist) == 10.5:
+    if True or dust.dist2distmod(dist) == 9.5 or dust.dist2distmod(dist) == 10.5:
         print numpy.sum(combinedmask)
         print dust.dist2distmod(dist), numpy.sum(cosb*densmap*combinedmask)
     # If rmcenter, rm the center of the MW
