@@ -30,6 +30,7 @@ def checkAbundanceScatterClusters():
         medianafe= numpy.median(tdata[define_rcsample._AFETAG])
         fehoffset.extend(tdata['FE_H']-medianfeh)
         afeoffset.extend(tdata[define_rcsample._AFETAG]-medianafe)
+        if cluster == 'M67': print medianafe, len(tdata)
     fehoffset= numpy.array(fehoffset)
     afeoffset= numpy.array(afeoffset)
     print 'FE_H scatter %g' % (numpy.nanstd(fehoffset[numpy.fabs(fehoffset) < 0.3]))
