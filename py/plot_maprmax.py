@@ -45,7 +45,7 @@ def plot_maprmax(savefilename,plotname):
     #                edgecolor='none'))
     #t= pyplot.text(-0.475,0.195,r'$\mathrm{exponential}$',
     #                size=16.,color='w')
-    t= pyplot.text(-0.525,0.195,r'$R_{\mathrm{peak}} < 5\,\mathrm{kpc}$',
+    t= pyplot.text(-0.625,0.195,r'$R_{\mathrm{peak}} < 5\,\mathrm{kpc}$',
                     size=16.,color='w')
     t.set_bbox(dict(alpha=0.5,color=cm.coolwarm_r(0.),
                     edgecolor='none'))
