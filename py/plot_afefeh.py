@@ -18,7 +18,7 @@ def plot_afefeh(plotfilename):
                           data[define_rcsample._AFETAG],
                           'k.',ms=.8,
                           levels=special.erf(numpy.arange(1,2)/numpy.sqrt(2.)),
-                          xrange=[-.9,0.5],
+                          xrange=[-1.,0.4],
                           yrange=[-0.15,0.35],
                           xlabel=r'$[\mathrm{Fe/H}]$',
                           ylabel=define_rcsample._AFELABEL)
@@ -84,18 +84,20 @@ def plot_afefeh(plotfilename):
                                   define_rcsample._highfeh_highafe(highfeh)],
                 'k--',lw=2.)
     # Label them
-    bovy_plot.bovy_text(-0.3,0.265,r'$\mathrm{high}\ [\alpha/\mathrm{Fe}]$',
+    bovy_plot.bovy_text(-0.4,0.265,r'$\mathrm{high}\ [\alpha/\mathrm{Fe}]$',
                          size=15.,backgroundcolor='w')
-    bovy_plot.bovy_text(-0.875,0.05,r'$\mathrm{low\ [Fe/H]}$',
+    bovy_plot.bovy_text(-0.975,0.05,r'$\mathrm{low\ [Fe/H]}$',
                          size=15.,backgroundcolor='w')
-    bovy_plot.bovy_text(0.1,-0.125,r'$\mathrm{high\ [Fe/H]}$',
+    bovy_plot.bovy_text(0.,-0.125,r'$\mathrm{high\ [Fe/H]}$',
                          size=15.,backgroundcolor='w')
-    bovy_plot.bovy_text(-0.125,-0.125,r'$\mathrm{solar}$',
+    bovy_plot.bovy_text(-0.225,-0.125,r'$\mathrm{solar}$',
                          size=15.,backgroundcolor='w')
-    haloc= define_rcsample.highalphalocus()
-    bovy_plot.bovy_plot(haloc[:,0],haloc[:,1],'k-',lw=2.,overplot=True)
-    haloc= define_rcsample.lowalphalocus()
-    bovy_plot.bovy_plot(haloc[:,0],haloc[:,1],'k-',lw=2.,overplot=True)
+    # Loci
+    if False:
+        haloc= define_rcsample.highalphalocus()
+        bovy_plot.bovy_plot(haloc[:,0],haloc[:,1],'k-',lw=2.,overplot=True)
+        haloc= define_rcsample.lowalphalocus()
+        bovy_plot.bovy_plot(haloc[:,0],haloc[:,1],'k-',lw=2.,overplot=True)
     bovy_plot.bovy_end_print(plotfilename)
     return None
 

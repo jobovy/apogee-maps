@@ -56,6 +56,8 @@ def get_rcsample():
     # Add the average alpha/Fe
     data= esutil.numpy_util.add_fields(data,[('AVG_ALPHAFE', float)])
     data['AVG_ALPHAFE']= avg_alphafe(data)
+    # Apply -0.1 offset in [Fe/H]
+    data[_FEHTAG]+= -0.10
     # Remove locations outside of the Pan-STARRS dust map
     # In the Southern hemisphere
     data= data[data['LOCATION_ID'] != 4266] #240,-18
@@ -94,16 +96,16 @@ def avg_alphafe(data):
 # Define the low-alpha, low-iron sample
 def _lowlow_lowfeh(afe):
     # The low metallicity edge
-    return -0.5
+    return -0.6
 def _lowlow_highfeh(afe):
     # The high metallicity edge
-    return -0.15
+    return -0.25
 def _lowlow_lowafe(feh):
     # The low alpha edge (-0.15,-0.075) to (-0.5,0)
-    return (0--0.075)/(-0.5--0.15)*(feh--0.15)-0.075
+    return (0--0.075)/(-0.5--0.15)*(feh+0.1--0.15)-0.075
 def _lowlow_highafe(feh):
     # The high alpha edge (-0.15,0.075) to (-0.5,0.15)
-    return (0.15-0.075)/(-0.5--0.15)*(feh--0.15)+0.075
+    return (0.15-0.075)/(-0.5--0.15)*(feh+0.1--0.15)+0.075
 
 def get_lowlowsample():
     """
@@ -131,16 +133,16 @@ def get_lowlowsample():
 # Define the high-alpha sample
 def _highalpha_lowfeh(afe):
     # The low metallicity edge
-    return -0.7
+    return -0.8
 def _highalpha_highfeh(afe):
     # The high metallicity edge
-    return -0.1
+    return -0.2
 def _highalpha_lowafe(feh):
     # The low alpha edge (-0.125,0.115) to (-0.6,0.215)
-    return (0.2-0.1)/(-0.6--0.125)*(feh--0.125)+0.115
+    return (0.2-0.1)/(-0.6--0.125)*(feh+0.1--0.125)+0.115
 def _highalpha_highafe(feh):
     # The high alpha edge (-0.125,0.19) to (-0.6,0.29)
-    return (0.275-0.175)/(-0.6--0.125)*(feh--0.125)+0.19
+    return (0.275-0.175)/(-0.6--0.125)*(feh+0.1--0.125)+0.19
 
 def get_highalphasample():
     """
@@ -168,16 +170,16 @@ def get_highalphasample():
 # Define the solar sample
 def _solar_lowfeh(afe):
     # The low metallicity edge
-    return -0.1
+    return -0.2
 def _solar_highfeh(afe):
     # The high metallicity edge
-    return 0.1
+    return 0.
 def _solar_lowafe(feh):
     # The low alpha edge (0.1,-0.075) to (-0.1,-0.075)
     return -0.075
 def _solar_highafe(feh):
     # The high alpha edge (-0.15,0.1) to (0.1,0.05)
-    return (0.1-0.05)/(-0.15-0.1)*(feh-0.1)+0.05
+    return (0.1-0.05)/(-0.15-0.1)*(feh+0.1-0.1)+0.05
 
 def get_solarsample():
     """
@@ -205,10 +207,10 @@ def get_solarsample():
 # Define the high metallicity sample
 def _highfeh_lowfeh(afe):
     # The low metallicity edge
-    return 0.15
+    return 0.05
 def _highfeh_highfeh(afe):
     # The high metallicity edge
-    return 0.4
+    return 0.3
 def _highfeh_lowafe(feh):
     # The low alpha edge (0.1,-0.075) to (-0.1,-0.075)
     return -0.075
@@ -244,18 +246,18 @@ def get_highfehsample():
 ###############################################################################
 def highalphalocus():
     data= get_rcsample()
-    indx= (data[_AFETAG] > (0.2-0.1)/(-0.6--0.125)*(data[_FEHTAG]--0.125)+0.11)\
-        *(data[_FEHTAG] < -0.125)\
-        +(data[_AFETAG] > 0.05/(-0.6--0.125)*(data[_FEHTAG]--0.125)+0.11)\
-        *(data[_FEHTAG] >= -0.125)*(data[_FEHTAG] < 0.225)\
-        +(data[_FEHTAG] >= 0.225)
+    indx= (data[_AFETAG] > (0.2-0.1)/(-0.6--0.125)*(data[_FEHTAG]+0.1--0.125)+0.11)\
+        *(data[_FEHTAG] < -0.225)\
+        +(data[_AFETAG] > 0.05/(-0.6--0.125)*(data[_FEHTAG]+0.1--0.125)+0.11)\
+        *(data[_FEHTAG] >= -0.225)*(data[_FEHTAG] < 0.125)\
+        +(data[_FEHTAG] >= 0.125)
     return lowess(data[_AFETAG][indx],data[_FEHTAG][indx],frac=0.6)
 def lowalphalocus():
     data= get_rcsample()
-    indx= (data[_AFETAG] > (0.2-0.1)/(-0.6--0.125)*(data[_FEHTAG]--0.125)+0.11)\
-        *(data[_FEHTAG] < -0.125)\
-        +(data[_AFETAG] > 0.05/(-0.6--0.125)*(data[_FEHTAG]--0.125)+0.11)\
-        *(data[_FEHTAG] >= -0.125)*(data[_FEHTAG] < 0.225)
+    indx= (data[_AFETAG] > (0.2-0.1)/(-0.6--0.125)*(data[_FEHTAG]+0.1--0.125)+0.11)\
+        *(data[_FEHTAG] < -0.025)\
+        +(data[_AFETAG] > 0.05/(-0.6--0.125)*(data[_FEHTAG]+0.1--0.125)+0.11)\
+        *(data[_FEHTAG] >= -0.225)*(data[_FEHTAG] < 0.125)
     return lowess(data[_AFETAG][True-indx],data[_FEHTAG][True-indx],frac=0.6)
 
 ###############################################################################
@@ -263,7 +265,7 @@ def lowalphalocus():
 ###############################################################################
 class MAPs:
     """Class that pixelizes the data sample in [Fe/H] and [a/Fe]"""
-    def __init__(self,data=None,dfeh=0.1,dafe=0.05,fehmin=-0.65,fehmax=0.45,
+    def __init__(self,data=None,dfeh=0.1,dafe=0.05,fehmin=-0.75,fehmax=0.35,
                 afemin=-0.075,afemax=0.275):
         """
         NAME:
