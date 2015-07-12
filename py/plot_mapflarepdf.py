@@ -60,11 +60,11 @@ def plot_mapflarepdf(savename,plotname):
 #        xrange= [-0.4,0.2]
         yrange= [0.,30.]
         combDiv= 2.
-        colorFunc= lambda x: cmap((x+0.5)*0.95/0.9+0.05)
+        colorFunc= lambda x: cmap((x+0.6)*0.95/0.9+0.05)
     else:
 #        xrange= [-0.3,0.3]
         yrange= [0.,13.5]
-        colorFunc= lambda x: cmap((x+0.4)*0.95/0.5+0.05)
+        colorFunc= lambda x: cmap((x+0.5)*0.95/0.5+0.05)
         combDiv= 1.5
     overplot= False
     plotXDFit= True
@@ -74,8 +74,8 @@ def plot_mapflarepdf(savename,plotname):
     for ii, map in enumerate(maps.map()):
         if not ii in plotmaps: continue
         tfeh= round(numpy.median(map['FE_H'])*20.)/20.
-        if tfeh == 0.35: tfeh= 0.4
-        if tfeh == -0.0: tfeh= 0.0
+        if tfeh == 0.25: tfeh= 0.3
+        if tfeh == -0.1: tfeh= -0.1
         bovy_plot.bovy_hist(samples[ii,4],
                             range=xrange,bins=51,overplot=overplot,
                             yrange=yrange,
