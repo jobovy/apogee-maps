@@ -35,15 +35,15 @@ def plot_mapflare(plotname):
         ldp= 1000./ldp # make it hz instead of its inverse
         # Label and relative normalization
         tfeh= round(numpy.median(map['FE_H'])*20.)/20.
-        if tfeh == 0.35: tfeh= 0.4
+        if tfeh == 0.25: tfeh= 0.3
         if tfeh == -0.0: tfeh= 0.0
-        offset= 10.**(-6.*tfeh)-0.4
-        if tfeh < 0.: offset/= 1.5
-        if tfeh < -0.1: offset/= 1.15
+        offset= 10.**(-6.*(tfeh+0.1))-0.4
+        if tfeh < -0.1: offset/= 1.5
+        if tfeh < -0.2: offset/= 1.15
         print ii, tfeh, len(map), offset
         bovy_plot.bovy_plot(Rs,numpy.median(ldp,axis=1)*offset,
                             '-',
-                            color=cmap((tfeh+0.4)*0.95/0.5+0.05),
+                            color=cmap((tfeh+0.5)*0.95/0.5+0.05),
                             lw=2.,overplot=overplot,
                             ylabel=r'$h_Z\,(\mathrm{pc})\times\mathrm{constant}$',
                             xrange=[0.,16.],
@@ -53,9 +53,9 @@ def plot_mapflare(plotname):
         pyplot.fill_between(Rs,
                             numpy.sort(ldp,axis=1)[:,int(round(_SIGNIF*nsamples))]*offset,
                             numpy.sort(ldp,axis=1)[:,int(round((1.-_SIGNIF)*nsamples))]*offset,
-                            color=cmap((tfeh+0.4)/0.4),
+                            color=cmap((tfeh+0.5)/0.4),
                             lw=0.,zorder=ii)
-        pyplot.plot(Rs,Rs*0.+300.*offset,color=cmap((tfeh+0.4)*0.95/0.5+0.05),
+        pyplot.plot(Rs,Rs*0.+300.*offset,color=cmap((tfeh+0.5)*0.95/0.5+0.05),
                     ls='--',lw=2.*0.8,zorder=ii+5)
         overplot= True
         if ii == 19:
@@ -64,7 +64,7 @@ def plot_mapflare(plotname):
                                 r'$[\mathrm{Fe/H}]$',size=16.,color='k')
         bovy_plot.bovy_text(2.,numpy.median(ldp,axis=1)[0]*offset,
                             r'$%+.1f$' % tfeh,size=16.,
-                            color=cmap((tfeh+0.4)*0.95/0.5+0.05))
+                            color=cmap((tfeh+0.5)*0.95/0.5+0.05))
     bovy_plot.bovy_text(10.,10.**5.6,
                         r'$\mathrm{high-}[\alpha/\mathrm{Fe}]\ \mathrm{MAPs}$',
                         size=16.)

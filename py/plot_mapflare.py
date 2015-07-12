@@ -35,14 +35,14 @@ def plot_mapflare(plotname):
         ldp= 1000./ldp # make it hz instead of its inverse
         # Label and relative normalization
         tfeh= round(numpy.median(map['FE_H'])*20.)/20.
-        if tfeh == 0.35: tfeh= 0.4
+        if tfeh == 0.25: tfeh= 0.3
         if tfeh == -0.0: tfeh= 0.0
-        offset= 10.**(4.*(tfeh+0.4))
-        if tfeh == 0.4: offset*= 3.
+        offset= 10.**(4.*(tfeh+0.5))
+        if tfeh == 0.3: offset*= 3.
         print ii, tfeh, len(map), offset
         bovy_plot.bovy_plot(Rs,numpy.median(ldp,axis=1)*offset,
                             '-',
-                            color=cmap((tfeh+0.5)*0.95/0.9+0.05),
+                            color=cmap((tfeh+0.6)*0.95/0.9+0.05),
                             lw=2.,overplot=overplot,
                             xlabel=r'$R\,(\mathrm{kpc})$',
                             ylabel=r'$h_Z\,(\mathrm{pc})\times\mathrm{constant}$',
@@ -53,9 +53,9 @@ def plot_mapflare(plotname):
         pyplot.fill_between(Rs,
                             numpy.sort(ldp,axis=1)[:,int(round(_SIGNIF*nsamples))]*offset,
                             numpy.sort(ldp,axis=1)[:,int(round((1.-_SIGNIF)*nsamples))]*offset,
-                            color=cmap((tfeh+0.5)),
+                            color=cmap((tfeh+0.6)),
                             lw=0.,zorder=ii)
-        pyplot.plot(Rs,Rs*0.+300.*offset,color=cmap((tfeh+0.5)*0.95/0.9+0.05),
+        pyplot.plot(Rs,Rs*0.+300.*offset,color=cmap((tfeh+0.6)*0.95/0.9+0.05),
                     ls='--',lw=2.*0.8,zorder=ii+5)
         overplot= True
         if ii == 16:
@@ -64,7 +64,7 @@ def plot_mapflare(plotname):
                                 r'$[\mathrm{Fe/H}]$',size=16.,color='k')
         bovy_plot.bovy_text(2.,numpy.median(ldp,axis=1)[0]*offset,
                             r'$%+.1f$' % tfeh,size=16.,
-                            color=cmap((tfeh+0.5)*0.95/0.9+0.05))
+                            color=cmap((tfeh+0.6)*0.95/0.9+0.05))
     bovy_plot.bovy_text(1.,10.**6.6,
                         r'$\mathrm{low-}[\alpha/\mathrm{Fe}]\ \mathrm{MAPs}$',
                         size=16.)
