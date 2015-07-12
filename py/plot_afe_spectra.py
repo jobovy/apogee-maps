@@ -23,7 +23,7 @@ def plot_afe_spectra(savename,plotname):
     # Load the data
     data= define_rcsample.get_rcsample()
     data= data[data['SNR'] > 200.]
-    fehindx= (data['FE_H'] <= -0.25)*(data['FE_H'] > -0.35)
+    fehindx= (data['FE_H'] <= -0.35)*(data['FE_H'] > -0.45)
     fehdata= data[fehindx]
     # First compute the residuals and do the EM-PCA smoothing
     if not os.path.exists(savename):
