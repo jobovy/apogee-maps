@@ -180,7 +180,8 @@ def plot_powspec(dist,basename,plotname):
                    prop={'size':14},
                    frameon=False) 
     """
-    bovy_plot.bovy_text(r'$\mathrm{error\ in}\ \ln\ \mathrm{effective\ area}$',top_right=True,size=16.)
+    if dist == 5.:
+        bovy_plot.bovy_text(r'$\mathrm{error\ in}\ \ln\ \mathrm{effective\ area}$',top_right=True,size=16.)
     bovy_plot.bovy_end_print(plotname.replace('powspec','cumulcrosspowspec')) 
     return None
 
