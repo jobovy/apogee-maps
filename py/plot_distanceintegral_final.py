@@ -31,8 +31,8 @@ def plot_distanceintegral_final(plotname):
     matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{yfonts}"]
     line1= bovy_plot.bovy_plot(psdx_full[1:],numpy.sqrt(psd_full[1:]),
                                'k-',loglog=True,
-                               xlabel=r'$k_\mu\,(\mathrm{mag}^{-1})$',
-                               ylabel=r'$\sqrt{P_k}$',
+                               xlabel=r'$\mathrm{distance\ resolution}\ k_\mu\,(\mathrm{mag}^{-1})$',
+                               ylabel=r'$\mathrm{effective\ volume\ error}\ \sqrt{P_k}$',
                                xrange=[0.04,20.],
                                yrange=[10**-11.,5.])
     line2= bovy_plot.bovy_plot(psdx_rmcenter[1:],numpy.sqrt(psd_rmcenter[1:]),
