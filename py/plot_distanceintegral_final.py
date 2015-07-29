@@ -27,16 +27,19 @@ def plot_distanceintegral_final(plotname):
         signal.periodogram(area_rmcenter*dust._GREEN15DISTS**3./numpy.sum(area_rmcenter*dust._GREEN15DISTS**3.),
                                       fs=1./(dust._GREEN15DISTMODS[1]-dust._GREEN15DISTMODS[0]),
                            detrend=lambda x: x,scaling='spectrum')
-    bovy_plot.bovy_print(fig_height=4.)
+    bovy_plot.bovy_print(fig_height=5.5)
     matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{yfonts}"]
     line1= bovy_plot.bovy_plot(psdx_full[1:],numpy.sqrt(psd_full[1:]),
                                'k-',loglog=True,
                                xlabel=r'$k_\mu\,(\mathrm{mag}^{-1})$',
                                ylabel=r'$\sqrt{P_k}$',
-                               xrange=[0.04,2.],
-                               yrange=[10**-6.,1.])
+                               xrange=[0.04,20.],
+                               yrange=[10**-11.,5.])
     line2= bovy_plot.bovy_plot(psdx_rmcenter[1:],numpy.sqrt(psd_rmcenter[1:]),
                                'r-',overplot=True)
+    bovy_plot.bovy_plot([1.,10.],[6.*10.**-4.,6.*10.**-7.],'k--',overplot=True)
+    bovy_plot.bovy_plot([1.,10.],[2.*10.**-5.,2.*10.**-10.],
+                        'r--',overplot=True)
     pyplot.legend((line1[0],line2[0]),
                   (r'$\mathrm{full\ sky}$',
                    r'$\mathrm{excluding}\ |180^\circ-l| > 155^\circ, |b| < 25^\circ$'),
