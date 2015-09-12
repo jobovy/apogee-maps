@@ -153,6 +153,8 @@ def _setup_densfunc(type):
         return densprofiles.tribrokenexpfixedflaredisk
     elif type.lower() == 'brokentwoexp':
         return densprofiles.brokentwoexpdisk
+    elif type.lower() == 'brokentwoexpflare':
+        return densprofiles.brokentwoexpflaredisk
     elif type.lower() == 'tribrokentwoexp':
         return densprofiles.tribrokentwoexpdisk
     elif type.lower() == 'gaussexp':
@@ -190,6 +192,9 @@ def _setup_initparams_densfunc(type,data):
     elif type.lower() == 'brokentwoexp':
         return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
                  densprofiles.logit(0.5),1./0.8]
+    elif type.lower() == 'brokentwoexpflare':
+        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+                 densprofiles.logit(0.5),1./0.8,-0.2]
     elif type.lower() == 'tribrokentwoexp':
         return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
                  densprofiles.logit(0.5),1./0.8]
@@ -265,6 +270,16 @@ def _check_range_params_densfunc(params,type):
         if numpy.exp(params[3]) > 16.: return False
         if numpy.exp(params[3]) < 1.: return False
     elif type.lower() == 'brokentwoexp':
+        if numpy.fabs(params[0]) > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if numpy.fabs(params[2]) > 2.: return False
+        if numpy.exp(params[3]) > 16.: return False
+        if numpy.exp(params[3]) < 1.: return False
+        if params[4] < -7.: return False
+        if params[4] > 0.: return False #make 2nd less dominant
+        if params[5] < 0.: return False
+        if numpy.fabs(params[5]) > 20.: return False
+    elif type.lower() == 'brokentwoexpflare':
         if numpy.fabs(params[0]) > 2.: return False
         if numpy.fabs(params[1]) > 20.: return False
         if numpy.fabs(params[2]) > 2.: return False

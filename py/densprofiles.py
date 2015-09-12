@@ -365,7 +365,7 @@ def tribrokenexpfixedflaredisk(R,phi,z,glon=False,
 @glonDecorator
 def brokentwoexpdisk(R,phi,z,glon=False,
                      params=[1./3.,1./0.3,1./4.,numpy.log(10.),
-                             1./0.8,logit(0.1)]):
+                             logit(0.1),1./0.8]):
     """
     NAME:
        brokentwoexpdisk
@@ -394,6 +394,42 @@ def brokentwoexpdisk(R,phi,z,glon=False,
                     *numpy.exp(-params[1]*numpy.fabs(z))\
                     +amp/2.*numpy.fabs(params[5])\
                     *numpy.exp(-params[5]*numpy.fabs(z)))
+
+@scalarDecorator
+@glonDecorator
+def brokentwoexpflaredisk(R,phi,z,glon=False,
+                     params=[1./3.,1./0.3,1./4.,numpy.log(10.),
+                             logit(0.1),1./0.8,-1./5.]):
+    """
+    NAME:
+       brokentwoexpflaredisk
+    PURPOSE:
+       density of a broken exponential disk (two scale lengths), with a 
+       vertical density profile consisting of two scale heights, flaring with the same scale length
+    INPUT:
+       R,phi,z - Galactocentric cylindrical coordinates or (l/rad,b/rad,D/kpc)
+       glon= (False) if True, input coordinates above are (l,b,D)
+       params= parameters [1/hR,1/hz,1/hR2,log[Rbreak],1/hz2,logit(amp2)]
+    OUTPUT:
+       density or log density
+    HISTORY:
+       2015-09-12 - Written - Bovy (UofT)
+    """
+    Rb= numpy.exp(params[3])
+    out= numpy.empty_like(R)
+    sR= R[R <= Rb]
+    bR= R[R > Rb]
+    out[R <= Rb]= numpy.exp(-params[0]*(sR-_R0))
+    out[R > Rb]=\
+        numpy.exp(-params[2]*(bR-_R0))\
+        *numpy.exp(params[2]*(Rb-_R0)-params[0]*(Rb-_R0))
+    amp= ilogit(params[4])
+    tinvhz1= params[1]*numpy.exp((R-_R0)*params[6])
+    tinvhz2= params[5]*numpy.exp((R-_R0)*params[6])
+    return out*((1.-amp)/2.*numpy.fabs(tinvhz1)\
+                    *numpy.exp(-tinvhz1*numpy.fabs(z))\
+                    +amp/2.*numpy.fabs(tinvhz2)\
+                    *numpy.exp(-tinvhz2*numpy.fabs(z)))
 
 @scalarDecorator
 @glonDecorator
