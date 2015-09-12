@@ -240,7 +240,7 @@ def _calc_lnprob(loc,nls,nbs,ds,distmods,H0,densfunc):
                          +10.**-8.)
 
 def get_options():
-    usage = "usage: %prog [options] <savefilename>\n\nsavefilename= name of the file that the mock datawill be saved to"
+    usage = "usage: %prog [options] <savefilename>\n\nsavefilename= name of the file that the mock data will be saved to"
     parser = OptionParser(usage=usage)
     parser.add_option("--type",dest='type',default='exp',
                       help="Type of density profile")
