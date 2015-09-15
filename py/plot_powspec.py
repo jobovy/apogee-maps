@@ -96,7 +96,7 @@ def plot_powspec(dist,basename,plotname):
     line1= bovy_plot.bovy_plot(ell[1:],
                                (2.*ell[1:]+1.)*combinedcl[1:],
                                'k-',loglog=True,
-                               ylabel=r'$(2l+1)\,C_l$',
+                               ylabel=r'$(2\ell+1)\,C_\ell$',
                                xrange=[0.5,20000],
                                yrange=yrange,
                                zorder=3)
@@ -125,7 +125,7 @@ def plot_powspec(dist,basename,plotname):
     line1= bovy_plot.bovy_plot(ell[1:],
                                (2.*ell[1:]+1.)*numpy.fabs(combinedcr[1:]),
                                'k-',loglog=True,
-                               ylabel=r'$(2l+1)\,C^{\mathrm{cross}}_l$',
+                               ylabel=r'$(2\ell+1)\,C^{\mathrm{cross}}_\ell$',
                                xrange=[0.5,20000],
                                yrange=yrange,
                                zorder=1)
@@ -157,8 +157,8 @@ def plot_powspec(dist,basename,plotname):
                                numpy.fabs(numpy.log(effvol)
                                           -numpy.log(numpy.cumsum((2.*ell+1.)*combinedmcr)))[1:],
                                'k-',loglog=True,
-                               xlabel=r'$l$',
-                               ylabel=r'$\left|\Delta\ln\sum_{l}\sum_{m}\nu_{*,lm}\,\textswab{S}_{lm}\right|$',
+                               xlabel=r'$\ell$',
+                               ylabel=r'$\left|\Delta\ln\sum_{\ell}\sum_{m}\nu_{*,\ell m}\,\textswab{S}_{\ell m}\right|$',
                                xrange=[0.5,20000],
                                yrange=[2.*10.**-13.,20.],
                                zorder=3)
