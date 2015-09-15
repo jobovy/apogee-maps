@@ -27,7 +27,7 @@ The stellar population structure of the Galactic disk
 -------------------------------------------------------
 
 This code is mainly concerned with fitting spatial-density profiles to
-subsets of APOGEE data. Almost all of these functions require the
+subsets of APOGEE data. Almost all of the commands below require the
 effective-selection function (see the papers above for a description
 of this), which you should first calculate as::
 
@@ -123,7 +123,9 @@ Fits are done as follows::
      python fitMAPs.py tribrokenexplinflare ../mapfits/tribrokenexplinflare.sav
      python fitMAPs.py tribrokentwoexp ../mapfits/tribrokentwoexp.sav
 
-that is, ``fitMAPs.py`` just fits a given density profile to all MAPs.
+that is, ``fitMAPs.py`` just fits a given density profile to all
+MAPs. It also runs MCMC for each MAP and saves all of these results
+(in a rather large file!).
 
 Figure 10::
 
@@ -146,7 +148,7 @@ Figure 13::
 
 Figure 14::
 
-       python plot_maphz.py ./mapfits-hz.png && convert ./mapfits-hz.png
+       python plot_maphz.py ./mapfits-hz.png
 
 Figure 15::
 
