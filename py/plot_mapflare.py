@@ -12,10 +12,15 @@ import densprofiles
 import define_rcsample
 _SKIP= 10
 _SIGNIF= 0.025
-def plot_mapflare(plotname):
-    with open('../mapfits/tribrokenexpflare.sav','rb') as savefile:
-        bf= numpy.array(pickle.load(savefile))
-        samples_brexp= numpy.array(pickle.load(savefile))
+def plot_mapflare(plotname,linflare=False):
+    if not linflare:
+        with open('../mapfits/tribrokenexpflare.sav','rb') as savefile:
+            bf= numpy.array(pickle.load(savefile))
+            samples_brexp= numpy.array(pickle.load(savefile))
+    else:
+        with open('../mapfits/tribrokenexplinflare.sav','rb') as savefile:
+            bf= numpy.array(pickle.load(savefile))
+            samples_brexp= numpy.array(pickle.load(savefile))
     plotmaps= [16,23,29,36,43,50,57,64,71]
     bovy_plot.bovy_print(fig_width=8.,fig_height=9.*4.99/8.98)
     maps= define_rcsample.MAPs()
@@ -31,7 +36,11 @@ def plot_mapflare(plotname):
         nsamples= len(samples[0])
         tRs= numpy.tile(Rs,(nsamples,1)).T
         ldp= numpy.empty((len(Rs),nsamples))
-        ldp= samples[1]*numpy.exp(samples[4]*(tRs-densprofiles._R0))
+        if linflare:
+            ldp= samples[1]\
+                *(1.+samples[4]*(tRs-densprofiles._R0)*(numpy.exp(1.)-1.))
+        else:
+            ldp= samples[1]*numpy.exp(samples[4]*(tRs-densprofiles._R0))
         ldp= 1000./ldp # make it hz instead of its inverse
         # Label and relative normalization
         tfeh= round(numpy.median(map['FE_H'])*20.)/20.
@@ -71,5 +80,5 @@ def plot_mapflare(plotname):
     bovy_plot.bovy_end_print(plotname)
 
 if __name__ == '__main__':
-    plot_mapflare(sys.argv[1])
+    plot_mapflare(sys.argv[1],linflare=len(sys.argv) > 2)
     
