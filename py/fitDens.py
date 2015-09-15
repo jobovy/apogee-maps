@@ -53,9 +53,13 @@ def fitDens(data,
                                            dataR,dataphi,dataz,
                                            effsel,Rgrid,phigrid,zgrid),
                        init,disp=verbose)
+    if 'explinflare' in type:
+        step= [0.2,0.2,0.2,0.2,0.02] # need small step for Rfinv
+    else:
+        step= 0.2
     if mcmc:
         samples= bovy_mcmc.markovpy(out,
-                                    0.2,
+                                    step,
                                     lambda x: loglike(x,densfunc,type,
                                                       dataR,dataphi,dataz,
                                                       effsel,Rgrid,
@@ -167,6 +171,8 @@ def _setup_densfunc(type):
         return densprofiles.brokenexpdiskfixedspiral
     elif type.lower() == 'tribrokenexplinflare':
         return densprofiles.tribrokenexplinflaredisk
+    elif type.lower() == 'tribrokenexpinvlinflare':
+        return densprofiles.tribrokenexpinvlinflaredisk
 def _setup_initparams_densfunc(type,data):
     """Return the initial parameters of the density for this type, might depend on the data"""
     if type.lower() == 'exp':
@@ -208,7 +214,10 @@ def _setup_initparams_densfunc(type,data):
         return [1./6.,1./0.3,1./2.,numpy.log(14.),numpy.log(1.)]
     elif type.lower() == 'tribrokenexplinflare':
         return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
-                 -1./5.]
+                0.]
+    elif type.lower() == 'tribrokenexpinvlinflare':
+        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+                -1./5.]
 def _check_range_params_densfunc(params,type):
     """Check that the current parameters are in a reasonable range (prior)"""
     # Second parameter is always a scale height, which we don't allow neg.
@@ -328,6 +337,14 @@ def _check_range_params_densfunc(params,type):
         if numpy.exp(params[3]) > 16.: return False
         if numpy.exp(params[3]) < 1.: return False
     elif type.lower() == 'tribrokenexplinflare':
+        if params[0] < 0.: return False
+        if params[0] > 2.: return False
+        if numpy.fabs(params[1]) > 20.: return False
+        if params[2] < 0.: return False
+        if params[2] > 2.: return False
+        if numpy.exp(params[3]) > 16.: return False
+        if numpy.exp(params[3]) < 1.: return False
+    elif type.lower() == 'tribrokenexpinvlinflare':
         if params[0] < 0.: return False
         if params[0] > 2.: return False
         if numpy.fabs(params[1]) > 20.: return False
