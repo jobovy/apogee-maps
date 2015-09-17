@@ -12,15 +12,17 @@ import densprofiles
 import define_rcsample
 _SKIP= 10
 _SIGNIF= 0.025
-def plot_mapflare(plotname,linflare=False):
-    if not linflare:
-        with open('../mapfits/tribrokenexpflare.sav','rb') as savefile:
-            bf= numpy.array(pickle.load(savefile))
-            samples_brexp= numpy.array(pickle.load(savefile))
-    else:
-        with open('../mapfits/tribrokenexplinflare.sav','rb') as savefile:
-            bf= numpy.array(pickle.load(savefile))
-            samples_brexp= numpy.array(pickle.load(savefile))
+def plot_mapflare(plotname):
+    # Open all three alternative models
+    with open('../mapfits/tribrokenexpflare.sav','rb') as savefile:
+        bf= numpy.array(pickle.load(savefile))
+        samples_brexp= numpy.array(pickle.load(savefile))
+    with open('../mapfits/tribrokenexpinvlinflare.sav','rb') as savefile:
+        bf= numpy.array(pickle.load(savefile))
+        samples_brexp_invlin= numpy.array(pickle.load(savefile))
+    with open('../mapfits/tribrokenexplinflare.sav','rb') as savefile:
+        bf= numpy.array(pickle.load(savefile))
+        samples_brexp_lin= numpy.array(pickle.load(savefile))
     plotmaps= [16,23,29,36,43,50,57,64,71]
     bovy_plot.bovy_print(fig_width=8.,fig_height=9.*4.99/8.98)
     maps= define_rcsample.MAPs()
@@ -33,15 +35,19 @@ def plot_mapflare(plotname,linflare=False):
         #Rmax= numpy.sort(map['RC_GALR_H'])[numpy.amin([len(map)-1,int(round(0.995*len(map)))])]
         Rs= numpy.linspace(4.,14.,1001)
         samples= samples_brexp[ii,:,::_SKIP]
+        samples_invlin= samples_brexp_invlin[ii,:,::_SKIP]
+        samples_lin= samples_brexp_lin[ii,:,::_SKIP]
         nsamples= len(samples[0])
         tRs= numpy.tile(Rs,(nsamples,1)).T
         ldp= numpy.empty((len(Rs),nsamples))
-        if linflare:
-            ldp= samples[1]\
-                *(1.+samples[4]*(tRs-densprofiles._R0)*(numpy.exp(1.)-1.))
-        else:
-            ldp= samples[1]*numpy.exp(samples[4]*(tRs-densprofiles._R0))
+        ldp= samples[1]*numpy.exp(samples[4]*(tRs-densprofiles._R0))
+        ldp_invlin= samples_invlin[1]\
+            *(1.+samples_invlin[4]*(tRs-densprofiles._R0)*(numpy.exp(1.)-1.))
+        ldp_lin= samples_lin[1]\
+            /(1.-(tRs-densprofiles._R0)*samples_lin[4]*(numpy.exp(1.)-1.))
         ldp= 1000./ldp # make it hz instead of its inverse
+        ldp_invlin= 1000./ldp_invlin
+        ldp_lin= 1000./ldp_lin
         # Label and relative normalization
         tfeh= round(numpy.median(map['FE_H'])*20.)/20.
         if tfeh == 0.25: tfeh= 0.3
@@ -57,15 +63,21 @@ def plot_mapflare(plotname,linflare=False):
                             ylabel=r'$h_Z\,(\mathrm{pc})\times\mathrm{constant}$',
                             xrange=[0.,16.],
                             yrange=[10.**2.,10.**6.99],
-                            zorder=10+ii,
+                            zorder=12+ii,
                             semilogy=True)
+        pyplot.fill_between(Rs,
+                            numpy.median(ldp_lin,axis=1)*offset,
+                            numpy.median(ldp_invlin,axis=1)*offset,
+                            color='0.65',
+                            lw=0.,zorder=ii-1)
         pyplot.fill_between(Rs,
                             numpy.sort(ldp,axis=1)[:,int(round(_SIGNIF*nsamples))]*offset,
                             numpy.sort(ldp,axis=1)[:,int(round((1.-_SIGNIF)*nsamples))]*offset,
                             color=cmap((tfeh+0.6)),
                             lw=0.,zorder=ii)
-        pyplot.plot(Rs,Rs*0.+300.*offset,color=cmap((tfeh+0.6)*0.95/0.9+0.05),
-                    ls='--',lw=2.*0.8,zorder=ii+5)
+        line,= pyplot.plot(Rs,Rs*0.+300.*offset,color=cmap((tfeh+0.6)*0.95/0.9+0.05),
+                          ls='-',lw=2.*0.8,zorder=ii+5)
+        line.set_dashes([8,6])        
         overplot= True
         if ii == 16:
             bovy_plot.bovy_text(2.,
@@ -80,5 +92,5 @@ def plot_mapflare(plotname,linflare=False):
     bovy_plot.bovy_end_print(plotname)
 
 if __name__ == '__main__':
-    plot_mapflare(sys.argv[1],linflare=len(sys.argv) > 2)
+    plot_mapflare(sys.argv[1])
     
