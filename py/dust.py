@@ -13,7 +13,7 @@ def distmod2dist(distmod):
     return 10.**(distmod/5.-2.)
 
 _greendir= os.path.join(os.getenv('DUST_DIR'),'green15')
-_bovydir= os.path.join(os.getenv('DUST_DIR'),'bovy15')
+_bovydir= os.path.join(os.getenv('DUST_DIR'),'combined15')
 _GREEN15DISTMODS= numpy.linspace(4.,19.,31)
 _GREEN15DISTS= distmod2dist(_GREEN15DISTMODS)
 # we load these in the load_green15 function, but then re-use them
