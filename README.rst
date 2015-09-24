@@ -3,9 +3,9 @@ apogee-maps
 
 This repository contains the code for the papers "The stellar
 population structure of the Galactic disk" `Bovy, Rix, Schlafly et
-al. (2015) <http://arxiv.org/abs/1509.XXXXX>`__ and "On Galactic
+al. (2015) <http://arxiv.org/abs/1509.05796>`__ and "On Galactic
 density modeling in the presence of dust extinction" `Bovy, Rix, Green
-et al. (2015) <http://arxiv.org/abs/1509.XXXXX>`__. This code is
+et al. (2015) <http://arxiv.org/abs/1509.06751>`__. This code is
 provided for illustration purposes only, but it should allow you to
 perform the same analysis as in these papers if you want. Much of this
 code runs for quite a long time and no guidance is given here as to
