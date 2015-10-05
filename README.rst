@@ -17,7 +17,7 @@ Prerequisites
 
 This code heavily depends on the `apogee
 <https://github.com/jobovy/apogee>`__ and `mwdust
-<github.com/jobovy/mwdust>`__ general-use packages. You need to
+<https://github.com/jobovy/mwdust>`__ general-use packages. You need to
 install these (including downloading all of the necessary dust data)
 first. This code also makes use of the numpy, scipy, matplotlib
 stack. Parts of the code require healpy. The code will complain if you
