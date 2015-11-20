@@ -136,7 +136,7 @@ Figure 11::
        python plot_mapsurfdens.py ./mapfits-radial.ps
        python plot_mapsurfdens_highalpha.py ./mapfits-radial-highalpha.ps 
 
-The resulting output profiles for the low- and high-alpha MAPs displayed in this figure can be found under csv/mapsurfdens.csv `<csv/mapsurfdens.csv.>`__ and `csv/mapsurfdens_highalpha.csv <csv/mapsurfdens_highalpha.csv`>__.
+The resulting output profiles for the low- and high-alpha MAPs displayed in this figure can be found under <csv/mapsurfdens.csv.> and <csv/mapsurfdens_highalpha.csv>.
 
 Figure 12::
 
@@ -148,7 +148,7 @@ Figure 13::
        python plot_mapflare.py ./mapfits-radialflare.ps
        python plot_mapflare_highalpha.py ./mapfits-radialflare-highalpha.ps 
 
-The resulting output profiles for the low- and high-alpha MAPs displayed in this figure can be found under csv/mapflare.csv `<csv/mapflare.csv.>`__ and `csv/mapflare_highalpha.csv <csv/mapflare_highalpha.csv`>__.
+The resulting output profiles for the low- and high-alpha MAPs displayed in this figure can be found under <csv/mapflare.csv.> and <csv/mapflare_highalpha.csv>.
 
 Figure 14::
 
