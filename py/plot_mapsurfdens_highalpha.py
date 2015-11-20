@@ -2,7 +2,9 @@
 # plot_mapsurfdens_highalpha.py: make of plot of the surface-density of the 
 #                                high alpha stars
 ###############################################################################
+import os, os.path
 import sys
+import csv
 import pickle
 import numpy
 import matplotlib
@@ -22,10 +24,20 @@ def plot_mapsurfdens(plotname):
     maps= define_rcsample.MAPs()
     cmap= cm.coolwarm
     overplot= False
+    Rs= numpy.linspace(4.,14.,1001)
+    # Setup for saving the profiles
+    csvfile= open(os.path.join('..','out','mapsurfdens_highalpha.csv'),'w')
+    writer= csv.writer(csvfile,delimiter=',',quoting=csv.QUOTE_NONE)
+    writer.writerow(['# Surface density profile for MAPs (Figure 11 in Bovy et al. 2016)'])
+    writer.writerow(['# The first line lists the radii at which the surface density profiles'])
+    writer.writerow(['# are evaluated'])
+    writer.writerow(['# The rest of the file are the log surface profiles; the 0.025'])
+    writer.writerow(['# lower limit and the 0.0975 upper limit (each 1 line)'])
+    writer.writerow(['# Different MAPs are separated by a comment line'])
+    writer.writerow(['{:.2f}'.format(x) for x in Rs])
     for ii, map in enumerate(maps.map()):
         if not ii in plotmaps: continue
         # Create all density profiles
-        Rs= numpy.linspace(4.,14.,1001)
         samples= samples_brexp[ii,:,::_SKIP]
         nsamples= len(samples[0])
         tRs= numpy.tile(Rs,(nsamples,1)).T
@@ -79,6 +91,11 @@ def plot_mapsurfdens(plotname):
         bovy_plot.bovy_text(2.,(numpy.exp(numpy.median(ldp,axis=1))/norm)[0],
                             r'$%+.1f$' % tfeh,size=16.,
                             color=cmap((tfeh+0.5)*0.95/0.5+0.05))
+        writer.writerow(['# High-alpha MAP w/ [Fe/H]=%g' % tfeh])
+        writer.writerow(['{:.3f}'.format(x) for x in list(numpy.median(ldp,axis=1))])
+        writer.writerow(['{:.3f}'.format(x) for x in list(numpy.sort(ldp,axis=1)[:,int(round(_SIGNIF*nsamples))])])
+        writer.writerow(['{:.3f}'.format(x) for x in list(numpy.sort(ldp,axis=1)[:,int(round((1.-_SIGNIF)*nsamples))])])
+    csvfile.close()
     bovy_plot.bovy_text(10.,10.**1.,
                         r'$\mathrm{high-}[\alpha/\mathrm{Fe}]\ \mathrm{MAPs}$',
                         size=16.)
