@@ -1,7 +1,9 @@
 ###############################################################################
 # plot_mapflare.py: make of plot of the flaring of MAPs
 ###############################################################################
+import os, os.path
 import sys
+import csv
 import pickle
 import numpy
 import matplotlib
@@ -28,12 +30,22 @@ def plot_mapflare(plotname):
     maps= define_rcsample.MAPs()
     cmap= cm.coolwarm
     overplot= False
+    Rs= numpy.linspace(4.,14.,1001)
+    # Setup for saving the profiles
+    csvfile= open(os.path.join('..','out','mapflare.csv'),'w')
+    writer= csv.writer(csvfile,delimiter=',',quoting=csv.QUOTE_NONE)
+    writer.writerow(['# Scale height profile for MAPs (Figure 13 in Bovy et al. 2016)'])
+    writer.writerow(['# The first line lists the radii at which the scale height profiles'])
+    writer.writerow(['# are evaluated'])
+    writer.writerow(['# The rest of the file are the scale heights; the 0.025'])
+    writer.writerow(['# lower limit and the 0.0975 upper limit (each 1 line)'])
+    writer.writerow(['# Different MAPs are separated by a comment line'])
+    writer.writerow(['{:.2f}'.format(x) for x in Rs])
     for ii, map in enumerate(maps.map()):
         if not ii in plotmaps: continue
         # Create all flaring profiles
         #Rmin= numpy.sort(map['RC_GALR_H'])[int(round(0.005*len(map)))]
         #Rmax= numpy.sort(map['RC_GALR_H'])[numpy.amin([len(map)-1,int(round(0.995*len(map)))])]
-        Rs= numpy.linspace(4.,14.,1001)
         samples= samples_brexp[ii,:,::_SKIP]
         samples_invlin= samples_brexp_invlin[ii,:,::_SKIP]
         samples_lin= samples_brexp_lin[ii,:,::_SKIP]
@@ -86,6 +98,11 @@ def plot_mapflare(plotname):
         bovy_plot.bovy_text(2.,numpy.median(ldp,axis=1)[0]*offset,
                             r'$%+.1f$' % tfeh,size=16.,
                             color=cmap((tfeh+0.6)*0.95/0.9+0.05))
+        writer.writerow(['# Low-alpha MAP w/ [Fe/H]=%g' % tfeh])
+        writer.writerow(['{:.3f}'.format(x) for x in list(numpy.median(ldp,axis=1))])
+        writer.writerow(['{:.3f}'.format(x) for x in list(numpy.sort(ldp,axis=1)[:,int(round(_SIGNIF*nsamples))])])
+        writer.writerow(['{:.3f}'.format(x) for x in list(numpy.sort(ldp,axis=1)[:,int(round((1.-_SIGNIF)*nsamples))])])
+    csvfile.close()
     bovy_plot.bovy_text(1.,10.**6.6,
                         r'$\mathrm{low-}[\alpha/\mathrm{Fe}]\ \mathrm{MAPs}$',
                         size=16.)
