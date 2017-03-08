@@ -131,7 +131,7 @@ def get_rgbsample(loggcut = [1.8, 3.0],
 		if verbose == True:
 			print str(len(data))+' Stars with ages'
 	if apply_corrections == True:
-		martig1 = np.genfromtxt(prefix+'martig2016_table1.txt', dtype=None, names=True, skip_header=2)
+		martig1 = np.genfromtxt(catpath+'martig2016_table1.txt', dtype=None, names=True, skip_header=2)
 		fit = lowess(np.log10(martig1['Age_out']),np.log10(martig1['Age_in']))
 		xs = np.linspace(-0.3,1.2,100)
 		xsinterpolate = interp1d(xs,xs)

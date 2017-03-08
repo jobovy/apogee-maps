@@ -8,6 +8,9 @@
 *.egg-info
 dist
 savs
+out
+essf
+catalogues
 build
 eggs
 parts
