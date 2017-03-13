@@ -22,8 +22,8 @@ def get_agetables(args,options):
     _download_file_vizier(cat, out, catalogname=tab2name)
     subprocess.call(['gunzip', os.path.join(out,tab2name)])
     ztab2name = 'table2.dat'
-    tab1_colnames = '2MASS, Teff, Logg, [M/H], [C/M], [N/M], Massin, e_Massin, Massout, Age_in, e_Agein, E_Agein, Age_out'
-    tab2_colnames = '2MASS, Teff, Logg, [M/H], [C/M], [N/M], Massout, Age'
+    tab1_colnames = '2MASS_ID, Teff, Logg, [M/H], [C/M], [N/M], Massin, e_Massin, Massout, Age_in, e_Agein, E_Agein, Age_out'
+    tab2_colnames = '2MASS_ID, Teff, Logg, [M/H], [C/M], [N/M], Massout, Age'
     tab1 = np.genfromtxt(os.path.join(out,tab1name), dtype=None, names=tab1_colnames)
     tab2 = np.genfromtxt(os.path.join(out,ztab2name), dtype=None, names=tab2_colnames)
     hdu1 = fits.BinTableHDU.from_columns(tab1)
