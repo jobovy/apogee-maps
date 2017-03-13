@@ -7,10 +7,11 @@
 *.egg
 *.egg-info
 dist
-savs
-out
-essf
-catalogues
+savs/*
+out/*
+essf/*
+catalogues/*
+.ipynb_checkpoints
 build
 eggs
 parts

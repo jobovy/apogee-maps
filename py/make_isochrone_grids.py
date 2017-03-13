@@ -4,6 +4,7 @@ import isodist
 import os
 import glob
 import pickle
+from tqdm import tqdm
 
 ISO_PATH = os.getenv('ISODIST_DATA')
 
@@ -19,15 +20,15 @@ Zs = isochrone.Zs()
 #Generate isochrone grid
 def isochrone_grid(logages, Zs, imf):
 	grid = []
-	for lage in logages:
+	for lage in tqdm(range(len(logages))):
 		for met in Zs:
-			print 'generating grid entry for Age='+str(round((10**lage)/1e9,1))+'Gyr and Fe/H='+str(round(isodist.Z2FEH(met),2))+'...'
-			iso = isochrone(lage, Z=met)
+			#print 'generating grid entry for Age='+str(round((10**lage)/1e9,1))+'Gyr and Fe/H='+str(round(isodist.Z2FEH(met),2))+'...'
+			iso = isochrone(logages[lage], Z=met)
 			H_iso = iso['H'][1:]
 			M_iso = iso['M_ini'][1:]
 			logg_iso = iso['logg'][1:]
 			J_K_iso = iso['J'][1:]-iso['Ks'][1:]
-			lage_iso = np.ones(len(iso['H'][1:]))*lage-9
+			lage_iso = np.ones(len(iso['H'][1:]))*logages[lage]-9
 			met_iso = np.ones(len(iso['H'][1:]))*met
 			m_weights = (imf(iso['M_ini'][1:], int=True)-imf(iso['M_ini'][:-1], int=True))
 			entry = np.dstack((lage_iso, met_iso, M_iso, logg_iso, H_iso, J_K_iso, m_weights))[0]

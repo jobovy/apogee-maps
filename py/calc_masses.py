@@ -20,7 +20,8 @@ def load_isochrones(gridfile):
 def calc_normalisation(params, nbin, iso_grid,
                        fehbin=[-0.1,0.0], 
                        agebin=[1.,3.], 
-                       loggcut=[1.8,3.0], 
+                       loggcut=[1.8,3.0],
+                       teffcut=[4000,5000], 
                        type='brokenexpflare',
                        verbose=True,
                        fitIndx=None,
@@ -29,7 +30,10 @@ def calc_normalisation(params, nbin, iso_grid,
                        lowermass = None):
     #first get the values necessary from the isochrone grid
     #make a mask for giant stars (+ J-K cut)
-    giants = (iso_grid[:,3] >= loggcut[0])&(iso_grid[:,3] < loggcut[1])&(iso_grid[:,5] > 0.5)
+    if teffcut == None:
+        giants = (iso_grid[:,3] >= loggcut[0])&(iso_grid[:,3] < loggcut[1])&(iso_grid[:,5] > 0.5)
+    else:
+        giants = (iso_grid[:,3] >= loggcut[0])&(iso_grid[:,3] < loggcut[1])&(iso_grid[:,5] > 0.5)&(10**iso_grid[:,7] >= teffcut[0])&(10**iso_grid[:,7] < teffcut[1])
     #make a mask for the age and feh bin
     if agebin == None:
     	bin = (10**iso_grid[:,0] >= 0.)&(10**iso_grid[:,0] < 13.)&\
@@ -129,11 +133,10 @@ def calc_normalisation(params, nbin, iso_grid,
                                     degree=True)
         Rphiz= bovy_coords.XYZ_to_galcencyl(XYZ[:,0],XYZ[:,1],XYZ[:,2],
                                             Xsun=define_rgbsample._R0,
-                                            Ysun=0.,
                                             Zsun=define_rgbsample._Z0)
-        Rgrid.append(Rphiz[0])
-        phigrid.append(Rphiz[1])
-        zgrid.append(Rphiz[2])
+        Rgrid.append(Rphiz[:,0])
+        phigrid.append(Rphiz[:,1])
+        zgrid.append(Rphiz[:,2])
     Rgrid= numpy.array(Rgrid)
     phigrid= numpy.array(phigrid)
     zgrid= numpy.array(zgrid)
@@ -153,7 +156,9 @@ def calc_normalisation(params, nbin, iso_grid,
     return bin_mass, norm, m_ratio, (av_mass*1e-6*(180/np.pi)**2)/(sumrate*m_ratio)
 
 def calculate_bin_error(samples, fehbin, agebin, nbin, iso_grid, 
-						type='brokenexpflare', 
+						type='brokenexpflare',
+						loggcut=[1.8,3.0],
+						teffcut=[4000,5000], 
 						n_sampling=1000, 
 						progress=True, 
 						mp=True, 
@@ -167,10 +172,10 @@ def calculate_bin_error(samples, fehbin, agebin, nbin, iso_grid,
         for ii,params in enumerate(randsamples):
             if progress==True:
                 print ''+str(round(float(ii)/float(n_sampling)*100,2))+'% complete!'
-            m = calc_normalisation(params, nbin , iso_grid, fehbin = fehbin, agebin=agebin, type=type, verbose=False, fitIndx=fitIndx, gridfile=gridfile, weights=weights, distance_cut = distance_cut, lowermass=lowermass)[0]
+            m = calc_normalisation(params, nbin , iso_grid, fehbin = fehbin, agebin=agebin, loggcut=loggcut, teffcut=teffcut, type=type, verbose=False, fitIndx=fitIndx, gridfile=gridfile, weights=weights, distance_cut = distance_cut, lowermass=lowermass)[0]
             m_sample[ii] = m
     if mp == True:
-         m_sample= multi.parallel_map((lambda x: calc_normalisation(randsamples[x], nbin, iso_grid, fehbin=fehbin, agebin=agebin, type=type, verbose=False, fitIndx=fitIndx, distance_cut=distance_cut, lowermass=lowermass)[0]),\
+         m_sample= multi.parallel_map((lambda x: calc_normalisation(randsamples[x], nbin, iso_grid, fehbin=fehbin, agebin=agebin,loggcut=loggcut, teffcut=teffcut, type=type, verbose=False, fitIndx=fitIndx, distance_cut=distance_cut, lowermass=lowermass)[0]),\
          								range(np.shape(randsamples)[0]),numcores=numpy.amin([np.shape(randsamples)[0], multiprocessing.cpu_count()/2]))
     median = np.percentile(m_sample, 50)
     lowerr = np.percentile(m_sample, 16)

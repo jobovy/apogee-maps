@@ -83,13 +83,13 @@ def get_rgbsample(loggcut = [1.8, 3.0],
                                 data['GLAT'],
                                 data['MH50_DIST'],
                                 degree=True)
-	R,phi,Z= bovy_coords.XYZ_to_galcencyl(XYZ[:,0],
+	RphiZ= bovy_coords.XYZ_to_galcencyl(XYZ[:,0],
                                           XYZ[:,1],
                                           XYZ[:,2],
                                           Xsun=8.,Zsun=0.025)
-	data['MH50_GALR']= R
-	data['MH50_GALPHI']= phi
-	data['MH50_GALZ']= Z
+	data['MH50_GALR']= RphiZ[:,0]
+	data['MH50_GALPHI']= RphiZ[:,1]
+	data['MH50_GALZ']= RphiZ[:,2]
 	data['M_J'] = data['J0']-data['HAYDEN_DISTMOD_50']
 	data['M_H'] = data['H0']-data['HAYDEN_DISTMOD_50']
 	data['M_K'] = data['K0']-data['HAYDEN_DISTMOD_50']
@@ -116,7 +116,7 @@ def get_rgbsample(loggcut = [1.8, 3.0],
 		print str(len(data))+' Stars with distance measures (and in good fields...)'
 	if add_ages == True:
 		if agetype == 'Martig':
-			ages = fits.open(catpath+'DR12_martigages.fits')[1].data
+			ages = fits.open(catpath+'DR12_martigages_vizier.fits')[1].data
 			idtag = '2MASS_ID'
 		if agetype == 'Cannon':
 			ages = fits.open(catpath+'RGB_Cannon_Ages.fits')[1].data
@@ -131,7 +131,8 @@ def get_rgbsample(loggcut = [1.8, 3.0],
 		if verbose == True:
 			print str(len(data))+' Stars with ages'
 	if apply_corrections == True:
-		martig1 = np.genfromtxt(catpath+'martig2016_table1.txt', dtype=None, names=True, skip_header=2)
+		#martig1 = np.genfromtxt(catpath+'martig2016_table1.txt', dtype=None, names=True, skip_header=2)
+		martig1 = fits.open(catpath+'martig_table1.fits')
 		fit = lowess(np.log10(martig1['Age_out']),np.log10(martig1['Age_in']))
 		xs = np.linspace(-0.3,1.2,100)
 		xsinterpolate = interp1d(xs,xs)

@@ -375,11 +375,10 @@ def _setup_effvol(locations,effsel,distmods):
                                     degree=True)
         Rphiz= bovy_coords.XYZ_to_galcencyl(XYZ[:,0],XYZ[:,1],XYZ[:,2],
                                             Xsun=define_rcsample._R0,
-                                            Ysun=0.,
                                             Zsun=define_rcsample._Z0)
-        Rgrid.append(Rphiz[0])
-        phigrid.append(Rphiz[1])
-        zgrid.append(Rphiz[2])
+        Rgrid.append(Rphiz[:,0])
+        phigrid.append(Rphiz[:,1])
+        zgrid.append(Rphiz[:,2])
     Rgrid= numpy.array(Rgrid)
     phigrid= numpy.array(phigrid)
     zgrid= numpy.array(zgrid)
