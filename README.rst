@@ -14,6 +14,8 @@ though).
 
 The code for "The age-metallicity structure of the Milky Way disk" Mackereth, Bovy, Schiavon et al. (2017), is also provided for completeness, as this paper made very similar analysis, and used an augmented version of the code for the above papers. The same disclaimers in terms of run-time should be adopted for this code, which is also provided for illustration only.
 
+.. contents::
+
 Prerequisites
 --------------
 
