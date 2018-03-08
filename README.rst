@@ -12,6 +12,10 @@ code runs for quite a long time and no guidance is given here as to
 how long each command takes (none of it takes *ridiculously* long
 though).
 
+The code for "The age-metallicity structure of the Milky Way disk" `Mackereth, Bovy, Schiavon et al. (2017) <https://arxiv.org/abs/1706.00018>`__, is also provided for completeness, as this paper made very similar analysis, and used an augmented version of the code for the above papers. The same disclaimers in terms of run-time should be adopted for this code, which is also provided for illustration only.
+
+.. contents::
+
 Prerequisites
 --------------
 
@@ -192,3 +196,42 @@ and similar for other locations (like 4240). Figure 6::
     python plot_effsel_location.py 4240 ./effsel_4240.ps 
 
 also similar for other locations.
+
+
+The age-metallicity structure of the Milky Way disk
+-----------------------------------------------------------------
+
+The following section concerns the adaptations made to the code above for the Mackereth et al. (2017) paper. Most of the additions were made in order to allow the use of the code with the full APOGEE red giant branch (RGB) sample, which has a larger sample with measured ages, and for which the selection function is more easily applied to the stellar evolution models (for calculating the surface-mass density contributions of populations).
+
+There are quite a few extra requirements necessary to reproduce the results which make up this paper, the main ones being the extra data tables (with DR12 RGB distances, and the ages from Martig et al. 2016), and the PARSEC isochrones - implemented via the `isodist <https://github.com/jobovy/isodist>`__ python package.
+
+To get hold of the DR12 distances, which have not yet been made publicly available, you need to have access to the SDSS SAS (SDSS collaborators only) and the file at `this link <https://data.sdss.org/sas/apogeework/apogee/sandbox/Distance_VAC/dr12/DR12_DIST_R-GC.fits>`__. You should place this file in ../catalogues . If you dont have access to that catalogue, you could download the (publicly available) DR14 distance VAC `here <https://dr14.sdss.org/sas/dr14/apogee/vac/apogee-distances/apogee_distances-DR14.fits>`__, which can be cross-matched with the DR12 catalogue to get distance estimates. This would, however, require some tweaks to the existing code where the distance catalogue is used. 
+
+The age catalogues can be obtained from vizier via ftp by running::
+
+    python get_agetables.py ../catalogues
+	
+which will download and convert the tables into the required format.
+
+You will then need to run the code which extracts and calculates the weights for the PARSEC isochrones (first installing the `isodist <https://github.com/jobovy/isodist>`__ package), by simply running::
+
+    python make_isochrone_grids.py
+    
+This can take quite some time due to the large number of nodes in the grid...
+
+Yet another prerequisite for these results is to re-calculate the effective selection function for the RGB sample. This requires a sampling of the $M_{\mathrm{H}}$ distribution, which is implemented using the isochrone grid(s) calculated above. 
+
+This is run by calling::
+
+	python calc_effsel_monoage.py --dmap=marshall06 
+	python calc_effsel_monoage.py --dmap=green15
+	
+These scripts will also calculate the raw APOGEE selection function if this file does not exist (i.e. if you havent run the code for the previous papers). These can take quite some time to run depending on your system. You have now calculated all the required files to start performing the calculations which make up the bulk of results in the paper using these scripts::
+
+	python fit_monoage.py
+	python mass_script.py
+
+These will perform the density fits to the mono-age mono-$\mathrm{[Fe/H]}$ populations (including MCMC explorations), and then calculate their surface-mass density contributions (again using the precalculated isochrone grids). Again, these scripts are pretty time consuming depending on your system, but not prohibitively so. Results are saved into files in the ../out folder.
+
+The plots for the paper can then be produced by running the code in the `apogee-monoage <https://github.com/jmackereth/apogee-maps/blob/master/py/apogee-monoage.ipynb>`__ iPy notebook.
+

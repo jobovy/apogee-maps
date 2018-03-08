@@ -16,7 +16,8 @@ def fitDens(data,
             mcmc=False,nsamples=10000,
             verbose=True,
             init=None,
-            retMaxL=False):
+            retMaxL=False,
+            pos_keys = ['RC_GALR_H', 'RC_GALPHI_H', 'RC_GALZ_H']):
     """
     NAME:
        fitDens
@@ -33,21 +34,23 @@ def fitDens(data,
        verbose= (True) set this to False for no optimize convergence messages
        init= (None) if set, these are the initial conditions
        retMaxL= (False) if True, return the maximum likelihood
+       pos_keys = the keys in the data table to R, phi and Z
     OUTPUT:
        (best-fit, samples, maximum-likelihood) based on options
     HISTORY:
        2015-03-24 - Written - Bovy (IAS)
+       2017-03-04 - added pos_keys kwarg - Mackereth (ARI)
     """
     # Setup the density function and its initial parameters
     densfunc= _setup_densfunc(type)
     if init is None:
-        init= _setup_initparams_densfunc(type,data)
+        init= _setup_initparams_densfunc(type,data, pos_keys = pos_keys)
     # Setup the integration of the effective volume
     effsel, Rgrid, phigrid, zgrid= _setup_effvol(locations,effsel,distmods)
     # Get the data's R,phi,z
-    dataR= data['RC_GALR_H']
-    dataphi= data['RC_GALPHI_H']
-    dataz= data['RC_GALZ_H']
+    dataR= data[pos_keys[0]]
+    dataphi= data[pos_keys[1]]
+    dataz= data[pos_keys[2]]
     # Optimize
     out= optimize.fmin(lambda x: _mloglike(x,densfunc,type,
                                            dataR,dataphi,dataz,
@@ -173,7 +176,7 @@ def _setup_densfunc(type):
         return densprofiles.tribrokenexplinflaredisk
     elif type.lower() == 'tribrokenexpinvlinflare':
         return densprofiles.tribrokenexpinvlinflaredisk
-def _setup_initparams_densfunc(type,data):
+def _setup_initparams_densfunc(type,data, pos_keys=['RC_GALR_H', 'RC_GALPHI_H', 'RC_GALZ_H']):
     """Return the initial parameters of the density for this type, might depend on the data"""
     if type.lower() == 'exp':
         return [1./3.,1./0.3]
@@ -182,27 +185,27 @@ def _setup_initparams_densfunc(type,data):
     elif type.lower() == 'twoexp':
         return [1./3.,1./0.3,1./4.,1./0.5,densprofiles.logit(0.5)]
     elif type.lower() == 'brokenexp':
-        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H']))]
+        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data[pos_keys[0]]))]
     elif type.lower() == 'tribrokenexp':
-        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H']))]
+        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data[pos_keys[0]]))]
     elif type.lower() == 'symbrokenexp':
         return [0.4,1./0.3,numpy.log(10.)]
     elif type.lower() == 'brokenexpflare':
-        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data[pos_keys[0]])),
                  -1./5.]
     elif type.lower() == 'tribrokenexpflare':
-        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data[pos_keys[0]])),
                  -1./5.]
     elif type.lower() == 'tribrokenexpfixedflare':
-        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H']))]
+        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data[pos_keys[0]]))]
     elif type.lower() == 'brokentwoexp':
-        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data[pos_keys[0]])),
                  densprofiles.logit(0.5),1./0.8]
     elif type.lower() == 'brokentwoexpflare':
-        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+        return [-1./3.,1./0.3,1./3.,numpy.log(numpy.median(data[pos_keys[0]])),
                  densprofiles.logit(0.5),1./0.8,-0.2]
     elif type.lower() == 'tribrokentwoexp':
-        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data[pos_keys[0]])),
                  densprofiles.logit(0.5),1./0.8]
     elif type.lower() == 'gaussexp':
         return [1./3.,1./0.3,numpy.log(10.)]
@@ -213,10 +216,10 @@ def _setup_initparams_densfunc(type,data):
     elif type.lower() == 'brokenexpfixedspiral':
         return [1./6.,1./0.3,1./2.,numpy.log(14.),numpy.log(1.)]
     elif type.lower() == 'tribrokenexplinflare':
-        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data[pos_keys[0]])),
                 0.]
     elif type.lower() == 'tribrokenexpinvlinflare':
-        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data['RC_GALR_H'])),
+        return [1./3.,1./0.3,1./3.,numpy.log(numpy.median(data[pos_keys[0]])),
                 -1./5.]
 def _check_range_params_densfunc(params,type):
     """Check that the current parameters are in a reasonable range (prior)"""
@@ -372,11 +375,10 @@ def _setup_effvol(locations,effsel,distmods):
                                     degree=True)
         Rphiz= bovy_coords.XYZ_to_galcencyl(XYZ[:,0],XYZ[:,1],XYZ[:,2],
                                             Xsun=define_rcsample._R0,
-                                            Ysun=0.,
                                             Zsun=define_rcsample._Z0)
-        Rgrid.append(Rphiz[0])
-        phigrid.append(Rphiz[1])
-        zgrid.append(Rphiz[2])
+        Rgrid.append(Rphiz[:,0])
+        phigrid.append(Rphiz[:,1])
+        zgrid.append(Rphiz[:,2])
     Rgrid= numpy.array(Rgrid)
     phigrid= numpy.array(phigrid)
     zgrid= numpy.array(zgrid)

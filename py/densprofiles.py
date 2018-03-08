@@ -247,7 +247,7 @@ def symbrokenexpdisk(R,phi,z,glon=False,
 
 @scalarDecorator
 @glonDecorator
-def brokenexpflaredisk(R,phi,z,glon=False,
+def brokenexpflaredisk(R,phi,z,glon=False,surfdens=False,
                        params=[1./3.,1./0.3,1./4.,numpy.log(10.),1./5.]):
     """
     NAME:
@@ -271,7 +271,10 @@ def brokenexpflaredisk(R,phi,z,glon=False,
     out[R <= Rb]= numpy.exp(-params[0]*(sR-_R0))
     out[R > Rb]= numpy.exp(-params[2]*(bR-_R0))\
         *numpy.exp(params[2]*(Rb-_R0)-params[0]*(Rb-_R0))
-    return numpy.fabs(tinvhz)/2.*out*numpy.exp(-tinvhz*numpy.fabs(z))
+    if surfdens == True:
+    	return out
+    else:
+    	return numpy.fabs(tinvhz)/2.*out*numpy.exp(-tinvhz*numpy.fabs(z))
 
 @scalarDecorator
 @glonDecorator
